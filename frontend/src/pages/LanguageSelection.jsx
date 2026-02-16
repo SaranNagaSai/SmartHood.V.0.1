@@ -1,9 +1,10 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
+import smartHoodLogo from '../assets/images/Smart Hood Logo.png';
 
 const LanguageSelection = () => {
-    const { setLanguage } = useLanguage();
+    const { t, setLanguage } = useLanguage();
     const navigate = useNavigate();
 
     const handleSelect = (lang) => {
