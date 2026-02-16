@@ -49,7 +49,6 @@ const Profile = () => {
                 setUser(data);
                 setEditData(data);
                 // Also update localStorage to keep it in sync
-                const token = localStorage.getItem('token');
                 localStorage.setItem('user', JSON.stringify({ ...data, token }));
             } catch (err) {
                 console.error('Failed to fetch profile', err);

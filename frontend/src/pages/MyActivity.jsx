@@ -6,6 +6,7 @@ import {
     Briefcase, Award, Star, Clock, BarChart3,
     ArrowUpRight, ArrowDownRight, Calendar, Bell
 } from 'lucide-react';
+import { API_URL } from '../utils/apiConfig';
 import Loader from '../components/common/Loader';
 
 const MyActivity = () => {
@@ -31,7 +32,7 @@ const MyActivity = () => {
     const fetchActivity = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('/api/users/activity', {
+            const res = await fetch(`${API_URL}/users/activity`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -44,7 +45,7 @@ const MyActivity = () => {
     const fetchActiveServices = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('/api/services/my', {
+            const res = await fetch(`${API_URL}/services/my`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -59,7 +60,7 @@ const MyActivity = () => {
     const fetchMyAlerts = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('/api/alerts/my', {
+            const res = await fetch(`${API_URL}/alerts/my`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { requestForToken, onMessageListener } from '../config/firebase';
+import { API_URL } from '../utils/apiConfig';
 
 const useNotifications = () => {
     useEffect(() => {
@@ -10,7 +11,7 @@ const useNotifications = () => {
                 const authToken = localStorage.getItem('token');
 
                 if (token && user && authToken) {
-                    await fetch('/api/users/fcm-token', {
+                    await fetch(`${API_URL}/users/fcm-token`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
