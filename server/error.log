@@ -1,0 +1,22 @@
+{"level":"error","message":"Error broadcasting emergency to topic Gandhi Nagar: Malformed topic name","timestamp":"2026-01-28T06:53:49.292Z"}
+{"level":"error","message":"Error in markAsRead: Cast to ObjectId failed for value \"3\" (type string) at path \"_id\" for model \"Notification\"","timestamp":"2026-01-28T06:55:53.802Z"}
+{"level":"error","message":"Error in markAsRead: Cast to ObjectId failed for value \"3\" (type string) at path \"_id\" for model \"Notification\"","timestamp":"2026-01-28T06:55:55.078Z"}
+{"level":"error","message":"Error in getServices: getaddrinfo ENOTFOUND ac-imy0xvq-shard-00-01.ak4hxrn.mongodb.net","timestamp":"2026-01-29T04:39:56.747Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:02:28.759Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:02:28.893Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:02:33.877Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:02:33.959Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:06:48.690Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:06:48.815Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:06:52.148Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:06:52.250Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:07:22.927Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:07:23.031Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:24:30.239Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:24:30.413Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:26:35.237Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:26:35.656Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:30:48.064Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:30:48.204Z"}
+{"level":"error","message":"Not Found - /api/locations/states - GET /api/locations/states - ::1","timestamp":"2026-01-30T08:14:48.578Z"}
+{"level":"error","message":"Not Found - /api/locations/states - GET /api/locations/states - ::1","timestamp":"2026-01-30T08:14:48.587Z"}

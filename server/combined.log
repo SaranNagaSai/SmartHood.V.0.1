@@ -1,0 +1,59 @@
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T06:29:51.413Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T06:38:48.007Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T06:43:26.838Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T06:43:48.917Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T06:49:23.645Z"}
+{"level":"error","message":"Error broadcasting emergency to topic Gandhi Nagar: Malformed topic name","timestamp":"2026-01-28T06:53:49.292Z"}
+{"level":"error","message":"Error in markAsRead: Cast to ObjectId failed for value \"3\" (type string) at path \"_id\" for model \"Notification\"","timestamp":"2026-01-28T06:55:53.802Z"}
+{"level":"error","message":"Error in markAsRead: Cast to ObjectId failed for value \"3\" (type string) at path \"_id\" for model \"Notification\"","timestamp":"2026-01-28T06:55:55.078Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T07:02:48.295Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T07:03:03.192Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T08:25:26.171Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T08:27:38.680Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-28T09:08:19.180Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:18:15.067Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:25:35.156Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:25:37.852Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:25:40.115Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:36:38.849Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:36:44.757Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:36:46.636Z"}
+{"level":"error","message":"Error in getServices: getaddrinfo ENOTFOUND ac-imy0xvq-shard-00-01.ak4hxrn.mongodb.net","timestamp":"2026-01-29T04:39:56.747Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:57:03.718Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T04:57:08.533Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T05:37:58.268Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:28:22.177Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:47:02.078Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:47:27.867Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:53:02.358Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:53:28.222Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:54:08.949Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:58:05.091Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:58:09.541Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T06:58:27.854Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T07:08:25.858Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T08:41:01.235Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T08:58:55.146Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T09:00:54.506Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T10:00:18.584Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:02:28.759Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:02:28.893Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:02:33.877Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:02:33.959Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:06:48.690Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:06:48.815Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:06:52.148Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:06:52.250Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:07:22.927Z"}
+{"level":"error","message":"Error in getServices: Cannot read properties of null (reading 'locality')","timestamp":"2026-01-29T10:07:23.031Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:24:30.239Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:24:30.413Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:26:35.237Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:26:35.656Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:30:48.064Z"}
+{"level":"error","message":"Error in getNotifications: Cannot read properties of null (reading '_id')","timestamp":"2026-01-29T10:30:48.204Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-29T11:01:18.353Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-30T08:05:06.439Z"}
+{"level":"error","message":"Not Found - /api/locations/states - GET /api/locations/states - ::1","timestamp":"2026-01-30T08:14:48.578Z"}
+{"level":"error","message":"Not Found - /api/locations/states - GET /api/locations/states - ::1","timestamp":"2026-01-30T08:14:48.587Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-01-30T08:35:28.304Z"}

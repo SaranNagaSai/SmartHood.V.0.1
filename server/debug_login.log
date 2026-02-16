@@ -1,0 +1,121 @@
+[2026-02-04T04:18:51.547Z] Login Attempt - Name: "GPF46", Phone: "6303510070"
+[MATCH CHECK] User Found: Name="S. Poojith", UniqueID="GPF46"
+[SUCCESS] Login Successful for S. Poojith
+[2026-02-04T04:59:17.488Z] Login Attempt - Name: "Srinivas Bhargav", Phone: "7659046629"
+[MATCH CHECK] User Found: Name="Srinivas Bhargav", UniqueID="NLE59"
+[SUCCESS] Login Successful for Srinivas Bhargav
+[2026-02-04T05:03:46.950Z] Login Attempt - Name: "T. Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[2026-02-04T05:03:47.028Z] Name/ID Mismatch - Input: "t. saran naga sai" vs DB Name: "thiriveedhi saran naga sai" / DB ID: "xga74"
+[2026-02-04T05:03:57.447Z] Login Attempt - Name: "Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[2026-02-04T05:03:57.502Z] Name/ID Mismatch - Input: "saran naga sai" vs DB Name: "thiriveedhi saran naga sai" / DB ID: "xga74"
+[2026-02-04T05:04:18.286Z] Login Attempt - Name: "Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[2026-02-04T05:04:18.341Z] Name/ID Mismatch - Input: "saran naga sai" vs DB Name: "thiriveedhi saran naga sai" / DB ID: "xga74"
+[2026-02-04T05:06:09.331Z] Login Attempt - Name: "Seemakurthi Srinivas", Phone: "9398154788"
+[2026-02-04T05:06:09.380Z] Phone Mismatch - Input Phone: "9398154788" not found in DB
+[2026-02-04T05:06:21.074Z] Login Attempt - Name: "Seemakurthi Srinivas", Phone: "9398157488"
+[MATCH CHECK] User Found: Name="Seemakurthi Srinivas", UniqueID="DGS82"
+[SUCCESS] Login Successful for Seemakurthi Srinivas
+[2026-02-04T05:25:02.743Z] Login Attempt - Name: "IGK74", Phone: "7842270892"
+[MATCH CHECK] User Found: Name="Rabiya Basreen", UniqueID="IGK74"
+[SUCCESS] Login Successful for Rabiya Basreen
+[2026-02-04T05:37:23.576Z] Login Attempt - Name: "K.Bhaskar Ram", Phone: "9014330954"
+[MATCH CHECK] User Found: Name="k.Bhaskar Ram", UniqueID="UBI11"
+[SUCCESS] Login Successful for k.Bhaskar Ram
+[2026-02-04T07:23:55.385Z] Login Attempt - Name: "R. Sai Vijay", Phone: "7815831514"
+[MATCH CHECK] User Found: Name="R. Sai Vijay", UniqueID="RTR78"
+[SUCCESS] Login Successful for R. Sai Vijay
+[2026-02-04T07:55:08.161Z] Login Attempt - Name: "Srinivas Bhargav", Phone: "7659046629"
+[MATCH CHECK] User Found: Name="Srinivas Bhargav", UniqueID="NLE59"
+[SUCCESS] Login Successful for Srinivas Bhargav
+[2026-02-04T08:11:26.523Z] Login Attempt - Name: "K. Bhaskar Ram", Phone: "9014330954"
+[MATCH CHECK] User Found: Name="k.Bhaskar Ram", UniqueID="UBI11"
+[2026-02-04T08:11:26.613Z] Name/ID Mismatch - Input: "k. bhaskar ram" vs DB Name: "k.bhaskar ram" / DB ID: "ubi11"
+[2026-02-04T08:12:05.796Z] Login Attempt - Name: "UBI11", Phone: "9014330954"
+[MATCH CHECK] User Found: Name="k.Bhaskar Ram", UniqueID="UBI11"
+[SUCCESS] Login Successful for k.Bhaskar Ram
+[2026-02-05T06:48:18.668Z] Login Attempt - Name: "T.Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[2026-02-05T06:48:18.794Z] Name/ID Mismatch - Input: "t.saran naga sai" vs DB Name: "thiriveedhi saran naga sai" / DB ID: "xga74"
+[2026-02-05T06:49:05.801Z] Login Attempt - Name: "K.Bhaskar Ram", Phone: "9014330954"
+[MATCH CHECK] User Found: Name="k.Bhaskar Ram", UniqueID="UBI11"
+[SUCCESS] Login Successful for k.Bhaskar Ram
+[2026-02-05T06:49:41.825Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-07T03:49:13.572Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-07T04:07:18.126Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-07T10:02:48.166Z] Login Attempt - Name: "FXV97", Phone: "9959815367"
+[MATCH CHECK] User Found: Name="M. Revanth", UniqueID="FXV97"
+[SUCCESS] Login Successful for M. Revanth
+[2026-02-07T10:14:47.338Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[2026-02-07T10:14:47.350Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[2026-02-07T10:14:48.319Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[2026-02-07T10:14:49.904Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[ERROR] Server Error: getaddrinfo ENOTFOUND ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+[ERROR] Server Error: getaddrinfo ENOTFOUND ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+[ERROR] Server Error: getaddrinfo ENOTFOUND ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+[ERROR] Server Error: getaddrinfo ENOTFOUND ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+[2026-02-07T10:15:26.826Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[2026-02-07T10:15:27.954Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[2026-02-07T10:15:28.691Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[2026-02-07T10:15:28.916Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-09T07:46:11.936Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-12T07:15:09.789Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-12T08:29:36.341Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-12T09:22:21.021Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-12T10:39:45.535Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-12T10:53:09.099Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-13T10:39:53.134Z] Login Attempt - Name: "AQU11", Phone: "7386916939"
+[MATCH CHECK] User Found: Name="A.chandrakala", UniqueID="AQU11"
+[SUCCESS] Login Successful for A.chandrakala
+[2026-02-13T10:42:09.831Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-14T13:46:41.481Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-15T06:11:49.545Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-15T06:23:12.970Z] Login Attempt - Name: "తిరువీధి శరణ్, నాగసాయి.", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[2026-02-15T06:23:13.033Z] Name/ID Mismatch - Input: "తిరువీధి శరణ్, నాగసాయి." vs DB Name: "thiriveedhi saran naga sai" / DB ID: "xga74"
+[2026-02-15T06:23:26.282Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-16T03:57:26.777Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-16T03:57:41.843Z] Login Attempt - Name: "XGA74", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI
+[2026-02-16T03:58:35.183Z] Login Attempt - Name: "Thiriveedhi Saran Naga Sai", Phone: "9398176717"
+[MATCH CHECK] User Found: Name="THIRIVEEDHI SARAN NAGA SAI", UniqueID="XGA74"
+[SUCCESS] Login Successful for THIRIVEEDHI SARAN NAGA SAI

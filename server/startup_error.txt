@@ -1,0 +1,17 @@
+Error: Cannot find module 'winston'
+Require stack:
+- C:\Users\saran\OneDrive\Desktop\SmartHood\server\utils\logger.js
+- C:\Users\saran\OneDrive\Desktop\SmartHood\server\controllers\authController.js
+- C:\Users\saran\OneDrive\Desktop\SmartHood\server\routes\authRoutes.js
+- C:\Users\saran\OneDrive\Desktop\SmartHood\server\app.js
+- C:\Users\saran\OneDrive\Desktop\SmartHood\server\test_startup.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+    at Module.require (node:internal/modules/cjs/loader:1311:12)
+    at require (node:internal/modules/helpers:136:16)
+    at Object.<anonymous> (C:\Users\saran\OneDrive\Desktop\SmartHood\server\utils\logger.js:1:17)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Object..js (node:internal/modules/cjs/loader:1706:10)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)

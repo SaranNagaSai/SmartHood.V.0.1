@@ -1,0 +1,62 @@
+﻿
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\components\forms\EmergencyForm.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\components\forms\ServiceForm.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\context\AuthContext.jsx
+  1:42  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                            no-unused-vars
+  3:14  error  Fast refresh only works when a file only exports components. Move your React context(s) to a separate file  react-refresh/only-export-components
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\context\NotificationContext.jsx
+  6:14  error  Fast refresh only works when a file only exports components. Move your React context(s) to a separate file  react-refresh/only-export-components
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Activity.jsx
+   3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u            no-unused-vars
+  14:12  error  'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Admin.jsx
+   2:10  error  'useTranslation' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  48:18  error  'error' is defined but never used                                                      no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Complaints.jsx
+   3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  39:18  error  'error' is defined but never used                                              no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Emergency.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                        no-unused-vars
+  18:6   warning  React Hook useEffect has a missing dependency: 'fetchEmergencies'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\ExploreCity.jsx
+  10:10  error  'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Home.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                 no-unused-vars
+  21:10  error    'emergencies' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+  22:10  error    'services' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                      no-unused-vars
+  23:10  error    'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                       no-unused-vars
+  30:6   warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\LanguageSelect.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Login.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Profile.jsx
+  43:18  error  'error' is defined but never used  no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Register.jsx
+   3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  15:75  error  'Icon' is defined but never used                                               no-unused-vars
+
+C:\Users\saran\OneDrive\Desktop\SmartHood\frontend\src\pages\Tourism.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+Γ£û 25 problems (23 errors, 2 warnings)
+
