@@ -219,7 +219,7 @@ const Register = () => {
                         </span>
                     </div>
                     {idx < 3 && (
-                        <div className="flex-1 w-16 h-0.5 mx-2 bg-gray-200 relative overflow-hidden rounded-full">
+                        <div className="flex-1 h-0.5 mx-1 md:mx-2 bg-gray-200 relative overflow-hidden rounded-full min-w-[30px] max-w-[60px]">
                             <div className={`absolute top-0 left-0 h-full bg-success transition-all duration-500 ease-out ${s < current ? 'w-full' : 'w-0'}`}></div>
                         </div>
                     )}

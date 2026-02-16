@@ -15,7 +15,7 @@ const LanguageSelection = () => {
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-brand px-6">
             <div className="animate-fade-in text-center mb-12">
                 {/* Logo Placeholder */}
-                <img src="/logo.png" alt="Smart Hood Logo" style={{ width: '1200px', height: '200px' }} className="object-contain mx-auto mb-6 rounded-2xl" />
+                <img src="/logo.png" alt="Smart Hood Logo" className="w-full max-w-[280px] md:max-w-[400px] h-auto object-contain mx-auto mb-6 rounded-2xl" />
                 <h1 className="text-3xl font-bold text-white tracking-wide">Smart Hood</h1>
                 <p className="text-blue-100 mt-2 text-sm tracking-widest uppercase">Hyperlocal Community</p>
             </div>

@@ -51,6 +51,7 @@ body {
   background-color: var(--col-bg);
   color: var(--col-text-primary);
   line-height: 1.5;
+  overflow-x: hidden;
 }
 
 h1,

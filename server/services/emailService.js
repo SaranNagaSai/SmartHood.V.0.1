@@ -2,36 +2,37 @@ const nodemailer = require('nodemailer');
 
 // Create transporter - configure with your email service
 const createTransporter = () => {
-    // Check if using Brevo (Sendinblue)
-    const isBrevo = process.env.EMAIL_HOST?.includes('brevo') || process.env.EMAIL_HOST?.includes('sendinblue') || true; // Default to Brevo for now as per request
+    const isBrevo = process.env.EMAIL_HOST?.includes('brevo') || process.env.EMAIL_HOST?.includes('sendinblue') || true;
+
+    console.log(`[Email] Configuring SMTP: ${process.env.EMAIL_HOST || 'smtp-relay.brevo.com'}:${process.env.EMAIL_PORT || 587} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'})`);
 
     return nodemailer.createTransport({
         host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
-        port: process.env.EMAIL_PORT || 587,
-        secure: false, // true for 465, false for other ports
+        port: parseInt(process.env.EMAIL_PORT) || 465,
+        secure: true, // Port 465 requires secure: true
         auth: {
-            user: process.env.EMAIL_USER, // Your Brevo login email
-            pass: process.env.EMAIL_PASSWORD // Your Brevo API Key
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        },
+        tls: {
+            // Do not fail on invalid certs
+            rejectUnauthorized: false
         }
     });
 };
 
-/**
- * Send an email
- * @param {string} to - Recipient email
- * @param {string} subject - Email subject
- * @param {string} text - Email body (plain text)
- * @param {string} html - Email body (HTML) - optional
- */
 const sendEmail = async (to, subject, text, html = null) => {
     try {
-        // Skip if email credentials not configured
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-            console.log('Email not configured, skipping:', { to, subject });
+            console.error('[Email] ERROR: Credentials not configured in environment variables');
             return { success: false, reason: 'Email not configured' };
         }
 
         const transporter = createTransporter();
+
+        // Verify connection before sending
+        await transporter.verify();
+        console.log('[Email] SMTP Connection Verified');
 
         const mailOptions = {
             from: `"SmartHood" <${process.env.EMAIL_USER}>`,
@@ -63,10 +64,11 @@ const sendEmail = async (to, subject, text, html = null) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.messageId);
+        console.log('[Email] SUCCESS: Message sent to', to, 'MessageId:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        console.error('Email send error:', error);
+        console.error('[Email] FAILED to send email to', to);
+        console.error('[Email] Error Detail:', error);
         return { success: false, error: error.message };
     }
 };
