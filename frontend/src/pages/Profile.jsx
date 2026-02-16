@@ -187,11 +187,11 @@ const Profile = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-8">
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white p-8 rounded-b-[2rem] relative overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white p-6 sm:p-8 rounded-b-[1.5rem] sm:rounded-b-[2rem] relative overflow-hidden">
                 <div className="relative z-10">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
                         <div className="relative group">
-                            <div className="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center text-6xl font-bold backdrop-blur overflow-hidden border-4 border-white/30 shadow-2xl">
+                            <div className="w-28 h-28 sm:w-40 h-40 bg-white/20 rounded-full flex items-center justify-center text-4xl sm:text-6xl font-bold backdrop-blur overflow-hidden border-4 border-white/30 shadow-2xl">
                                 {user.profilePhoto ? (
                                     <img src={`${SERVER_URL}${user.profilePhoto}`} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
@@ -200,19 +200,19 @@ const Profile = () => {
                             </div>
                             <button
                                 onClick={() => setPhotoModalOpen(true)}
-                                className="absolute bottom-0 right-0 bg-white text-[var(--col-primary)] p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                                className="absolute bottom-1 right-1 sm:bottom-0 sm:right-0 bg-white text-[var(--col-primary)] p-2 rounded-full shadow-lg opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
                             >
-                                <Camera size={16} />
+                                <Camera size={14} sm:size={16} />
                             </button>
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-bold">{user.name}</h1>
-                            <div className="flex items-center gap-3 mt-2">
-                                <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-mono">
+                        <div className="text-center sm:text-left">
+                            <h1 className="text-xl sm:text-2xl font-bold">{user.name}</h1>
+                            <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-3 mt-2">
+                                <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] sm:text-sm font-mono">
                                     {user.uniqueId}
                                 </span>
-                                <span className="bg-red-500/80 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                                    <Droplet size={12} /> {user.bloodGroup}
+                                <span className="bg-red-500/80 px-3 py-1 rounded-full text-[10px] sm:text-sm flex items-center gap-1">
+                                    <Droplet size={10} sm:size={12} /> {user.bloodGroup}
                                 </span>
                             </div>
                         </div>
@@ -222,22 +222,22 @@ const Profile = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="px-4 mt-6 mb-6">
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-2xl shadow-lg text-center">
-                        <Award className="mx-auto text-amber-500 mb-1" size={24} />
-                        <p className="text-xl font-bold text-gray-800">{user.impactScore || 0}</p>
-                        <p className="text-xs text-gray-500">Impact Score</p>
+            <div className="px-4 mt-4 sm:mt-6 mb-4 sm:mb-6">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
+                        <Award className="mx-auto text-amber-500 mb-1" size={20} sm:size={24} />
+                        <p className="text-lg sm:text-xl font-bold text-gray-800">{user.impactScore || 0}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">Impact</p>
                     </div>
-                    <div className="bg-white p-4 rounded-2xl shadow-lg text-center">
-                        <TrendingUp className="mx-auto text-green-500 mb-1" size={24} />
-                        <p className="text-xl font-bold text-gray-800">{user.experience || 0}</p>
-                        <p className="text-xs text-gray-500">Years Exp</p>
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
+                        <TrendingUp className="mx-auto text-green-500 mb-1" size={20} sm:size={24} />
+                        <p className="text-lg sm:text-xl font-bold text-gray-800">{user.experience || 0}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">Exp</p>
                     </div>
-                    <div className="bg-white p-4 rounded-2xl shadow-lg text-center">
-                        <DollarSign className="mx-auto text-blue-500 mb-1" size={24} />
-                        <p className="text-xl font-bold text-gray-800">₹{user.revenue || 0}</p>
-                        <p className="text-xs text-gray-500">Revenue</p>
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
+                        <DollarSign className="mx-auto text-blue-500 mb-1" size={20} sm:size={24} />
+                        <p className="text-lg sm:text-xl font-bold text-gray-800">₹{user.revenue || 0}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">Rev</p>
                     </div>
                 </div>
             </div>

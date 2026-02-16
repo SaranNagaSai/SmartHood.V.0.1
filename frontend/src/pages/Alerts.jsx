@@ -153,13 +153,13 @@ const Alerts = () => {
                 )}
 
                 {/* Category Grid - Enhanced */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 px-2 sm:px-0">
                     {categories.map(cat => (
                         <button
                             key={cat.name}
                             onClick={() => { setSelectedCategory(cat.name); setSubType(''); }}
-                            className={`group relative overflow-hidden p-8 rounded-3xl flex flex-col items-center justify-center gap-4 border-2 transition-all duration-500 transform hover:scale-105 ${selectedCategory === cat.name
-                                ? `bg-gradient-to-br ${cat.gradient} text-white shadow-2xl scale-105 border-transparent`
+                            className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-row sm:flex-col items-center sm:justify-center gap-4 border-2 transition-all duration-500 transform hover:scale-105 active:scale-95 ${selectedCategory === cat.name
+                                ? `bg-gradient-to-br ${cat.gradient} text-white shadow-2xl border-transparent`
                                 : 'bg-white border-gray-200 text-gray-600 hover:shadow-xl hover:border-gray-300'
                                 }`}
                         >
@@ -167,21 +167,16 @@ const Alerts = () => {
                             <div className={`absolute inset-0 bg-gradient-to-br ${cat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
 
                             {/* Icon with Animation */}
-                            <div className={`relative z-10 p-4 rounded-2xl ${selectedCategory === cat.name ? 'bg-white/20' : cat.bg} transition-all duration-300 group-hover:rotate-6`}>
-                                <cat.icon size={40} className={selectedCategory === cat.name ? 'text-white' : cat.text} />
+                            <div className={`relative z-10 p-3 sm:p-4 rounded-xl sm:rounded-2xl ${selectedCategory === cat.name ? 'bg-white/20' : cat.bg} transition-all duration-300 group-hover:rotate-6`}>
+                                <cat.icon size={30} className={selectedCategory === cat.name ? 'text-white' : cat.text} />
                             </div>
 
-                            {/* Emoji Badge */}
-                            <div className="absolute top-3 right-3 text-2xl opacity-50 group-hover:opacity-100 transition-opacity">
+                            {/* Emoji Badge - Hidden on small mobile row layout to save space */}
+                            <div className="absolute top-3 right-3 text-2xl opacity-50 group-hover:opacity-100 transition-opacity hidden sm:block">
                                 {cat.emoji}
                             </div>
 
-                            <span className="relative z-10 font-bold text-lg">{cat.label}</span>
-
-                            {/* Selection Indicator */}
-                            {selectedCategory === cat.name && (
-                                <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-white rounded-full animate-pulse"></div>
-                            )}
+                            <span className="relative z-10 font-bold text-base sm:text-lg">{cat.label}</span>
                         </button>
                     ))}
                 </div>

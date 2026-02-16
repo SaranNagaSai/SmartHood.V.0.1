@@ -110,25 +110,25 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-slate-100 pb-24">
             {/* Identity Banner */}
-            <div className="bg-gradient-brand text-white p-8 rounded-b-[2rem] shadow-lg relative overflow-hidden">
-                <div className="relative z-10 flex items-center gap-4">
-                    <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-4xl font-bold overflow-hidden border-4 border-white/30 shadow-2xl flex-shrink-0">
+            <div className="bg-gradient-brand text-white p-6 md:p-8 rounded-b-[1.5rem] md:rounded-b-[2rem] shadow-lg relative overflow-hidden">
+                <div className="relative z-10 flex items-center gap-3 md:gap-4">
+                    <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-3xl md:text-4xl font-bold overflow-hidden border-2 md:border-4 border-white/30 shadow-2xl flex-shrink-0">
                         {user.profilePhoto ? (
                             <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
                         ) : (
                             user.name?.charAt(0).toUpperCase()
                         )}
                     </div>
-                    <div>
-                        <p className="opacity-80 text-sm font-medium tracking-wide uppercase">{t('welcome_back_user')}</p>
-                        <h1 className="text-2xl font-bold">{user.name}</h1>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-xs font-mono tracking-wider flex items-center gap-1">
+                    <div className="flex-1 min-w-0">
+                        <p className="opacity-80 text-[10px] md:text-sm font-medium tracking-wide uppercase truncate">{t('welcome_back_user')}</p>
+                        <h1 className="text-xl md:text-2xl font-bold truncate">{user.name}</h1>
+                        <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mt-1">
+                            <span className="bg-white/20 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] md:text-xs font-mono tracking-wider flex items-center gap-1 whitespace-nowrap">
                                 <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
                                 {user.uniqueId}
                             </span>
-                            <span className="bg-black/20 px-2 py-0.5 rounded text-xs flex items-center gap-1">
-                                <MapPin size={10} /> {user.locality}
+                            <span className="bg-black/20 px-1.5 py-0.5 rounded text-[9px] md:text-xs flex items-center gap-1 whitespace-nowrap">
+                                <MapPin size={8} md:size={10} /> {user.locality}
                             </span>
                         </div>
                     </div>
@@ -211,21 +211,21 @@ const Home = () => {
             <div className="mt-4 px-4">
                 <h2 className="text-lg font-bold text-[var(--col-text-primary)] mb-4">{t('local_professionals')}</h2>
                 {stats.professions.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                         {stats.professions.map((prof, idx) => {
                             const style = getProStyle(prof._id || 'Others');
                             return (
                                 <div
                                     key={idx}
                                     onClick={() => handleProfessionClick(prof._id || 'Others')}
-                                    className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 hover:border-secondary transition-colors group cursor-pointer"
+                                    className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:border-secondary transition-colors group cursor-pointer"
                                 >
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${style.color} group-hover:scale-110 transition-transform`}>
+                                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl ${style.color} group-hover:scale-110 transition-transform`}>
                                         {style.icon}
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="font-bold text-gray-800 text-sm">{prof._id}</h3>
-                                        <span className="text-[10px] font-bold text-gray-400 mt-1 block">{prof.count} {t('pros_nearby')}</span>
+                                        <h3 className="font-bold text-gray-800 text-xs md:text-sm truncate max-w-[100px]">{prof._id}</h3>
+                                        <span className="text-[9px] md:text-[10px] font-bold text-gray-400 mt-0.5 md:mt-1 block">{prof.count} {t('pros_nearby')}</span>
                                     </div>
                                 </div>
                             );

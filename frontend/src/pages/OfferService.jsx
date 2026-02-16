@@ -325,7 +325,7 @@ const OfferService = () => {
                                 </div>
 
                                 {/* Community Cards with Checkboxes */}
-                                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
                                     {localities
                                         .filter(l => l.name?.toLowerCase() !== user?.locality?.toLowerCase())
                                         .map(loc => {
@@ -400,7 +400,7 @@ const OfferService = () => {
                                     {t('no_professions_locality')}
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
                                     {jobTitles.map(p => {
                                         const isSelected = formData.targetProfessions.includes(p.profession);
                                         return (

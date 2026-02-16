@@ -8,8 +8,8 @@ const createTransporter = () => {
 
     return nodemailer.createTransport({
         host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
-        port: parseInt(process.env.EMAIL_PORT) || 465,
-        secure: true, // Port 465 requires secure: true
+        port: parseInt(process.env.EMAIL_PORT) || 587,
+        secure: false, // Port 587 requires secure: false (STARTTLS)
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASSWORD

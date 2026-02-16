@@ -196,30 +196,30 @@ const Register = () => {
 
     // Stepper Component
     const Stepper = ({ current }) => (
-        <div className="flex items-center justify-center mb-8">
+        <div className="flex items-center justify-center mb-8 px-2">
             {[1, 2, 3, 4].map((s, idx) => (
                 <React.Fragment key={s}>
                     <div className="relative flex flex-col items-center z-10">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-500 ${s < current ? 'bg-success text-white shadow-xl shadow-success/30' :
+                        <div className={`w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold transition-all duration-500 ${s < current ? 'bg-success text-white shadow-xl shadow-success/30' :
                             s === current ? 'bg-primary text-white shadow-xl shadow-primary/30 scale-110' :
                                 'bg-gray-100 text-gray-400 border border-gray-200'
                             }`}>
-                            {s < current ? <Check size={20} strokeWidth={3} /> : (
-                                <>
+                            {s < current ? <Check size={16} md:size={20} strokeWidth={3} /> : (
+                                <div className="scale-75 md:scale-100">
                                     {s === 1 && <User size={18} />}
                                     {s === 2 && <MapPin size={18} />}
                                     {s === 3 && <Briefcase size={18} />}
                                     {s === 4 && <Camera size={18} />}
-                                </>
+                                </div>
                             )}
                         </div>
-                        <span className={`text-[10px] uppercase tracking-wider mt-3 font-bold transition-colors ${s === current ? 'text-primary' : 'text-gray-400'
+                        <span className={`text-[8px] md:text-[10px] uppercase tracking-wider mt-2 md:mt-3 font-bold transition-colors ${s === current ? 'text-primary' : 'text-gray-400'
                             }`}>
                             {s === 1 ? t('personal') : s === 2 ? t('location') : s === 3 ? t('work') : t('photo') || 'PHOTO'}
                         </span>
                     </div>
                     {idx < 3 && (
-                        <div className="flex-1 h-0.5 mx-1 md:mx-2 bg-gray-200 relative overflow-hidden rounded-full min-w-[30px] max-w-[60px]">
+                        <div className="flex-1 h-0.5 mx-1 bg-gray-200 relative overflow-hidden rounded-full min-w-[15px] md:min-w-[30px] max-w-[60px]">
                             <div className={`absolute top-0 left-0 h-full bg-success transition-all duration-500 ease-out ${s < current ? 'w-full' : 'w-0'}`}></div>
                         </div>
                     )}
@@ -231,12 +231,12 @@ const Register = () => {
     return (
         <div className="min-h-screen w-full bg-gradient-brand flex flex-col items-center justify-center p-4 relative">
             <div className="w-full max-w-[600px] bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 animate-slide-up relative z-10">
-                <div className="bg-primary/5 p-8 text-center border-b border-primary/10">
-                    <h1 className="text-3xl font-bold text-primary tracking-tight">{t('join_smarthood')}</h1>
-                    <p className="text-gray-500 text-sm mt-2">{t('community_connect')}</p>
+                <div className="bg-primary/5 p-6 md:p-8 text-center border-b border-primary/10">
+                    <h1 className="text-2xl md:text-3xl font-bold text-primary tracking-tight">{t('join_smarthood')}</h1>
+                    <p className="text-gray-500 text-xs md:text-sm mt-2">{t('community_connect')}</p>
                 </div>
 
-                <div className="p-8">
+                <div className="p-5 md:p-8">
                     <Stepper current={step} />
 
                     <form onSubmit={(e) => e.preventDefault()} className="animate-fade-in">
@@ -265,7 +265,7 @@ const Register = () => {
                                         required
                                     />
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <VoiceInput
                                             name="age"
                                             label={t('age') + " *"}
@@ -289,7 +289,7 @@ const Register = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">{t('blood_group')} *</label>
                                             <select
@@ -346,7 +346,7 @@ const Register = () => {
                                         required
                                     />
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <VoiceInput
                                             name="town"
                                             label={t('town_label') + " *"}
@@ -604,15 +604,15 @@ const Register = () => {
                                     )}
 
                                     {/* Controls - Always visible */}
-                                    <div className="flex gap-4 w-full">
+                                    <div className="flex flex-col md:flex-row gap-4 w-full">
                                         <button
                                             onClick={() => setCameraMode(true)}
-                                            className="flex-1 flex flex-col items-center gap-2 p-4 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 hover:bg-blue-100 transition"
+                                            className="flex-1 flex flex-row md:flex-col items-center justify-center gap-3 md:gap-2 p-4 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 hover:bg-blue-100 transition"
                                         >
                                             <Camera size={24} />
                                             <span className="font-bold text-sm">{t('take_photo') || 'Take Photo'}</span>
                                         </button>
-                                        <label className="flex-1 flex flex-col items-center gap-2 p-4 bg-green-50 text-green-600 rounded-xl border border-green-100 hover:bg-green-100 transition cursor-pointer">
+                                        <label className="flex-1 flex flex-row md:flex-col items-center justify-center gap-3 md:gap-2 p-4 bg-green-50 text-green-600 rounded-xl border border-green-100 hover:bg-green-100 transition cursor-pointer">
                                             <Upload size={24} />
                                             <span className="font-bold text-sm">{t('upload_photo') || 'Upload'}</span>
                                             <input

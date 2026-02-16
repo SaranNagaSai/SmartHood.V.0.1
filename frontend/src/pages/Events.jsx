@@ -138,20 +138,20 @@ const Events = () => {
     return (
         <div className="pb-8">
             {/* Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white p-6 rounded-b-[2rem]">
-                <div className="flex items-center justify-between">
+            <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white p-4 sm:p-6 rounded-b-[1.5rem] sm:rounded-b-[2rem]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <Calendar size={24} />
+                        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                            <Calendar size={20} sm:size={24} />
                             {t('community_events')}
                         </h1>
-                        <p className="text-white/70 text-sm mt-1">
+                        <p className="text-white/70 text-xs sm:text-sm mt-1">
                             {events.length} {t('events_locality')}
                         </p>
                     </div>
                     <button
                         onClick={() => setShowCreate(true)}
-                        className="flex items-center gap-1 px-4 py-2 bg-white text-orange-600 rounded-xl font-bold hover:bg-orange-50 transition"
+                        className="flex items-center justify-center gap-1 px-4 py-2.5 bg-white text-orange-600 rounded-xl font-bold hover:bg-orange-50 transition shadow-md w-full sm:w-auto"
                     >
                         <Plus size={18} />
                         {t('create')}
@@ -159,13 +159,13 @@ const Events = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="flex gap-2 mt-4">
+                <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
                     {['upcoming', 'past', 'all'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition ${filter === f
-                                ? 'bg-white text-orange-600'
+                            className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition whitespace-nowrap ${filter === f
+                                ? 'bg-white text-orange-600 shadow-sm'
                                 : 'bg-white/20 text-white'
                                 }`}
                         >

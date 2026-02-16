@@ -13,28 +13,30 @@ const LanguageSelection = () => {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-brand px-6">
-            <div className="animate-fade-in text-center mb-12">
-                {/* Logo Placeholder */}
-                <img src="/logo.png" alt="Smart Hood Logo" className="w-full max-w-[280px] md:max-w-[400px] h-auto object-contain mx-auto mb-6 rounded-2xl" />
-                <h1 className="text-3xl font-bold text-white tracking-wide">Smart Hood</h1>
-                <p className="text-blue-100 mt-2 text-sm tracking-widest uppercase">Hyperlocal Community</p>
+            <div className="text-center mb-6 md:mb-8">
+                <div className="flex flex-col items-center justify-center gap-2 mb-4 md:mb-6">
+                    <img src={smartHoodLogo} alt="SmartHood" className="w-20 h-20 md:w-24 md:h-24 object-contain" />
+                    <h2 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">SmartHood</h2>
+                </div>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">{t('login')}</h1>
+                <p className="text-xs md:text-sm text-gray-500 mt-2 font-medium">{t('welcome_back_msg')}</p>
             </div>
 
-            <div className="space-y-6 w-full max-w-sm animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="space-y-4 md:space-y-6 w-full max-w-sm animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <button
                     onClick={() => handleSelect('English')}
-                    className="w-full bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:transform hover:scale-105 transition-all duration-300 group"
+                    className="w-full bg-white/95 backdrop-blur-sm p-5 md:p-6 rounded-2xl shadow-lg hover:transform hover:scale-105 transition-all duration-300 group"
                 >
-                    <h2 className="text-2xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)]">English</h2>
-                    <p className="text-gray-500 text-sm mt-1">Continue in English</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)]">English</h2>
+                    <p className="text-gray-500 text-xs md:text-sm mt-1">Continue in English</p>
                 </button>
 
                 <button
                     onClick={() => handleSelect('Telugu')}
-                    className="w-full bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:transform hover:scale-105 transition-all duration-300 group"
+                    className="w-full bg-white/95 backdrop-blur-sm p-5 md:p-6 rounded-2xl shadow-lg hover:transform hover:scale-105 transition-all duration-300 group"
                 >
-                    <h2 className="text-2xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)] font-telugu">తెలుగు</h2>
-                    <p className="text-gray-500 text-sm mt-1">తెలుగులో కొనసాగండి</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)] font-telugu">తెలుగు</h2>
+                    <p className="text-gray-500 text-xs md:text-sm mt-1">తెలుగులో కొనసాగండి</p>
                 </button>
             </div>
 

@@ -89,23 +89,23 @@ const MyActivity = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 pb-24">
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-b-[2rem]">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                    <Activity size={24} />
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 sm:p-6 rounded-b-[1.5rem] sm:rounded-b-[2rem]">
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                    <Activity size={20} sm:size={24} />
                     {t('my_activity_dashboard')}
                 </h1>
-                <p className="text-white/70 text-sm mt-1">
+                <p className="text-white/70 text-xs sm:text-sm mt-1">
                     {t('track_impact')}
                 </p>
 
                 {/* Tabs */}
-                <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+                <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition ${activeTab === tab.id
-                                ? 'bg-white text-indigo-600'
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition text-sm sm:text-base ${activeTab === tab.id
+                                ? 'bg-white text-indigo-600 shadow-sm'
                                 : 'bg-white/20 text-white'
                                 }`}
                         >

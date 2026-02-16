@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap');
 
+/* Tailwind Directives - Ignore linter warnings for @tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -52,6 +53,10 @@ body {
   color: var(--col-text-primary);
   line-height: 1.5;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
+  /* Prevents elastic bounce-back on mobile */
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
