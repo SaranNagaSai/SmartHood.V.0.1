@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import { User, MapPin, Briefcase, Check, Camera, Upload, X } from 'lucide-react'
 
 const Register = () => {
     const { t, language } = useLanguage();
+    const { login } = useAuth();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -180,12 +182,11 @@ const Register = () => {
                 formDataToSend.append('profilePhoto', profilePhoto);
             }
 
-            const res = await axios.post(`${API_URL}/auth/register`, formDataToSend, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const res = await axios.post(`${API_URL}/auth/register`, formDataToSend);
 
             alert(`Registration Successful! Your Unique ID: ${res.data.uniqueId}`);
-            navigate('/login');
+            login(res.data, res.data.token);
+            navigate('/home');
         } catch (error) {
             console.error(error);
             alert(error.response?.data?.message || 'Registration Failed');

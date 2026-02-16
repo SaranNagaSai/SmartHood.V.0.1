@@ -161,7 +161,7 @@ const sendWelcomeEmail = async (user) => {
 
                 <!-- CTA Button -->
                 <div style="text-align: center; margin-top: 40px; margin-bottom: 20px;">
-                    <a href="http://localhost:5173/login" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); font-size: 16px;">Login to Your Dashboard &rarr;</a>
+                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); font-size: 16px;">Login to Your Dashboard &rarr;</a>
                 </div>
             </div>
 

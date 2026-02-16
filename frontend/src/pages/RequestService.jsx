@@ -165,8 +165,7 @@ const RequestService = () => {
 
             const response = await axios.post(`${API_URL}/services`, formDataPayload, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
+                    Authorization: `Bearer ${token}`
                 }
             });
 

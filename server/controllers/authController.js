@@ -28,8 +28,22 @@ const registerUser = async (req, res) => {
         const {
             name, phone, age, gender, email, bloodGroup,
             address, locality, town, district, state,
-            professionCategory, professionDetails, experience
+            professionCategory, experience
         } = req.body;
+
+        // Robust parsing for professionDetails (handles flattened bracketed keys from FormData)
+        let professionDetails = req.body.professionDetails || {};
+        if (typeof professionDetails === 'string') {
+            try { professionDetails = JSON.parse(professionDetails); } catch (e) { professionDetails = {}; }
+        }
+
+        // Check for bracketed keys like "professionDetails[jobRole]"
+        Object.keys(req.body).forEach(key => {
+            if (key.startsWith('professionDetails[')) {
+                const subKey = key.match(/\[(.*?)\]/)[1];
+                professionDetails[subKey] = req.body[key];
+            }
+        });
 
         // Check if user exists
         const userExists = await User.findOne({ phone });
@@ -68,9 +82,9 @@ const registerUser = async (req, res) => {
         });
 
         if (user) {
-            // Send Welcome Email if user provided email
+            // Send Welcome Email if user provided email (Non-blocking)
             if (user.email) {
-                await sendWelcomeEmail(user);
+                sendWelcomeEmail(user).catch(err => console.error('Welcome Email Failed:', err));
             }
 
             // Also add an IN-APP welcome notification (skipEmail=true since welcome email already sent above)
