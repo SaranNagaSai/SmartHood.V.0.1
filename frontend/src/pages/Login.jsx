@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -8,14 +9,14 @@ import smartHoodLogo from '../assets/images/Smart Hood Logo.png';
 
 const Login = () => {
     const { t } = useLanguage();
+    const { login } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ name: '', phone: '' });
 
     const handleLogin = async () => {
         try {
             const res = await axios.post(`${API_URL}/auth/login`, formData);
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data));
+            login(res.data, res.data.token);
             navigate('/home');
         } catch (error) {
             alert(error.response?.data?.message || 'Login Failed');
