@@ -79,12 +79,20 @@ const createService = async (req, res) => {
         }
 
         let query = {
-            locality: { $in: allCommunities },
+            locality: {
+                $in: allCommunities.map(loc => new RegExp(`^\\s*${loc.trim()}\\s*$`, 'i'))
+            },
             _id: { $ne: user._id }
         };
 
         if (targetAudience === 'SPECIFIC' && professionArray.length > 0) {
-            query.professionCategory = { $in: professionArray };
+            query.$or = [
+                { professionCategory: { $in: professionArray } },
+                { 'professionDetails.jobRole': { $in: professionArray } },
+                { 'professionDetails.businessType': { $in: professionArray } },
+                { 'professionDetails.course': { $in: professionArray } },
+                { 'professionDetails.description': { $in: professionArray } }
+            ];
         }
 
         const targetUsers = await User.find(query);
@@ -121,22 +129,25 @@ const getServices = async (req, res) => {
         const currentUser = req.user;
         const { type, status } = req.query;
 
+        const localityRegex = new RegExp(`^\\s*${currentUser.locality.trim()}\\s*$`, 'i');
         let query = {
-            // Show services where:
-            // 1. Service is from my locality
-            // 2. OR Service explicitly targets my locality
             $or: [
-                { locality: currentUser.locality },
-                { targetLocalities: currentUser.locality }
+                { locality: { $regex: localityRegex } },
+                { targetLocalities: { $regex: localityRegex } },
+                { selectedCommunities: { $regex: localityRegex } }
             ],
-            // AND audience check
             $and: [
                 {
                     $or: [
                         { targetAudience: { $in: ['ALL', 'all'] } },
                         {
                             targetAudience: { $in: ['SPECIFIC', 'specific'] },
-                            targetProfession: { $in: [currentUser.professionCategory] }
+                            $or: [
+                                { targetProfession: { $in: [currentUser.professionCategory] } },
+                                { targetProfession: { $in: [currentUser.professionDetails?.jobRole] } },
+                                { targetProfession: { $in: [currentUser.professionDetails?.businessType] } },
+                                { targetProfession: { $in: [currentUser.professionDetails?.course] } }
+                            ]
                         }
                     ]
                 }
