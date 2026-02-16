@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../utils/apiConfig';
 import {
     Bell, Check, Trash2, Eye, Filter, RefreshCw,
     AlertTriangle, Briefcase, MessageCircle, Info
@@ -24,7 +25,7 @@ const Notifications = () => {
     const fetchNotifications = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/notifications', {
+            const res = await fetch(`${API_URL}/notifications`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -44,7 +45,7 @@ const Notifications = () => {
 
     const markAsRead = async (id) => {
         try {
-            await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            await fetch(`${API_URL}/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -58,7 +59,7 @@ const Notifications = () => {
 
     const markAllAsRead = async () => {
         try {
-            await fetch('http://localhost:5000/api/notifications/read-all', {
+            await fetch(`${API_URL}/notifications/read-all`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` }
             });

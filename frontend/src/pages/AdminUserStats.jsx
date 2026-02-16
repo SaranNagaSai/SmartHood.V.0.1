@@ -6,6 +6,7 @@ import {
     Activity, Clock, Calendar, BarChart3, PieChart, Star,
     RefreshCw, ChevronRight
 } from 'lucide-react';
+import { API_URL, SERVER_URL } from '../utils/apiConfig';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => `${i}:00`);
@@ -36,7 +37,7 @@ const AdminUserStats = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`http://localhost:5000/api/admin/users/${id}/stats`, {
+            const res = await fetch(`${API_URL}/admin/users/${id}/stats`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const json = await res.json();
@@ -92,7 +93,7 @@ const AdminUserStats = () => {
                     <div className="flex items-center gap-5">
                         <div className="w-32 h-32 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-5xl font-bold overflow-hidden border-2 border-white/30 shadow-xl">
                             {user.profilePhoto ? (
-                                <img src={`http://localhost:5000${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                                <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
                             ) : (
                                 user.name?.charAt(0).toUpperCase()
                             )}

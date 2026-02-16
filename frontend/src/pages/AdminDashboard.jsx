@@ -6,6 +6,7 @@ import {
     ArrowUp, ArrowDown, RefreshCw, LogOut
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { API_URL, SERVER_URL } from '../utils/apiConfig';
 
 const AdminDashboard = () => {
     const { t } = useLanguage();
@@ -44,7 +45,7 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch('http://localhost:5000/api/admin/analytics', {
+            const res = await fetch(`${API_URL}/admin/analytics`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -59,7 +60,7 @@ const AdminDashboard = () => {
         setUserLoading(true);
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch('http://localhost:5000/api/admin/users', {
+            const res = await fetch(`${API_URL}/admin/users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -305,7 +306,7 @@ const AdminDashboard = () => {
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-12 h-12 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold overflow-hidden border border-purple-200">
                                                                 {user.profilePhoto ? (
-                                                                    <img src={`http://localhost:5000${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                                                                    <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
                                                                 ) : (
                                                                     user.name?.charAt(0)
                                                                 )}

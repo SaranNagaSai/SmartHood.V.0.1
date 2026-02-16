@@ -94,6 +94,7 @@ const registerUser = async (req, res) => {
                 town: user.town,
                 district: user.district,
                 state: user.state,
+                profilePhoto: user.profilePhoto,
                 token: generateToken(user._id)
             });
         }
@@ -162,6 +163,7 @@ const loginUser = async (req, res) => {
                 town: user.town,
                 district: user.district,
                 state: user.state,
+                profilePhoto: user.profilePhoto,
                 token: generateToken(user._id)
             });
         } else {

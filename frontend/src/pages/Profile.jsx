@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import Webcam from 'react-webcam';
 import VoiceInput from '../components/common/VoiceInput';
+import { API_URL, SERVER_URL } from '../utils/apiConfig';
 
 const Profile = () => {
     const { t } = useLanguage();
@@ -28,7 +29,6 @@ const Profile = () => {
     // Locality Users State
     const [localityUsers, setLocalityUsers] = useState([]);
     const [loadingLocalityUsers, setLoadingLocalityUsers] = useState(false);
-    const apiBase = 'http://localhost:5000';
 
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('user'));
@@ -42,12 +42,15 @@ const Profile = () => {
         // Fetch full profile from API
         const fetchProfile = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/users/profile', {
+                const res = await fetch(`${API_URL}/users/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await res.json();
                 setUser(data);
                 setEditData(data);
+                // Also update localStorage to keep it in sync
+                const token = localStorage.getItem('token');
+                localStorage.setItem('user', JSON.stringify({ ...data, token }));
             } catch (err) {
                 console.error('Failed to fetch profile', err);
                 setUser(userData);
@@ -64,7 +67,7 @@ const Profile = () => {
             setLoadingLocalityUsers(true);
             const token = localStorage.getItem('token');
             // Fetch users from the same locality and town
-            const res = await fetch(`${apiBase}/api/users/locality/${encodeURIComponent(locality)}?town=${encodeURIComponent(town)}`, {
+            const res = await fetch(`${API_URL}/users/locality/${encodeURIComponent(locality)}?town=${encodeURIComponent(town)}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -113,7 +116,7 @@ const Profile = () => {
             formData.append('profilePhoto', tempPhoto);
 
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/api/users/photo', {
+            const res = await fetch(`${API_URL}/users/photo`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData
@@ -143,7 +146,7 @@ const Profile = () => {
         setSaving(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/api/users/profile', {
+            const res = await fetch(`${API_URL}/users/profile`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -191,7 +194,7 @@ const Profile = () => {
                         <div className="relative group">
                             <div className="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center text-6xl font-bold backdrop-blur overflow-hidden border-4 border-white/30 shadow-2xl">
                                 {user.profilePhoto ? (
-                                    <img src={`http://localhost:5000${user.profilePhoto}`} alt="Profile" className="w-full h-full object-cover" />
+                                    <img src={`${SERVER_URL}${user.profilePhoto}`} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
                                     user.name?.charAt(0) || 'U'
                                 )}

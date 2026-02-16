@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { Map, Zap, MapPin, Shield, X, Briefcase, Award } from 'lucide-react';
+import { API_URL, SERVER_URL } from '../utils/apiConfig';
 
 const Home = () => {
     const { t } = useLanguage();
@@ -14,6 +15,7 @@ const Home = () => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [loadingUsers, setLoadingUsers] = useState(false);
 
+
     useEffect(() => {
         const fetchData = async () => {
             const userData = JSON.parse(localStorage.getItem('user'));
@@ -21,7 +23,7 @@ const Home = () => {
             if (userData) {
                 setUser(userData);
                 try {
-                    const res = await fetch('http://localhost:5000/api/users/stats', {
+                    const res = await fetch(`${API_URL}/users/stats`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const data = await res.json();
@@ -47,7 +49,7 @@ const Home = () => {
         setLoadingUsers(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:5000/api/users/by-profession/${encodeURIComponent(profession)}`, {
+            const res = await fetch(`${API_URL}/users/by-profession/${encodeURIComponent(profession)}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -112,7 +114,7 @@ const Home = () => {
                 <div className="relative z-10 flex items-center gap-4">
                     <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-4xl font-bold overflow-hidden border-4 border-white/30 shadow-2xl flex-shrink-0">
                         {user.profilePhoto ? (
-                            <img src={`http://localhost:5000${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                            <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
                         ) : (
                             user.name?.charAt(0).toUpperCase()
                         )}
@@ -287,7 +289,7 @@ const Home = () => {
                                         <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[var(--col-primary)] transition-colors flex items-start gap-3">
                                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-gray-600 shadow-sm overflow-hidden border border-gray-200 flex-shrink-0">
                                                 {u.profilePhoto ? (
-                                                    <img src={`http://localhost:5000${u.profilePhoto}`} alt="Pro" className="w-full h-full object-cover" />
+                                                    <img src={`${SERVER_URL}${u.profilePhoto}`} alt="Pro" className="w-full h-full object-cover" />
                                                 ) : (
                                                     u.name.charAt(0)
                                                 )}

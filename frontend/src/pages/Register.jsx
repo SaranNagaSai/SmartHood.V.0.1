@@ -4,6 +4,7 @@ import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
+import { API_URL } from '../utils/apiConfig';
 import { User, MapPin, Briefcase, Check, Camera, Upload, X } from 'lucide-react';
 
 const Register = () => {
@@ -179,7 +180,7 @@ const Register = () => {
                 formDataToSend.append('profilePhoto', profilePhoto);
             }
 
-            const res = await axios.post('http://localhost:5000/api/auth/register', formDataToSend, {
+            const res = await axios.post(`${API_URL}/auth/register`, formDataToSend, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

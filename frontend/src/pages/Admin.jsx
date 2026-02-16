@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import VoiceInput from '../components/common/VoiceInput';
 import { Shield, Lock, Mail, ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import { API_URL } from '../utils/apiConfig';
 
 const Admin = () => {
     const { t } = useLanguage();
@@ -27,7 +28,7 @@ const Admin = () => {
         setError('');
 
         try {
-            const res = await axios.post('http://localhost:5000/api/admin/login', formData);
+            const res = await axios.post(`${API_URL}/admin/login`, formData);
 
             if (res.data.success) {
                 localStorage.setItem('adminToken', res.data.token);

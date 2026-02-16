@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
 import { ArrowLeft, Send, Users, UserCheck, Paperclip, X, Image, AlertCircle } from 'lucide-react';
+import { API_URL } from '../utils/apiConfig';
 
 const OfferService = () => {
     const { t } = useLanguage();
@@ -35,7 +36,7 @@ const OfferService = () => {
             if (userTown) {
                 // 1. Fetch Localities (independent)
                 try {
-                    const locRes = await axios.get(`http://localhost:5000/api/localities?town=${encodeURIComponent(userTown)}`);
+                    const locRes = await axios.get(`${API_URL}/localities?town=${encodeURIComponent(userTown)}`);
                     setLocalities(locRes.data);
 
                     if (formData.targetLocalities.length === 0) {
@@ -48,7 +49,7 @@ const OfferService = () => {
                 // 2. Fetch communities (independent)
                 try {
                     console.log(`Fetching available communities for town: ${userTown}`);
-                    const commRes = await axios.get(`http://localhost:5000/api/communities/by-town?town=${encodeURIComponent(userTown)}`, {
+                    const commRes = await axios.get(`${API_URL}/communities/by-town?town=${encodeURIComponent(userTown)}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     console.log("Communities response:", commRes.data);
@@ -61,7 +62,7 @@ const OfferService = () => {
                 try {
                     const userLocality = user?.locality?.trim();
                     console.log(`Fetching professions for locality: ${userLocality}`);
-                    const profRes = await axios.get(`http://localhost:5000/api/professions/by-community?community=${encodeURIComponent(userLocality)}`, {
+                    const profRes = await axios.get(`${API_URL}/professions/by-community?community=${encodeURIComponent(userLocality)}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     console.log("Professions response:", profRes.data);
@@ -162,7 +163,7 @@ const OfferService = () => {
                 formDataPayload.append('attachments', att.file);
             });
 
-            const response = await axios.post('http://localhost:5000/api/services', formDataPayload, {
+            const response = await axios.post(`${API_URL}/services`, formDataPayload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

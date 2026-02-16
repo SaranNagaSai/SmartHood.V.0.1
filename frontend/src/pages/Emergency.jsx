@@ -14,6 +14,7 @@ import {
     CheckCircle2,
     Loader2
 } from 'lucide-react';
+import { API_URL } from '../utils/apiConfig';
 
 const Emergency = () => {
     const { t } = useLanguage();
@@ -56,7 +57,7 @@ const Emergency = () => {
                 state: user.state
             };
 
-            await axios.post('http://localhost:5000/api/alerts', alertData, {
+            await axios.post(`${API_URL}/alerts`, alertData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -107,8 +108,8 @@ const Emergency = () => {
                                 key={type.id}
                                 onClick={() => setSubType(type.id)}
                                 className={`p-5 rounded-2xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${subType === type.id
-                                        ? 'bg-white border-red-500 shadow-lg scale-[1.02]'
-                                        : 'bg-white border-transparent shadow-sm hover:border-gray-200'
+                                    ? 'bg-white border-red-500 shadow-lg scale-[1.02]'
+                                    : 'bg-white border-transparent shadow-sm hover:border-gray-200'
                                     }`}
                             >
                                 <div className={`w-12 h-12 ${type.color} text-white rounded-full flex items-center justify-center shadow-lg`}>
@@ -136,8 +137,8 @@ const Emergency = () => {
                                             key={bg}
                                             onClick={() => setBloodGroup(bg)}
                                             className={`py-3 rounded-xl font-bold transition-all ${bloodGroup === bg
-                                                    ? 'bg-red-600 text-white shadow-md'
-                                                    : 'bg-red-50 text-red-400 hover:bg-red-100'
+                                                ? 'bg-red-600 text-white shadow-md'
+                                                : 'bg-red-50 text-red-400 hover:bg-red-100'
                                                 }`}
                                         >
                                             {bg}

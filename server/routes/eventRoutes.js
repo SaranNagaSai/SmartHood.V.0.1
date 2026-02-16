@@ -10,7 +10,9 @@ const {
 } = require('../controllers/eventController');
 
 router.get('/', protect, getEvents);
-router.post('/', protect, createEvent);
+const upload = require('../middleware/uploadMiddleware');
+
+router.post('/', protect, upload.single('image'), createEvent);
 router.get('/:id', protect, getEventById);
 router.post('/:id/rsvp', protect, rsvpEvent);
 router.delete('/:id', protect, deleteEvent);

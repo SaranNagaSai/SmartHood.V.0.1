@@ -5,6 +5,7 @@ import {
     MessageSquare, Send, Clock, CheckCircle, XCircle,
     AlertCircle, Plus, X, Filter
 } from 'lucide-react';
+import { API_URL } from '../utils/apiConfig';
 
 const Complaints = () => {
     const navigate = useNavigate();
@@ -34,7 +35,7 @@ const Complaints = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/api/complaints', {
+            const res = await fetch(`${API_URL}/complaints`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -53,7 +54,7 @@ const Complaints = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/api/complaints', {
+            const res = await fetch(`${API_URL}/complaints`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -125,8 +126,8 @@ const Complaints = () => {
                             key={f.id}
                             onClick={() => setFilter(f.id)}
                             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${filter === f.id
-                                    ? 'bg-white text-red-600'
-                                    : 'bg-white/20 text-white'
+                                ? 'bg-white text-red-600'
+                                : 'bg-white/20 text-white'
                                 }`}
                         >
                             {f.label}

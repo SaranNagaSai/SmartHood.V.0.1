@@ -5,6 +5,7 @@ import { ArrowLeft, Users, X, MapPin, Search, ChevronDown, Mic } from 'lucide-re
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { API_URL, SERVER_URL } from '../utils/apiConfig';
 
 // Fix for default marker icon in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -68,7 +69,7 @@ const ExploreCity = () => {
                 const userData = JSON.parse(localStorage.getItem('user'));
 
                 // Fetch Available Towns
-                const filterRes = await fetch('/api/localities/filters');
+                const filterRes = await fetch(`${API_URL}/localities/filters`);
                 const filterData = await filterRes.json();
 
                 if (filterData.towns) {
@@ -296,7 +297,7 @@ const ExploreCity = () => {
         try {
             const token = localStorage.getItem('token');
             // Fetch localities for the selected town
-            const locRes = await fetch(`/api/localities?town=${encodeURIComponent(townName)}`, {
+            const locRes = await fetch(`${API_URL}/localities?town=${encodeURIComponent(townName)}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const locData = await locRes.json();
@@ -360,7 +361,7 @@ const ExploreCity = () => {
         try {
             const token = localStorage.getItem('token');
             // Pass the currently selected town (userTown) to the API
-            const res = await fetch(`/api/users/locality/${encodeURIComponent(localityName)}?town=${encodeURIComponent(userTown)}`, {
+            const res = await fetch(`${API_URL}/users/locality/${encodeURIComponent(localityName)}?town=${encodeURIComponent(userTown)}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -670,7 +671,7 @@ const ExploreCity = () => {
                                         <div key={user.uniqueId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition border border-gray-100">
                                             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 flex items-center justify-center font-bold text-xl overflow-hidden border border-blue-100 flex-shrink-0">
                                                 {user.profilePhoto ? (
-                                                    <img src={`http://localhost:5000${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                                                    <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
                                                 ) : (
                                                     user.name.charAt(0)
                                                 )}
@@ -680,6 +681,9 @@ const ExploreCity = () => {
                                                 <p className="text-xs text-gray-500">{user.professionCategory}</p>
                                                 {user.professionDetails?.jobRole && (
                                                     <p className="text-[10px] text-gray-400">{user.professionDetails.jobRole}</p>
+                                                )}
+                                                {user.phone && (
+                                                    <p className="text-[10px] font-bold text-blue-500 mt-1">{user.phone}</p>
                                                 )}
                                             </div>
                                             <div className="text-right">

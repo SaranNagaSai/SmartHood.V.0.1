@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import axios from 'axios';
+import { API_URL } from '../utils/apiConfig';
 import {
     GraduationCap,
     Users,
@@ -30,9 +31,9 @@ const StudentDashboard = () => {
 
             try {
                 const [peersRes, mentorsRes, statsRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/students/peers', { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get('http://localhost:5000/api/students/mentors', { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get('http://localhost:5000/api/students/stats', { headers: { Authorization: `Bearer ${token}` } })
+                    axios.get(`${API_URL}/students/peers`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get(`${API_URL}/students/mentors`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get(`${API_URL}/students/stats`, { headers: { Authorization: `Bearer ${token}` } })
                 ]);
 
                 setPeers(peersRes.data);

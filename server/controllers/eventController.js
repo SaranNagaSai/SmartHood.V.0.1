@@ -30,7 +30,7 @@ const createEvent = async (req, res) => {
     try {
         const { title, description, date, time, venue, category } = req.body;
 
-        const event = await Event.create({
+        const eventData = {
             title,
             description,
             date,
@@ -39,7 +39,13 @@ const createEvent = async (req, res) => {
             category,
             createdBy: req.user._id,
             locality: req.user.locality
-        });
+        };
+
+        if (req.file) {
+            eventData.image = `/uploads/${req.file.filename}`;
+        }
+
+        const event = await Event.create(eventData);
 
         // Notify neighbors
         const targetUsers = await User.find({

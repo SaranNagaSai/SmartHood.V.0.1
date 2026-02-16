@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { AlertTriangle, Speaker, Heart, Film, ArrowLeft, Droplet, Paperclip, X, Zap, Send } from 'lucide-react';
+import { API_URL } from '../utils/apiConfig';
 
 const Alerts = () => {
     const { t } = useLanguage();
@@ -94,7 +95,7 @@ const Alerts = () => {
                 formData.append('attachments', file);
             });
 
-            const response = await axios.post('http://localhost:5000/api/alerts', formData, {
+            const response = await axios.post(`${API_URL}/alerts`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

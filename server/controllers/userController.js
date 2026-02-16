@@ -86,7 +86,7 @@ const getUsersByLocality = async (req, res) => {
             locality: { $regex: localityRegex },
             town: { $regex: townRegex }
         })
-            .select('name uniqueId professionCategory professionDetails impactScore')
+            .select('name uniqueId professionCategory professionDetails impactScore profilePhoto phone')
             .sort({ impactScore: -1 });
 
         res.json(users);
@@ -117,7 +117,7 @@ const getUsersByProfession = async (req, res) => {
                 { professionCategory: profession } // For Homemaker or legacy
             ]
         })
-            .select('name uniqueId experience professionDetails professionCategory locality impactScore phone email')
+            .select('name uniqueId experience professionDetails professionCategory locality impactScore phone email profilePhoto')
             .sort({ experience: -1 });
 
         res.json(users);

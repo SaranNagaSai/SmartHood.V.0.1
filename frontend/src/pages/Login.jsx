@@ -3,6 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../utils/apiConfig';
 import smartHoodLogo from '../assets/images/Smart Hood Logo.png';
 
 const Login = () => {
@@ -12,7 +13,7 @@ const Login = () => {
 
     const handleLogin = async () => {
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+            const res = await axios.post(`${API_URL}/auth/login`, formData);
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data));
             navigate('/home');

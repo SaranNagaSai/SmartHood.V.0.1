@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
+import { API_URL, SERVER_URL } from '../utils/apiConfig';
 import VoiceInput from '../components/common/VoiceInput';
 import {
     ArrowLeft, Shield, User, Clock, MapPin, Phone, Mail,
@@ -32,7 +33,7 @@ const ServiceDetail = () => {
     const fetchService = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/services/${id}`, {
+            const res = await axios.get(`${API_URL}/services/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setService(res.data);
@@ -48,7 +49,7 @@ const ServiceDetail = () => {
     const handleInterest = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`http://localhost:5000/api/services/${id}/interest`, {}, {
+            await axios.post(`${API_URL}/services/${id}/interest`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchService(); // Refresh to show updated interest status
@@ -66,7 +67,7 @@ const ServiceDetail = () => {
         setCompleting(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`http://localhost:5000/api/services/${id}/complete`, {
+            await axios.post(`${API_URL}/services/${id}/complete`, {
                 providerUniqueId: providerId,
                 amountSpent: Number(amount)
             }, {
@@ -138,7 +139,7 @@ const ServiceDetail = () => {
                             <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white overflow-hidden border-2 border-white/50 ${service.type === 'offer' ? 'bg-blue-500' : 'bg-green-500'
                                 }`}>
                                 {service.createdBy?.profilePhoto ? (
-                                    <img src={`http://localhost:5000${service.createdBy.profilePhoto}`} alt="Creator" className="w-full h-full object-cover" />
+                                    <img src={`${SERVER_URL}${service.createdBy.profilePhoto}`} alt="Creator" className="w-full h-full object-cover" />
                                 ) : (
                                     service.createdBy?.name?.charAt(0)
                                 )}
@@ -241,7 +242,7 @@ const ServiceDetail = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-blue-600 shadow-sm overflow-hidden border border-blue-100">
                                                     {provider.profilePhoto ? (
-                                                        <img src={`http://localhost:5000${provider.profilePhoto}`} alt="Provider" className="w-full h-full object-cover" />
+                                                        <img src={`${SERVER_URL}${provider.profilePhoto}`} alt="Provider" className="w-full h-full object-cover" />
                                                     ) : (
                                                         provider.name.charAt(0)
                                                     )}
@@ -330,7 +331,7 @@ const ServiceDetail = () => {
                                         <div key={idx} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition">
                                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold overflow-hidden">
                                                 {viewer.profilePhoto ? (
-                                                    <img src={`http://localhost:5000${viewer.profilePhoto}`} alt={viewer.name} className="w-full h-full object-cover" />
+                                                    <img src={`${SERVER_URL}${viewer.profilePhoto}`} alt={viewer.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     viewer.name?.charAt(0).toUpperCase()
                                                 )}

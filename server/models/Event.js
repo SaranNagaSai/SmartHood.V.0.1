@@ -8,6 +8,9 @@ const eventSchema = new mongoose.Schema({
     description: {
         type: String
     },
+    image: {
+        type: String // Stores URL/path to event banner
+    },
     date: {
         type: Date,
         required: true
