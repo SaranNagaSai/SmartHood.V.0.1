@@ -521,6 +521,20 @@ const Register = () => {
                                     )}
                                 </div>
 
+                                <div className="flex gap-4 mt-6">
+                                    <button
+                                        onClick={prevStep}
+                                        className="flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition"
+                                    >
+                                        {t('back')}
+                                    </button>
+                                    <button
+                                        onClick={nextStep}
+                                        className="flex-1 bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition"
+                                    >
+                                        {t('next_step')} →
+                                    </button>
+                                </div>
                             </div>
                         )}
 

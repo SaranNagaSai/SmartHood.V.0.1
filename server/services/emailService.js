@@ -2,13 +2,16 @@ const nodemailer = require('nodemailer');
 
 // Create transporter - configure with your email service
 const createTransporter = () => {
+    // Check if using Brevo (Sendinblue)
+    const isBrevo = process.env.EMAIL_HOST?.includes('brevo') || process.env.EMAIL_HOST?.includes('sendinblue') || true; // Default to Brevo for now as per request
+
     return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+        host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
         port: process.env.EMAIL_PORT || 587,
-        secure: false,
+        secure: false, // true for 465, false for other ports
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
+            user: process.env.EMAIL_USER, // Your Brevo login email
+            pass: process.env.EMAIL_PASSWORD // Your Brevo API Key
         }
     });
 };

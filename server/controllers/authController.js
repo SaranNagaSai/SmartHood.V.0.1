@@ -43,8 +43,8 @@ const registerUser = async (req, res) => {
         // Handle Profile Photo
         let profilePhotoPath = '';
         if (req.file) {
-            // Store relative path: /assets/images/filename.jpg
-            profilePhotoPath = `/assets/images/${req.file.filename}`;
+            // Store relative path: /uploads/filename.jpg
+            profilePhotoPath = `/uploads/${req.file.filename}`;
         }
 
         // Create user

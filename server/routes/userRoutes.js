@@ -11,7 +11,7 @@ const {
     getUsersByLocality,
     uploadPhoto
 } = require('../controllers/userController');
-const upload = require('../middleware/profilePhotoMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 router.get('/stats', protect, getLocalityStats);
 router.get('/by-profession/:profession', protect, getUsersByProfession);

@@ -295,7 +295,7 @@ const uploadPhoto = async (req, res) => {
 
         if (user) {
             // Store relative path
-            const profilePhotoPath = `/assets/images/${req.file.filename}`;
+            const profilePhotoPath = `/uploads/${req.file.filename}`;
             user.profilePhoto = profilePhotoPath;
             await user.save();
 
