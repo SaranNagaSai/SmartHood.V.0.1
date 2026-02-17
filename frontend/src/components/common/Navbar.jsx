@@ -85,7 +85,7 @@ const Navbar = () => {
                                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/50 bg-white/20 flex items-center justify-center font-bold text-base">
                                     {user?.profilePhoto ? (
                                         <img
-                                            src={`${SERVER_URL}${user.profilePhoto}`}
+                                            src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />

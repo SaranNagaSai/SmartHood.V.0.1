@@ -442,7 +442,7 @@ const ExploreCity = () => {
                     </button>
 
                     {isDropdownOpen && (
-                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 maxHeight-60 overflow-y-auto">
+                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-60 overflow-y-auto">
                             <div className="p-2 border-b">
                                 <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
                                     <Search size={14} className="text-gray-400" />
@@ -671,7 +671,11 @@ const ExploreCity = () => {
                                         <div key={user.uniqueId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition border border-gray-100">
                                             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 flex items-center justify-center font-bold text-xl overflow-hidden border border-blue-100 flex-shrink-0">
                                                 {user.profilePhoto ? (
-                                                    <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                                                    <img
+                                                        src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                                        alt="User"
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                 ) : (
                                                     user.name.charAt(0)
                                                 )}

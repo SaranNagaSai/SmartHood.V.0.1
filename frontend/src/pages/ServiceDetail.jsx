@@ -139,7 +139,11 @@ const ServiceDetail = () => {
                             <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white overflow-hidden border-2 border-white/50 ${service.type === 'offer' ? 'bg-blue-500' : 'bg-green-500'
                                 }`}>
                                 {service.createdBy?.profilePhoto ? (
-                                    <img src={`${SERVER_URL}${service.createdBy.profilePhoto}`} alt="Creator" className="w-full h-full object-cover" />
+                                    <img
+                                        src={service.createdBy.profilePhoto.startsWith('http') ? service.createdBy.profilePhoto : `${SERVER_URL}${service.createdBy.profilePhoto}`}
+                                        alt="Creator"
+                                        className="w-full h-full object-cover"
+                                    />
                                 ) : (
                                     service.createdBy?.name?.charAt(0)
                                 )}
@@ -242,7 +246,11 @@ const ServiceDetail = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-blue-600 shadow-sm overflow-hidden border border-blue-100">
                                                     {provider.profilePhoto ? (
-                                                        <img src={`${SERVER_URL}${provider.profilePhoto}`} alt="Provider" className="w-full h-full object-cover" />
+                                                        <img
+                                                            src={provider.profilePhoto.startsWith('http') ? provider.profilePhoto : `${SERVER_URL}${provider.profilePhoto}`}
+                                                            alt="Provider"
+                                                            className="w-full h-full object-cover"
+                                                        />
                                                     ) : (
                                                         provider.name.charAt(0)
                                                     )}
@@ -331,7 +339,11 @@ const ServiceDetail = () => {
                                         <div key={idx} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition">
                                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold overflow-hidden">
                                                 {viewer.profilePhoto ? (
-                                                    <img src={`${SERVER_URL}${viewer.profilePhoto}`} alt={viewer.name} className="w-full h-full object-cover" />
+                                                    <img
+                                                        src={viewer.profilePhoto.startsWith('http') ? viewer.profilePhoto : `${SERVER_URL}${viewer.profilePhoto}`}
+                                                        alt={viewer.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                 ) : (
                                                     viewer.name?.charAt(0).toUpperCase()
                                                 )}

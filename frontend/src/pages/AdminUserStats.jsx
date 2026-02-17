@@ -93,7 +93,11 @@ const AdminUserStats = () => {
                     <div className="flex items-center gap-5">
                         <div className="w-32 h-32 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-5xl font-bold overflow-hidden border-2 border-white/30 shadow-xl">
                             {user.profilePhoto ? (
-                                <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                                <img
+                                    src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                    alt="User"
+                                    className="w-full h-full object-cover"
+                                />
                             ) : (
                                 user.name?.charAt(0).toUpperCase()
                             )}

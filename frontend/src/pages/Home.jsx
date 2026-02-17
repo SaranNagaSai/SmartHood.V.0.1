@@ -114,7 +114,11 @@ const Home = () => {
                 <div className="relative z-10 flex items-center gap-3 md:gap-4">
                     <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-3xl md:text-4xl font-bold overflow-hidden border-2 md:border-4 border-white/30 shadow-2xl flex-shrink-0">
                         {user.profilePhoto ? (
-                            <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                            <img
+                                src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                alt="User"
+                                className="w-full h-full object-cover"
+                            />
                         ) : (
                             user.name?.charAt(0).toUpperCase()
                         )}
@@ -289,7 +293,11 @@ const Home = () => {
                                         <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[var(--col-primary)] transition-colors flex items-start gap-3">
                                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-gray-600 shadow-sm overflow-hidden border border-gray-200 flex-shrink-0">
                                                 {u.profilePhoto ? (
-                                                    <img src={`${SERVER_URL}${u.profilePhoto}`} alt="Pro" className="w-full h-full object-cover" />
+                                                    <img
+                                                        src={u.profilePhoto.startsWith('http') ? u.profilePhoto : `${SERVER_URL}${u.profilePhoto}`}
+                                                        alt="Pro"
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                 ) : (
                                                     u.name.charAt(0)
                                                 )}

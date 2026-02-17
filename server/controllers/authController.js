@@ -57,8 +57,8 @@ const registerUser = async (req, res) => {
         // Handle Profile Photo
         let profilePhotoPath = '';
         if (req.file) {
-            // Store relative path: /uploads/filename.jpg
-            profilePhotoPath = `/uploads/${req.file.filename}`;
+            // Store full Cloudinary URL
+            profilePhotoPath = req.file.path;
         }
 
         // Create user

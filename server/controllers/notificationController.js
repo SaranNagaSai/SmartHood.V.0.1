@@ -72,9 +72,14 @@ const createNotification = async (userId, title, body, type = 'system', link = n
 
         // Send Email (unless skipEmail is true - caller already handled email)
         if (user.email && !skipEmail) {
-            await sendEmail(user.email, title, body, emailHtml);
-            notification.deliveryMethod = 'email';
-            notification.delivered = true;
+            const emailResult = await sendEmail(user.email, title, body, emailHtml);
+            if (emailResult.success) {
+                notification.deliveryMethod = 'email';
+                notification.delivered = true;
+                console.log(`[Notification] Email sent to ${user.email}`);
+            } else {
+                console.error(`[Notification] Email FAILED to ${user.email}:`, emailResult.reason);
+            }
         }
 
         if (user.fcmToken) {

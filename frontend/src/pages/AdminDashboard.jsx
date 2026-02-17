@@ -306,7 +306,11 @@ const AdminDashboard = () => {
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-12 h-12 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold overflow-hidden border border-purple-200">
                                                                 {user.profilePhoto ? (
-                                                                    <img src={`${SERVER_URL}${user.profilePhoto}`} alt="User" className="w-full h-full object-cover" />
+                                                                    <img
+                                                                        src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                                                        alt="User"
+                                                                        className="w-full h-full object-cover"
+                                                                    />
                                                                 ) : (
                                                                     user.name?.charAt(0)
                                                                 )}

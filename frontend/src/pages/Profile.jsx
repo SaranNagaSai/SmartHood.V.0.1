@@ -193,7 +193,11 @@ const Profile = () => {
                         <div className="relative group">
                             <div className="w-28 h-28 sm:w-40 h-40 bg-white/20 rounded-full flex items-center justify-center text-4xl sm:text-6xl font-bold backdrop-blur overflow-hidden border-4 border-white/30 shadow-2xl">
                                 {user.profilePhoto ? (
-                                    <img src={`${SERVER_URL}${user.profilePhoto}`} alt="Profile" className="w-full h-full object-cover" />
+                                    <img
+                                        src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
                                 ) : (
                                     user.name?.charAt(0) || 'U'
                                 )}

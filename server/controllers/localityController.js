@@ -88,11 +88,17 @@ const getFilters = async (req, res) => {
         const states = await Locality.distinct('state', { isActive: true });
         const districts = await Locality.distinct('district', { isActive: true });
 
-        // Fetch towns from registered Users
-        const rawTowns = await User.distinct('town');
+        // Fetch towns from both Locality collection (predefined) and Users (registered)
+        const [localityTowns, userTowns] = await Promise.all([
+            Locality.distinct('town', { isActive: true }),
+            User.distinct('town')
+        ]);
+
+        // Combine both sources
+        const allRawTowns = [...localityTowns, ...userTowns];
 
         // Normalize: Trim, Capitalize first letter, remove duplicates
-        const uniqueTowns = [...new Set(rawTowns.map(t =>
+        const uniqueTowns = [...new Set(allRawTowns.map(t =>
             t ? t.trim().charAt(0).toUpperCase() + t.trim().slice(1).toLowerCase() : t
         ))].filter(Boolean).sort();
 

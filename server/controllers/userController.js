@@ -294,8 +294,8 @@ const uploadPhoto = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         if (user) {
-            // Store relative path
-            const profilePhotoPath = `/uploads/${req.file.filename}`;
+            // req.file.path contains the full Cloudinary URL when using multer-storage-cloudinary
+            const profilePhotoPath = req.file.path;
             user.profilePhoto = profilePhotoPath;
             await user.save();
 

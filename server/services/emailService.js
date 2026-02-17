@@ -2,14 +2,20 @@ const nodemailer = require('nodemailer');
 
 // Create transporter - configure with your email service
 const createTransporter = () => {
-    const isBrevo = process.env.EMAIL_HOST?.includes('brevo') || process.env.EMAIL_HOST?.includes('sendinblue') || true;
+    const host = process.env.EMAIL_HOST || 'smtp-relay.brevo.com';
+    const port = parseInt(process.env.EMAIL_PORT) || 587;
 
-    console.log(`[Email] Configuring SMTP: ${process.env.EMAIL_HOST || 'smtp-relay.brevo.com'}:${process.env.EMAIL_PORT || 587} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'})`);
+    // Automatically determine security based on port
+    // Port 465 is usually SSL (secure: true)
+    // Port 587 is usually STARTTLS (secure: false)
+    const secure = port === 465;
+
+    console.log(`[Email] Configuring SMTP: ${host}:${port} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'}, Secure: ${secure})`);
 
     return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
-        port: parseInt(process.env.EMAIL_PORT) || 587,
-        secure: false, // Port 587 requires secure: false (STARTTLS)
+        host,
+        port,
+        secure,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASSWORD
@@ -31,11 +37,16 @@ const sendEmail = async (to, subject, text, html = null) => {
         const transporter = createTransporter();
 
         // Verify connection before sending
-        await transporter.verify();
-        console.log('[Email] SMTP Connection Verified');
+        try {
+            await transporter.verify();
+            console.log('[Email] SMTP Connection Verified');
+        } catch (verifyError) {
+            console.error('[Email] SMTP Verification FAILED:', verifyError.message);
+            return { success: false, reason: 'SMTP Verification Failed', error: verifyError.message };
+        }
 
         const mailOptions = {
-            from: `"SmartHood" <${process.env.EMAIL_USER}>`,
+            from: `"SmartHood" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
             to,
             subject: `[SmartHood] ${subject}`,
             text,
