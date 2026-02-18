@@ -1,4 +1,0 @@
-DEBUG: matchStage {"town":{"$regex":{}}}
-DEBUG: localityGroups [{"_id":"patimeeda","displayName":"Patimeeda","userCount":3},{"_id":"padapalaparru","displayName":"padapalaparru","userCount":1},{"_id":"pedha veedhi","displayName":"pedha veedhi","userCount":1}]
-DEBUG: matchStage {"town":{"$regex":{}}}
-DEBUG: localityGroups [{"_id":"patimeeda","displayName":"Patimeeda","userCount":3},{"_id":"padapalaparru","displayName":"padapalaparru","userCount":1},{"_id":"pedha veedhi","displayName":"pedha veedhi","userCount":1}]

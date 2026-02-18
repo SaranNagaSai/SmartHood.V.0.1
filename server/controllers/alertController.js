@@ -29,9 +29,9 @@ const createAlert = async (req, res) => {
         });
 
         // NOTIFICATION LOGIC
-        // Fetch users in locality (case/whitespace-insensitive for consistency)
-        const localityRegex = new RegExp(`^\\s*${req.user.locality.trim()}\\s*$`, 'i');
-        let query = { locality: { $regex: localityRegex } };
+        // Broaden to TOWN-wide alerts for community emergency/general alerts
+        const townRegex = new RegExp(`^\\s*${req.user.town.trim()}\\s*$`, 'i');
+        let query = { town: { $regex: townRegex } };
         query._id = { $ne: req.user._id };
 
         if (category === 'Emergency' && subType === 'Blood Donation') {
@@ -40,9 +40,9 @@ const createAlert = async (req, res) => {
                 query.bloodGroup = bloodGroup;
             }
         }
-        // Else: Broadcast to all in locality
 
         const targetUsers = await User.find(query);
+        console.log(`[Alert] ${category} - ${subType} created for ${targetUsers.length} users in ${req.user.town}`);
 
         // Track notification counts
         let emailCount = 0;

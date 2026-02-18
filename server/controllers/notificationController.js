@@ -59,8 +59,12 @@ const markAllAsRead = async (req, res) => {
 // @desc    Create notification (internal use)
 const createNotification = async (userId, title, body, type = 'system', link = null, emailHtml = null, skipEmail = false) => {
     try {
+        console.log(`[Notification] creating for userId: ${userId}, title: ${title}`);
         const user = await User.findById(userId);
-        if (!user) return null;
+        if (!user) {
+            console.log(`[Notification] User NOT found: ${userId}`);
+            return null;
+        }
 
         const notification = await Notification.create({
             userId,
@@ -97,7 +101,10 @@ const createNotification = async (userId, title, body, type = 'system', link = n
         }
 
         if (notification.delivered) {
+            console.log(`[Notification] Marked as delivered (Entry ID: ${notification._id})`);
             await notification.save();
+        } else {
+            console.log(`[Notification] NOT delivered (No email/FCM)`);
         }
 
         return notification;

@@ -15,9 +15,9 @@ const LanguageSelection = () => {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-brand px-6">
             <div className="text-center mb-6 md:mb-8">
-                <div className="flex flex-col items-center justify-center gap-2 mb-4 md:mb-6">
-                    <img src={smartHoodLogo} alt="SmartHood" className="w-20 h-20 md:w-24 md:h-24 object-contain" />
-                    <h2 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">SmartHood</h2>
+                <div className="flex flex-col items-center justify-center gap-4 mb-4 md:mb-6">
+                    <img src={smartHoodLogo} alt="SmartHood" className="w-32 h-32 md:w-40 md:h-40 object-contain drop-shadow-2xl" />
+                    <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight drop-shadow-lg">SmartHood</h2>
                 </div>
                 <h1 className="text-xl md:text-2xl font-bold text-gray-800">{t('login')}</h1>
                 <p className="text-xs md:text-sm text-gray-500 mt-2 font-medium">{t('welcome_back_msg')}</p>

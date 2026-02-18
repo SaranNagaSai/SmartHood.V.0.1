@@ -1,18 +1,19 @@
 const nodemailer = require('nodemailer');
 
+// Persistent transporter instance
+let transporterInstance = null;
+
 // Create transporter - configure with your email service
 const createTransporter = () => {
+    if (transporterInstance) return transporterInstance;
+
     const host = process.env.EMAIL_HOST || 'smtp-relay.brevo.com';
     const port = parseInt(process.env.EMAIL_PORT) || 587;
-
-    // Automatically determine security based on port
-    // Port 465 is usually SSL (secure: true)
-    // Port 587 is usually STARTTLS (secure: false)
     const secure = port === 465;
 
-    console.log(`[Email] Configuring SMTP: ${host}:${port} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'}, Secure: ${secure})`);
+    console.log(`[Email] Creating persistent SMTP Transporter: ${host}:${port} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'}, Secure: ${secure})`);
 
-    return nodemailer.createTransport({
+    transporterInstance = nodemailer.createTransport({
         host,
         port,
         secure,
@@ -21,11 +22,15 @@ const createTransporter = () => {
             pass: process.env.EMAIL_PASSWORD
         },
         tls: {
-            // Do not fail on invalid certs
             rejectUnauthorized: false
         }
     });
+
+    return transporterInstance;
 };
+
+// Global verification status
+let isTransporterVerified = false;
 
 const sendEmail = async (to, subject, text, html = null) => {
     try {
@@ -36,17 +41,23 @@ const sendEmail = async (to, subject, text, html = null) => {
 
         const transporter = createTransporter();
 
-        // Verify connection before sending
-        try {
-            await transporter.verify();
-            console.log('[Email] SMTP Connection Verified');
-        } catch (verifyError) {
-            console.error('[Email] SMTP Verification FAILED:', verifyError.message);
-            return { success: false, reason: 'SMTP Verification Failed', error: verifyError.message };
+        // Verify connection once per session or if flag is false
+        if (!isTransporterVerified) {
+            try {
+                await transporter.verify();
+                isTransporterVerified = true;
+                console.log('[Email] SMTP Connection Verified (Cached)');
+            } catch (verifyError) {
+                console.error('[Email] SMTP Verification FAILED:', verifyError.message);
+                return { success: false, reason: 'SMTP Verification Failed', error: verifyError.message };
+            }
         }
 
         const mailOptions = {
-            from: `"SmartHood" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+            // Use authenticated user as sender to avoid DMARC 'p=reject' issues
+            // while showing a friendly name.
+            from: `"SmartHood Notifications" <${process.env.EMAIL_USER}>`,
+            replyTo: process.env.EMAIL_FROM || process.env.EMAIL_USER,
             to,
             subject: `[SmartHood] ${subject}`,
             text,
@@ -75,7 +86,8 @@ const sendEmail = async (to, subject, text, html = null) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log('[Email] SUCCESS: Message sent to', to, 'MessageId:', info.messageId);
+        console.log(`[Email] SUCCESS: Message sent to ${to}`);
+        console.log(`[Email] Info: Accepted: ${info.accepted}, Rejected: ${info.rejected}, MsgId: ${info.messageId}`);
         return { success: true, messageId: info.messageId };
     } catch (error) {
         console.error('[Email] FAILED to send email to', to);

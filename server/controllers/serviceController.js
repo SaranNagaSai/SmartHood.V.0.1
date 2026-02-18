@@ -49,6 +49,9 @@ const createService = async (req, res) => {
             professionArray = Array.isArray(targetProfession) ? targetProfession : [targetProfession];
         }
 
+        console.log(`[Service] Creating ${type} for user: ${user.name} (${user.locality})`);
+        console.log(`[Service] Target Localities:`, targetLocalities, `Communities:`, selectedCommunities);
+
         const service = await Service.create({
             createdBy: user._id,
             type: type.toLowerCase(),
@@ -65,6 +68,8 @@ const createService = async (req, res) => {
             state: user.state
         });
 
+        console.log(`[Service] ID: ${service._id} Created.`);
+
         // NOTIFICATION LOGIC - Find target users in ALL targeted localities AND communities
         let allCommunities = [user.locality]; // Start with user's own community
 
@@ -78,12 +83,19 @@ const createService = async (req, res) => {
             allCommunities = [...new Set([...allCommunities, ...allTargetLocalities])];
         }
 
+        // NOTIFICATION LOGIC - Broaden to TOWN if no specific localities selected
         let query = {
-            locality: {
-                $in: allCommunities.map(loc => new RegExp(`^\\s*${loc.trim()}\\s*$`, 'i'))
-            },
+            town: { $regex: new RegExp(`^\\s*${user.town.trim()}\\s*$`, 'i') },
             _id: { $ne: user._id }
         };
+
+        // If specific communities were targeted, we restrict by those locality names
+        // otherwise we broadcast to everyone in the town
+        if (allCommunities.length > 1) {
+            query.locality = {
+                $in: allCommunities.map(loc => new RegExp(`^\\s*${loc.trim()}\\s*$`, 'i'))
+            };
+        }
 
         if (targetAudience === 'SPECIFIC' && professionArray.length > 0) {
             query.$or = [
@@ -96,6 +108,7 @@ const createService = async (req, res) => {
         }
 
         const targetUsers = await User.find(query);
+        console.log(`[Service] Found ${targetUsers.length} recipients in town: ${user.town}`);
 
         // Send notifications via unified service
         const { routeNotifications } = require('../services/notificationService');
