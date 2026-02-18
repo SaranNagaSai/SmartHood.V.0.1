@@ -5,7 +5,7 @@ import { ArrowLeft, Users, X, MapPin, Search, ChevronDown, Mic } from 'lucide-re
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { API_URL, SERVER_URL } from '../utils/apiConfig';
+import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 // Fix for default marker icon in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -672,7 +672,7 @@ const ExploreCity = () => {
                                             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 flex items-center justify-center font-bold text-xl overflow-hidden border border-blue-100 flex-shrink-0">
                                                 {user.profilePhoto ? (
                                                     <img
-                                                        src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                                        src={getProfilePhotoUrl(user.profilePhoto)}
                                                         alt="User"
                                                         className="w-full h-full object-cover"
                                                     />

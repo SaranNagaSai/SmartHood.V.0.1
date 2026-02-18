@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
-import { API_URL, SERVER_URL } from '../utils/apiConfig';
+import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 import VoiceInput from '../components/common/VoiceInput';
 import {
     ArrowLeft, Shield, User, Clock, MapPin, Phone, Mail,
@@ -140,7 +140,7 @@ const ServiceDetail = () => {
                                 }`}>
                                 {service.createdBy?.profilePhoto ? (
                                     <img
-                                        src={service.createdBy.profilePhoto.startsWith('http') ? service.createdBy.profilePhoto : `${SERVER_URL}${service.createdBy.profilePhoto}`}
+                                        src={getProfilePhotoUrl(service.createdBy.profilePhoto)}
                                         alt="Creator"
                                         className="w-full h-full object-cover"
                                     />
@@ -247,7 +247,7 @@ const ServiceDetail = () => {
                                                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-blue-600 shadow-sm overflow-hidden border border-blue-100">
                                                     {provider.profilePhoto ? (
                                                         <img
-                                                            src={provider.profilePhoto.startsWith('http') ? provider.profilePhoto : `${SERVER_URL}${provider.profilePhoto}`}
+                                                            src={getProfilePhotoUrl(provider.profilePhoto)}
                                                             alt="Provider"
                                                             className="w-full h-full object-cover"
                                                         />
@@ -340,7 +340,7 @@ const ServiceDetail = () => {
                                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold overflow-hidden">
                                                 {viewer.profilePhoto ? (
                                                     <img
-                                                        src={viewer.profilePhoto.startsWith('http') ? viewer.profilePhoto : `${SERVER_URL}${viewer.profilePhoto}`}
+                                                        src={getProfilePhotoUrl(viewer.profilePhoto)}
                                                         alt={viewer.name}
                                                         className="w-full h-full object-cover"
                                                     />

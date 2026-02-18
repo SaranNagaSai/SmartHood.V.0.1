@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Webcam from 'react-webcam';
 import VoiceInput from '../components/common/VoiceInput';
-import { API_URL, SERVER_URL } from '../utils/apiConfig';
+import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const Profile = () => {
     const { t } = useLanguage();
@@ -194,7 +194,7 @@ const Profile = () => {
                             <div className="w-28 h-28 sm:w-40 h-40 bg-white/20 rounded-full flex items-center justify-center text-4xl sm:text-6xl font-bold backdrop-blur overflow-hidden border-4 border-white/30 shadow-2xl">
                                 {user.profilePhoto ? (
                                     <img
-                                        src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                        src={getProfilePhotoUrl(user.profilePhoto)}
                                         alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
@@ -564,8 +564,16 @@ const Profile = () => {
                             {localityUsers.map(u => (
                                 <div key={u.uniqueId} className="p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:shadow-md transition-all bg-white group">
                                     <div className="flex items-start gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center text-[var(--col-primary)] font-bold text-lg group-hover:scale-110 transition-transform">
-                                            {u.name?.charAt(0).toUpperCase() || 'U'}
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center text-[var(--col-primary)] font-bold text-lg group-hover:scale-110 transition-transform overflow-hidden">
+                                            {u.profilePhoto ? (
+                                                <img
+                                                    src={getProfilePhotoUrl(u.profilePhoto)}
+                                                    alt={u.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                u.name?.charAt(0).toUpperCase() || 'U'
+                                            )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="font-bold text-gray-800 truncate">{u.name}</h4>
