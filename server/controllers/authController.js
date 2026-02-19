@@ -84,12 +84,21 @@ const registerUser = async (req, res) => {
         if (user) {
             // Send Welcome Email if user provided email (Non-blocking)
             if (user.email) {
-                sendWelcomeEmail(user).catch(err => {
-                    console.error('--- Welcome Email FAILED ---');
-                    console.error('Target Email:', user.email);
-                    console.error('Error Trace:', err);
-                    console.error('----------------------------');
-                });
+                console.log(`[Auth] Triggering Welcome Email for: ${user.email}`);
+                sendWelcomeEmail(user)
+                    .then(result => {
+                        if (result.success) {
+                            console.log(`[Auth] Welcome Email SENT successfully to: ${user.email}`);
+                        } else {
+                            console.error(`[Auth] Welcome Email DELIVERY FAILED: ${result.error || 'Unknown error'}`);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('--- Welcome Email CRASHED ---');
+                        console.error('Target Email:', user.email);
+                        console.error('Error Trace:', err);
+                        console.error('----------------------------');
+                    });
             }
 
             // Also add an IN-APP welcome notification (skipEmail=true since welcome email already sent above)

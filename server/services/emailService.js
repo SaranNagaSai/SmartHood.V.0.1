@@ -55,8 +55,9 @@ const sendEmail = async (to, subject, text, html = null) => {
 
         const mailOptions = {
             // Use authenticated sender email to avoid DMARC 'p=reject' issues
-            from: `"SmartHood Notifications" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
-            replyTo: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+            // Standardizing to smarthoodc03@gmail.com as the primary verified sender
+            from: `"SmartHood Notifications" <${process.env.EMAIL_FROM || 'smarthoodc03@gmail.com'}>`,
+            replyTo: process.env.EMAIL_FROM || 'smarthoodc03@gmail.com',
             to,
             subject: `[SmartHood] ${subject}`,
             text,
@@ -85,13 +86,13 @@ const sendEmail = async (to, subject, text, html = null) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[Email] SUCCESS: Message sent to ${to}`);
-        console.log(`[Email] Info: Accepted: ${info.accepted}, Rejected: ${info.rejected}, MsgId: ${info.messageId}`);
+        console.log(`[Email] SUCCESS: Message sent to ${to} (Subject: ${subject})`);
+        console.log(`[Email] Info: Accepted: ${info.accepted}, MsgId: ${info.messageId}`);
         return { success: true, messageId: info.messageId };
     } catch (error) {
         console.error('[Email] FAILED to send email to', to);
-        console.error('[Email] Error Detail:', error);
-        return { success: false, error: error.message };
+        console.error('[Email] Error Stack:', error.stack || error);
+        return { success: false, error: error.message, reason: 'SMTP Transport Error' };
     }
 };
 
