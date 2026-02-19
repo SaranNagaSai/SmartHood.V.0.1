@@ -1,0 +1,33 @@
+{
+  "professionDetails": {
+    "jobRole": "Software engineering",
+    "sector": "It",
+    "businessType": "",
+    "educationLevel": "",
+    "course": "",
+    "description": ""
+  },
+  "_id": "69943e68d6b32dc526fcf9c7",
+  "uniqueId": "LVX93",
+  "name": "Sri Latha",
+  "phone": "7075600670",
+  "age": 21,
+  "gender": "Female",
+  "email": "srilathagarikapati02@gmail.com",
+  "bloodGroup": "B+",
+  "address": "6-90, saniverapeta",
+  "locality": "Saniverapeta",
+  "town": "Vegavaram",
+  "district": "Eluru",
+  "state": "Andhra Pradesh",
+  "professionCategory": "Employed",
+  "experience": 0,
+  "impactScore": 0,
+  "revenue": 0,
+  "isAdmin": false,
+  "language": "English",
+  "profilePhoto": "",
+  "createdAt": "2026-02-17T10:09:44.978Z",
+  "updatedAt": "2026-02-17T10:09:44.978Z",
+  "__v": 0
+}

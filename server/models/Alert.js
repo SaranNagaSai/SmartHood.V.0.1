@@ -22,6 +22,9 @@ const alertSchema = new mongoose.Schema({
     district: { type: String, required: true },
     state: { type: String, required: true },
 
+    // Recipients tracking
+    sentTo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
     isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 

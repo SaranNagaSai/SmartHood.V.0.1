@@ -48,6 +48,9 @@ const serviceSchema = new mongoose.Schema({
     // View Tracking
     views: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
+    // Recipients tracking
+    sentTo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
     // Ratings
     hasBeenRated: { type: Boolean, default: false }
 }, { timestamps: true });

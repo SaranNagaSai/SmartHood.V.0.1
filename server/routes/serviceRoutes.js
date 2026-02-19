@@ -9,13 +9,15 @@ const {
     getServiceById,
     expressInterest,
     completeService,
-    cancelService
+    cancelService,
+    getServiceRecipients
 } = require('../controllers/serviceController');
 
 router.post('/', protect, upload.array('attachments', 5), createService);
 router.get('/', protect, getServices);
 router.get('/my', protect, getMyServices);
 router.get('/:id', protect, getServiceById);
+router.get('/:id/recipients', protect, getServiceRecipients);
 router.post('/:id/interest', protect, expressInterest);
 router.post('/:id/complete', protect, completeService);
 router.delete('/:id', protect, cancelService);

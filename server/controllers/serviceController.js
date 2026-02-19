@@ -122,6 +122,10 @@ const createService = async (req, res) => {
         const targetUsers = await User.find(query);
         console.log(`[Service] Found ${targetUsers.length} recipients. Query:`, JSON.stringify(query, (k, v) => v instanceof RegExp ? v.toString() : v));
 
+        // Store recipient IDs for tracking
+        service.sentTo = targetUsers.map(u => u._id);
+        await service.save();
+
         // Send notifications via unified service
         const { routeNotifications } = require('../services/notificationService');
 
@@ -386,6 +390,30 @@ const cancelService = async (req, res) => {
     }
 };
 
+// @desc    Get recipients of a service
+// @route   GET /api/services/:id/recipients
+// @access  Private
+const getServiceRecipients = async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.id)
+            .populate('sentTo', 'name uniqueId locality professionCategory profilePhoto phone');
+
+        if (!service) {
+            return res.status(404).json({ message: 'Service not found' });
+        }
+
+        // Only the creator can see the recipient list
+        if (service.createdBy.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        res.json(service.sentTo || []);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     createService,
     getServices,
@@ -393,5 +421,6 @@ module.exports = {
     getServiceById,
     expressInterest,
     completeService,
-    cancelService
+    cancelService,
+    getServiceRecipients
 };

@@ -44,6 +44,10 @@ const createAlert = async (req, res) => {
         const targetUsers = await User.find(query);
         console.log(`[Alert] ${category} - ${subType} created for ${targetUsers.length} users in ${req.user.town}`);
 
+        // Store recipient IDs for tracking
+        alert.sentTo = targetUsers.map(u => u._id);
+        await alert.save();
+
         // Track notification counts
         let emailCount = 0;
         let browserCount = 0;
@@ -125,4 +129,28 @@ const getMyAlerts = async (req, res) => {
     }
 };
 
-module.exports = { createAlert, getAlerts, getMyAlerts };
+// @desc    Get recipients of an alert
+// @route   GET /api/alerts/:id/recipients
+// @access  Private
+const getAlertRecipients = async (req, res) => {
+    try {
+        const alert = await Alert.findById(req.params.id)
+            .populate('sentTo', 'name uniqueId locality professionCategory profilePhoto phone');
+
+        if (!alert) {
+            return res.status(404).json({ message: 'Alert not found' });
+        }
+
+        // Only the sender can see the recipient list
+        if (alert.senderId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        res.json(alert.sentTo || []);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+module.exports = { createAlert, getAlerts, getMyAlerts, getAlertRecipients };

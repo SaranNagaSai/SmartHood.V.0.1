@@ -23,6 +23,12 @@ const MyActivity = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
 
+    const [expandedServiceId, setExpandedServiceId] = useState(null);
+    const [recipients, setRecipients] = useState([]);
+    const [loadingRecipients, setLoadingRecipients] = useState(false);
+    const [expandedAlertId, setExpandedAlertId] = useState(null);
+    const [alertRecipients, setAlertRecipients] = useState([]);
+
     useEffect(() => {
         fetchActivity();
         fetchActiveServices();
@@ -67,6 +73,52 @@ const MyActivity = () => {
             setMyAlerts(data);
         } catch (err) {
             console.error('Failed to fetch my alerts', err);
+        }
+    };
+
+    const fetchServiceRecipients = async (serviceId) => {
+        if (expandedServiceId === serviceId) {
+            setExpandedServiceId(null);
+            setRecipients([]);
+            return;
+        }
+        setLoadingRecipients(true);
+        setExpandedServiceId(serviceId);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/services/${serviceId}/recipients`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            setRecipients(data);
+        } catch (err) {
+            console.error(err);
+            setRecipients([]);
+        } finally {
+            setLoadingRecipients(false);
+        }
+    };
+
+    const fetchAlertRecipients = async (alertId) => {
+        if (expandedAlertId === alertId) {
+            setExpandedAlertId(null);
+            setAlertRecipients([]);
+            return;
+        }
+        setLoadingRecipients(true);
+        setExpandedAlertId(alertId);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/alerts/${alertId}/recipients`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            setAlertRecipients(data);
+        } catch (err) {
+            console.error(err);
+            setAlertRecipients([]);
+        } finally {
+            setLoadingRecipients(false);
         }
     };
 
@@ -233,34 +285,74 @@ const MyActivity = () => {
                     </div>
                 )}
 
-                {/* Services Tab - Now Shows Active List */}
+                {/* Services Tab - With Expandable Recipient List */}
                 {activeTab === 'services' && (
                     <div className="space-y-4">
                         <h3 className="font-bold text-gray-800 px-2">{t('my_active_posts')}</h3>
                         {activeServices.length > 0 ? (
                             <div className="space-y-3">
                                 {activeServices.map(service => (
-                                    <div
-                                        key={service._id}
-                                        onClick={() => navigate(`/service/${service._id}`)}
-                                        className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-3 rounded-full ${service.type === 'offer' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
-                                                }`}>
-                                                {service.type === 'offer' ? <Briefcase size={20} /> : <Activity size={20} />}
+                                    <div key={service._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                        <div className="p-4 flex items-center justify-between">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                <div className={`p-3 rounded-full flex-shrink-0 ${service.type === 'offer' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                                                    {service.type === 'offer' ? <Briefcase size={20} /> : <Activity size={20} />}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="font-bold text-gray-800 truncate">{service.title}</h4>
+                                                    <p className="text-xs text-gray-500">
+                                                        {new Date(service.createdAt).toLocaleDateString()} • {service.targetAudience === 'ALL' ? 'Everyone' : 'Specific'}
+                                                    </p>
+                                                    {service.status === 'completed' && (
+                                                        <span className="text-xs font-bold text-green-600 uppercase mt-1 block">{t('completed')}</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-800">{service.title}</h4>
-                                                <p className="text-xs text-gray-500">
-                                                    {new Date(service.createdAt).toLocaleDateString()} • {service.targetAudience === 'ALL' ? 'Everyone' : 'Specific'}
-                                                </p>
-                                                {service.status === 'completed' && (
-                                                    <span className="text-xs font-bold text-green-600 uppercase mt-1 block">{t('completed')}</span>
-                                                )}
+                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); fetchServiceRecipients(service._id); }}
+                                                    className={`text-xs px-3 py-1.5 rounded-full font-medium transition ${expandedServiceId === service._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
+                                                >
+                                                    👥 {service.sentTo?.length || 0} sent
+                                                </button>
+                                                <button
+                                                    onClick={() => navigate(`/service/${service._id}`)}
+                                                    className="p-2 rounded-full hover:bg-gray-100 transition"
+                                                >
+                                                    <ArrowUpRight className="text-gray-400" size={18} />
+                                                </button>
                                             </div>
                                         </div>
-                                        <ArrowUpRight className="text-gray-300" size={20} />
+                                        {/* Expandable Recipient List */}
+                                        {expandedServiceId === service._id && (
+                                            <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Recipients ({recipients.length})</p>
+                                                {loadingRecipients ? (
+                                                    <p className="text-xs text-gray-400 text-center py-2">Loading...</p>
+                                                ) : recipients.length > 0 ? (
+                                                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                                                        {recipients.map(user => (
+                                                            <div key={user._id} className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-50">
+                                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+                                                                    {user.profilePhoto ? (
+                                                                        <img src={user.profilePhoto} alt="" className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        user.name?.charAt(0)
+                                                                    )}
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
+                                                                    <p className="text-xs text-gray-400">{user.locality} • {user.professionCategory || 'N/A'}</p>
+                                                                </div>
+                                                                <span className="text-xs text-gray-300 flex-shrink-0">{user.uniqueId}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-xs text-gray-400 text-center py-2">No recipients recorded yet</p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -274,50 +366,87 @@ const MyActivity = () => {
                     </div>
                 )}
 
-                {/* Alerts Tab */}
+                {/* Alerts Tab - With Expandable Recipient List */}
                 {activeTab === 'alerts' && (
                     <div className="space-y-4">
                         <h3 className="font-bold text-gray-800 px-2">My Alerts</h3>
                         {myAlerts.length > 0 ? (
                             <div className="space-y-3">
                                 {myAlerts.map(alert => (
-                                    <div
-                                        key={alert._id}
-                                        className="bg-white p-4 rounded-xl shadow-sm border border-gray-100"
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <div className={`p-3 rounded-full flex-shrink-0 ${alert.category === 'Emergency'
-                                                ? 'bg-red-100 text-red-600'
-                                                : alert.category === 'Community'
-                                                    ? 'bg-blue-100 text-blue-600'
-                                                    : 'bg-amber-100 text-amber-600'
-                                                }`}>
-                                                <Bell size={20} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${alert.category === 'Emergency'
-                                                        ? 'bg-red-100 text-red-700'
-                                                        : alert.category === 'Community'
-                                                            ? 'bg-blue-100 text-blue-700'
-                                                            : 'bg-amber-100 text-amber-700'
-                                                        }`}>
-                                                        {alert.category}
-                                                    </span>
-                                                    {alert.subType && (
-                                                        <span className="text-xs text-gray-400">{alert.subType}</span>
-                                                    )}
+                                    <div key={alert._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                        <div className="p-4">
+                                            <div className="flex items-start gap-3">
+                                                <div className={`p-3 rounded-full flex-shrink-0 ${alert.category === 'Emergency'
+                                                    ? 'bg-red-100 text-red-600'
+                                                    : alert.category === 'Community'
+                                                        ? 'bg-blue-100 text-blue-600'
+                                                        : 'bg-amber-100 text-amber-600'
+                                                    }`}>
+                                                    <Bell size={20} />
                                                 </div>
-                                                <p className="text-sm text-gray-700 line-clamp-2">{alert.description}</p>
-                                                <p className="text-xs text-gray-400 mt-2">
-                                                    {new Date(alert.createdAt).toLocaleDateString('en-IN', {
-                                                        day: 'numeric', month: 'short', year: 'numeric',
-                                                        hour: '2-digit', minute: '2-digit'
-                                                    })}
-                                                    {alert.locality && ` • ${alert.locality}`}
-                                                </p>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${alert.category === 'Emergency'
+                                                            ? 'bg-red-100 text-red-700'
+                                                            : alert.category === 'Community'
+                                                                ? 'bg-blue-100 text-blue-700'
+                                                                : 'bg-amber-100 text-amber-700'
+                                                            }`}>
+                                                            {alert.category}
+                                                        </span>
+                                                        {alert.subType && (
+                                                            <span className="text-xs text-gray-400">{alert.subType}</span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-gray-700 line-clamp-2">{alert.description}</p>
+                                                    <div className="flex items-center gap-2 mt-2">
+                                                        <p className="text-xs text-gray-400">
+                                                            {new Date(alert.createdAt).toLocaleDateString('en-IN', {
+                                                                day: 'numeric', month: 'short', year: 'numeric',
+                                                                hour: '2-digit', minute: '2-digit'
+                                                            })}
+                                                            {alert.locality && ` • ${alert.locality}`}
+                                                        </p>
+                                                        <button
+                                                            onClick={() => fetchAlertRecipients(alert._id)}
+                                                            className={`text-xs px-3 py-1 rounded-full font-medium transition ml-auto ${expandedAlertId === alert._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
+                                                        >
+                                                            👥 {alert.sentTo?.length || 0} sent
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+                                        {/* Expandable Recipient List */}
+                                        {expandedAlertId === alert._id && (
+                                            <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Recipients ({alertRecipients.length})</p>
+                                                {loadingRecipients ? (
+                                                    <p className="text-xs text-gray-400 text-center py-2">Loading...</p>
+                                                ) : alertRecipients.length > 0 ? (
+                                                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                                                        {alertRecipients.map(user => (
+                                                            <div key={user._id} className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-50">
+                                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+                                                                    {user.profilePhoto ? (
+                                                                        <img src={user.profilePhoto} alt="" className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        user.name?.charAt(0)
+                                                                    )}
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
+                                                                    <p className="text-xs text-gray-400">{user.locality} • {user.professionCategory || 'N/A'}</p>
+                                                                </div>
+                                                                <span className="text-xs text-gray-300 flex-shrink-0">{user.uniqueId}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-xs text-gray-400 text-center py-2">No recipients recorded yet</p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
