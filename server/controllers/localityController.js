@@ -110,7 +110,37 @@ const getFilters = async (req, res) => {
     }
 };
 
+// @desc    Proxy geocoding requests to Nominatim (avoids CORS on frontend)
+// @route   GET /api/localities/geocode
+// @access  Public
+const geocodeLocality = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.status(400).json({ message: 'Query parameter "q" is required' });
+        }
+
+        const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+            params: {
+                q,
+                format: 'json',
+                limit: 5,
+                countrycodes: 'in'
+            },
+            headers: {
+                'User-Agent': 'SmartHood/1.0'
+            }
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        console.error('Geocoding proxy error:', error.message);
+        res.status(500).json({ message: 'Geocoding failed', error: error.message });
+    }
+};
+
 module.exports = {
     getLocalities,
-    getFilters
+    getFilters,
+    geocodeLocality
 };
