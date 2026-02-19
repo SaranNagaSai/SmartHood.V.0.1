@@ -669,19 +669,21 @@ const ExploreCity = () => {
                                 <div className="space-y-3">
                                     {localityUsers.map((user) => (
                                         <div key={user.uniqueId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition border border-gray-100">
-                                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 flex items-center justify-center font-bold text-xl overflow-hidden border border-blue-100 flex-shrink-0">
-                                                {user.profilePhoto ? (
-                                                    <img
-                                                        src={getProfilePhotoUrl(user.profilePhoto)}
-                                                        alt="User"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    user.name.charAt(0)
-                                                )}
-                                            </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-gray-800 text-sm">{user.name}</h4>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    {user.profilePhoto ? (
+                                                        <img
+                                                            src={getProfilePhotoUrl(user.profilePhoto)}
+                                                            alt=""
+                                                            className="w-6 h-6 rounded-full object-cover border border-blue-100 shadow-sm"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">
+                                                            {user.name.charAt(0)}
+                                                        </div>
+                                                    )}
+                                                    <h4 className="font-bold text-gray-800 text-sm">{user.name}</h4>
+                                                </div>
                                                 <p className="text-xs text-gray-500">{user.professionCategory}</p>
                                                 {user.professionDetails?.jobRole && (
                                                     <p className="text-[10px] text-gray-400">{user.professionDetails.jobRole}</p>

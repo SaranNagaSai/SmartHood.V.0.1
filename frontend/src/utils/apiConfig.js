@@ -9,20 +9,33 @@ export const SERVER_URL = API_URL.replace('/api', '');
 export const getProfilePhotoUrl = (photoPath) => {
     if (!photoPath || typeof photoPath !== 'string') return null;
     const trimmedPath = photoPath.trim();
-    if (!trimmedPath || trimmedPath === 'null' || trimmedPath === 'undefined') return null;
+    if (!trimmedPath || trimmedPath === 'null' || trimmedPath === 'undefined' || trimmedPath === '') return null;
 
     // If it's already a full URL (Cloudinary)
     if (trimmedPath.startsWith('http')) {
-        // Upgrade Cloudinary URLs to HTTPS to avoid mixed content on hosted sites
         if (trimmedPath.includes('cloudinary.com') && trimmedPath.startsWith('http:')) {
             return trimmedPath.replace('http:', 'https:');
         }
         return trimmedPath;
     }
 
-    // Otherwise, it's a relative path from the server
-    const normalizedPath = trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`;
-    return `${SERVER_URL}${normalizedPath}`.replace(/\\/g, '/');
+    // Standardize slashes early
+    let cleanPath = trimmedPath.replace(/\\/g, '/');
+
+    // If the path is just a filename (no directory prefix), assume it belongs in /uploads/
+    if (!cleanPath.startsWith('/') && !cleanPath.includes('/')) {
+        cleanPath = `uploads/${cleanPath}`;
+    } else if (cleanPath.startsWith('/') && !cleanPath.substring(1).includes('/')) {
+        cleanPath = `uploads${cleanPath}`;
+    }
+
+    // Ensure leading slash for concatenation
+    const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+
+    // Construct full URL and clean up any double slashes (except the one in http://)
+    const fullUrl = `${SERVER_URL}${finalPath}`.replace(/([^:])\/+/g, '$1/');
+
+    return fullUrl;
 };
 
 if (import.meta.env.PROD) {

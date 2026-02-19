@@ -149,7 +149,16 @@ const ServiceDetail = () => {
                                 )}
                             </div>
                             <div>
-                                <p className="font-bold text-gray-800">{service.createdBy?.name}</p>
+                                <p className="font-bold text-gray-800 flex items-center gap-2">
+                                    {service.createdBy?.name}
+                                    {service.createdBy?.profilePhoto && (
+                                        <img
+                                            src={getProfilePhotoUrl(service.createdBy.profilePhoto)}
+                                            alt=""
+                                            className="w-6 h-6 rounded-full object-cover border border-indigo-100 shadow-sm"
+                                        />
+                                    )}
+                                </p>
                                 <p className="text-xs text-gray-500">{service.createdBy?.uniqueId}</p>
                             </div>
                         </div>

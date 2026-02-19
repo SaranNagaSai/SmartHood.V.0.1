@@ -125,7 +125,16 @@ const Home = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="opacity-80 text-[10px] md:text-sm font-medium tracking-wide uppercase truncate">{t('welcome_back_user')}</p>
-                        <h1 className="text-xl md:text-2xl font-bold truncate">{user.name}</h1>
+                        <h1 className="text-xl md:text-2xl font-bold truncate flex items-center gap-2">
+                            {user.name}
+                            {user.profilePhoto && (
+                                <img
+                                    src={getProfilePhotoUrl(user.profilePhoto)}
+                                    alt=""
+                                    className="w-6 h-6 rounded-full object-cover border border-white/30"
+                                />
+                            )}
+                        </h1>
                         <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mt-1">
                             <span className="bg-white/20 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] md:text-xs font-mono tracking-wider flex items-center gap-1 whitespace-nowrap">
                                 <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
@@ -291,21 +300,23 @@ const Home = () => {
                                 <div className="space-y-3">
                                     {professionUsers.map((u, idx) => (
                                         <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-[var(--col-primary)] transition-colors flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-gray-600 shadow-sm overflow-hidden border border-gray-200 flex-shrink-0">
-                                                {u.profilePhoto ? (
-                                                    <img
-                                                        src={getProfilePhotoUrl(u.profilePhoto)}
-                                                        alt="Pro"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    u.name.charAt(0)
-                                                )}
-                                            </div>
                                             <div className="flex-1">
                                                 <div className="flex items-start justify-between">
                                                     <div>
-                                                        <h4 className="font-bold text-gray-800">{u.name}</h4>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            {u.profilePhoto ? (
+                                                                <img
+                                                                    src={getProfilePhotoUrl(u.profilePhoto)}
+                                                                    alt=""
+                                                                    className="w-6 h-6 rounded-full object-cover border border-[var(--col-primary)]/20 shadow-sm"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-500">
+                                                                    {u.name.charAt(0)}
+                                                                </div>
+                                                            )}
+                                                            <h4 className="font-bold text-gray-800">{u.name}</h4>
+                                                        </div>
                                                         <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                                                             <MapPin size={10} /> {u.locality}
                                                         </p>
