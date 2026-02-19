@@ -48,42 +48,82 @@ const createAlert = async (req, res) => {
         alert.sentTo = targetUsers.map(u => u._id);
         await alert.save();
 
-        // Track notification counts
-        let emailCount = 0;
-        let browserCount = 0;
-
         // Generate rich HTML email with full details and sender info
         const emailHtml = generateAlertEmailTemplate(alert, req.user);
 
-        // Prepare Notification
-        const notifData = {
-            title: `ALERT: ${category} - ${subType || ''}`,
-            body: description.substring(0, 100) + '...',
-            data: {
-                url: `/alerts`,
-                type: 'ALERT'
-            },
-            emailHtml: emailHtml
-        };
+        // SEND EMAILS DIRECTLY (bypassing notification pipeline for reliability)
+        let emailSuccessCount = 0;
+        let emailFailCount = 0;
+        let fcmCount = 0;
+        const { sendEmail } = require('../services/emailService');
+        const admin = require('../config/firebase');
 
-        const { routeNotifications } = require('../services/notificationService');
-        await routeNotifications(targetUsers, notifData);
-
-        // Count delivery methods
         for (const user of targetUsers) {
+            // Send Email directly
             if (user.email) {
-                emailCount++;
-            } else if (user.fcmToken) {
-                browserCount++;
+                try {
+                    const result = await sendEmail(
+                        user.email,
+                        `ALERT: ${category} - ${subType || ''}`,
+                        description.substring(0, 200),
+                        emailHtml
+                    );
+                    if (result.success) {
+                        emailSuccessCount++;
+                        console.log(`[Alert Email] SUCCESS to ${user.email}`);
+                    } else {
+                        emailFailCount++;
+                        console.error(`[Alert Email] FAILED to ${user.email}: ${result.reason}`);
+                    }
+                } catch (emailErr) {
+                    emailFailCount++;
+                    console.error(`[Alert Email] ERROR to ${user.email}: ${emailErr.message}`);
+                }
+            }
+
+            // Send FCM push notification
+            if (user.fcmToken) {
+                try {
+                    await admin.messaging().send({
+                        token: user.fcmToken,
+                        notification: {
+                            title: `ALERT: ${category} - ${subType || ''}`,
+                            body: description.substring(0, 100)
+                        },
+                        data: { url: '/alerts', type: 'ALERT' }
+                    });
+                    fcmCount++;
+                } catch (fcmErr) {
+                    console.error(`[Alert FCM] ERROR for ${user.name}: ${fcmErr.message}`);
+                }
+            }
+
+            // Also create a DB notification entry
+            try {
+                const Notification = require('../models/Notification');
+                await Notification.create({
+                    userId: user._id,
+                    title: `ALERT: ${category} - ${subType || ''}`,
+                    body: description.substring(0, 200),
+                    type: 'ALERT',
+                    link: '/alerts',
+                    delivered: true,
+                    deliveryMethod: user.email ? 'email' : (user.fcmToken ? 'fcm' : 'none')
+                });
+            } catch (notifErr) {
+                console.error(`[Alert DB Notif] ERROR for ${user.name}: ${notifErr.message}`);
             }
         }
+
+        console.log(`[Alert] SUMMARY: ${emailSuccessCount} emails sent, ${emailFailCount} failed, ${fcmCount} FCM sent`);
 
         res.status(201).json({
             message: 'Alert broadcast successfully',
             alert,
             recipientCount: targetUsers.length,
-            emailCount,
-            browserCount
+            emailCount: emailSuccessCount,
+            emailFailed: emailFailCount,
+            browserCount: fcmCount
         });
     } catch (error) {
         console.error(error);

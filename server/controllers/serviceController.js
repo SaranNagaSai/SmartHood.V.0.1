@@ -126,23 +126,82 @@ const createService = async (req, res) => {
         service.sentTo = targetUsers.map(u => u._id);
         await service.save();
 
-        // Send notifications via unified service
-        const { routeNotifications } = require('../services/notificationService');
-
         // Generate rich HTML email
         const emailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase());
 
-        await routeNotifications(targetUsers, {
-            title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}`,
-            body: `${user.name} posted: ${title}`,
-            data: { url: `/service/${service._id}`, type: 'service' },
-            emailHtml: emailHtml
-        });
+        // SEND EMAILS DIRECTLY (bypassing notification pipeline for reliability)
+        let emailSuccessCount = 0;
+        let emailFailCount = 0;
+        let fcmCount = 0;
+        const { sendEmail } = require('../services/emailService');
+        const admin = require('../config/firebase');
+
+        for (const targetUser of targetUsers) {
+            // Send Email directly
+            if (targetUser.email) {
+                try {
+                    const result = await sendEmail(
+                        targetUser.email,
+                        `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
+                        `${user.name} posted: ${title}`,
+                        emailHtml
+                    );
+                    if (result.success) {
+                        emailSuccessCount++;
+                        console.log(`[Service Email] SUCCESS to ${targetUser.email}`);
+                    } else {
+                        emailFailCount++;
+                        console.error(`[Service Email] FAILED to ${targetUser.email}: ${result.reason}`);
+                    }
+                } catch (emailErr) {
+                    emailFailCount++;
+                    console.error(`[Service Email] ERROR to ${targetUser.email}: ${emailErr.message}`);
+                }
+            }
+
+            // Send FCM push notification
+            if (targetUser.fcmToken) {
+                try {
+                    await admin.messaging().send({
+                        token: targetUser.fcmToken,
+                        notification: {
+                            title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}`,
+                            body: `${user.name} posted: ${title}`
+                        },
+                        data: { url: `/service/${service._id}`, type: 'service' }
+                    });
+                    fcmCount++;
+                } catch (fcmErr) {
+                    console.error(`[Service FCM] ERROR for ${targetUser.name}: ${fcmErr.message}`);
+                }
+            }
+
+            // Also create a DB notification entry
+            try {
+                const Notification = require('../models/Notification');
+                await Notification.create({
+                    userId: targetUser._id,
+                    title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
+                    body: `${user.name} posted: ${title}`,
+                    type: 'service',
+                    link: `/service/${service._id}`,
+                    delivered: true,
+                    deliveryMethod: targetUser.email ? 'email' : (targetUser.fcmToken ? 'fcm' : 'none')
+                });
+            } catch (notifErr) {
+                console.error(`[Service DB Notif] ERROR for ${targetUser.name}: ${notifErr.message}`);
+            }
+        }
+
+        console.log(`[Service] SUMMARY: ${emailSuccessCount} emails sent, ${emailFailCount} failed, ${fcmCount} FCM sent`);
 
         res.status(201).json({
             message: 'Service created successfully',
             service,
-            recipientCount: targetUsers.length
+            recipientCount: targetUsers.length,
+            emailCount: emailSuccessCount,
+            emailFailed: emailFailCount,
+            browserCount: fcmCount
         });
     } catch (error) {
         console.error(error);
