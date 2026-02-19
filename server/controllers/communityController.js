@@ -1,3 +1,5 @@
+const User = require('../models/User');
+
 // @desc    Get professions by community (locality) - NOW UPDATED TO RETURN TOWN-WIDE BY DEFAULT IF REQUESTED
 // @route   GET /api/professions/by-community?community=X&town=Y
 // @access  Private
