@@ -1,0 +1,8 @@
+--- Testing Real Email Delivery to renukapaleti27@gmail.com ---
+Using EMAIL_USER: a27bcb001@smtp-brevo.com
+[Email] Creating persistent SMTP Transporter: smtp-relay.brevo.com:587 (User: Present, Secure: false)
+[Email] SMTP Connection Verified (Cached)
+[Email] SUCCESS: Message sent to renukapaleti27@gmail.com (Subject: SmartHood Connection Test)
+[Email] Info: Accepted: renukapaleti27@gmail.com, MsgId: <7c34bebe-dcc6-797d-3bb9-035cf4988d80@gmail.com>
+SUCCESS: Email sent successfully.
+MessageId: <7c34bebe-dcc6-797d-3bb9-035cf4988d80@gmail.com>

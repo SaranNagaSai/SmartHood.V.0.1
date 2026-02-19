@@ -1,0 +1,10 @@
+Connecting to: mongodb+srv:****@cluster0.ak4hxrn.mongodb.net/smarthood?retryWrites=true&w=majority&appName=Cluster0
+MongoDB Connected: ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+--- Users in Eluru: 7 ---
+Name: Renuka Paleti | Locality: 18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru | Email: renukapaleti27@gmail.com
+Name: Lakshmi Prasad  | Locality: Old bus stand | Email: MISSING
+Name: R. Sai Vijay | Locality: Sai Nagar | Email: saivijay.rs@gmail.com
+Name: Saikumar Gubbala | Locality: Tangellamudi | Email: saikumargubbala847@gmail.com
+Name: Seemakurthi Srinivas | Locality: agraharam | Email: srinivasrinu9510@gmail.com
+Name: Munikoti Tharun Sai | Locality: kothapeta | Email: munikotitharun@gmail.com
+Name: Ganesh Aditya Varma Penmethsa | Locality: santhi nagar | Email: adityavarmapenmethsa@gmail.com

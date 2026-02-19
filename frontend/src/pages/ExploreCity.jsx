@@ -257,7 +257,7 @@ const ExploreCity = () => {
                 const state = telanganaDistricts.includes(userTown) ? 'Telangana' : 'Andhra Pradesh';
 
                 const query = `${loc.name}, ${userTown}, ${state}, India`;
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=3&countrycodes=in`);
+                const res = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
                 if (data && data.length > 0) {

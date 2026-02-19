@@ -329,7 +329,7 @@ const generateInterestEmailTemplate = (service, interestedUser) => {
     const actionColor = '#3b82f6'; // Blue
 
     return `
-        < div style = "font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;" >
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
             <div style="background: ${actionColor}; padding: 25px; text-align: center; color: white;">
                 <h1 style="margin: 0; font-size: 24px; font-weight: 700;">New Interest! / కొత్త ఆసక్తి</h1>
                 <p style="margin: 5px 0 0; opacity: 0.9;">Someone is interested in your request</p>
@@ -383,7 +383,7 @@ const generateInterestEmailTemplate = (service, interestedUser) => {
             </div>
         </div>
     `;
-}
+};
 
 /**
  * Generate rich HTML email for Service Completion
@@ -392,7 +392,7 @@ const generateCompletionEmailTemplate = (service, provider, amount) => {
     const actionColor = '#10b981'; // Emerald Green
 
     return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
             <div style="background: ${actionColor}; padding: 25px; text-align: center; color: white;">
                 <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Service Completed! / సేవ పూర్తయింది</h1>
                 <p style="margin: 5px 0 0; opacity: 0.9;">Impact made in ${service.locality}</p>
@@ -435,7 +435,7 @@ const generateCompletionEmailTemplate = (service, provider, amount) => {
             </div>
         </div>
     `;
-}
+};
 
 /**
  * Generate rich HTML email for Alert notifications
@@ -459,8 +459,8 @@ const generateAlertEmailTemplate = (alert, sender) => {
     };
 
     return `
-        < div style = "font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;" >
-            < !--Header with Locality-- >
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+            <!-- Header with Locality -->
             <div style="background: ${headerColor}; padding: 30px 25px; text-align: center; color: white;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">⚠️ Alert from / నుండి హెచ్చరిక</p>
                 <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 0.5px;">${sender.locality || alert.locality || 'Your Community'}</h1>

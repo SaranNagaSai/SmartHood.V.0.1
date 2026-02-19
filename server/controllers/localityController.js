@@ -1,9 +1,10 @@
 const Locality = require('../models/Locality');
+const User = require('../models/User');
+const axios = require('axios');
 
 // @desc    Get all active localities
 // @route   GET /api/localities
 // @access  Public
-const User = require('../models/User');
 
 // @desc    Get all active localities with user counts
 // @route   GET /api/localities
