@@ -54,9 +54,8 @@ const sendEmail = async (to, subject, text, html = null) => {
         }
 
         const mailOptions = {
-            // Use authenticated user as sender to avoid DMARC 'p=reject' issues
-            // while showing a friendly name.
-            from: `"SmartHood Notifications" <${process.env.EMAIL_USER}>`,
+            // Use authenticated sender email to avoid DMARC 'p=reject' issues
+            from: `"SmartHood Notifications" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
             replyTo: process.env.EMAIL_FROM || process.env.EMAIL_USER,
             to,
             subject: `[SmartHood] ${subject}`,
