@@ -1,0 +1,7 @@
+Connecting to: mongodb+srv:****@cluster0.ak4hxrn.mongodb.net/smarthood?retryWrites=true&w=majority&appName=Cluster0
+MongoDB Connected: ac-imy0xvq-shard-00-02.ak4hxrn.mongodb.net
+Sender: Ganesh Aditya Varma Penmethsa | Town: "eluru" | Locality: "santhi nagar"
+Query without locality restrictions: {"town":{"$regex":"/^\\s*eluru\\s*$/i"},"_id":{"$ne":"69969747021f9560cddf569f"}}
+Found 6 potential recipients in town (excluding sender).
+Query with locality restrictions: {"town":{"$regex":"/^\\s*eluru\\s*$/i"},"_id":{"$ne":"69969747021f9560cddf569f"},"locality":{"$in":["/^\\s*santhi nagar\\s*$/i","/^\\s*Sai Nagar\\s*$/i"]}}
+Found 1 recipients with locality restrictions.

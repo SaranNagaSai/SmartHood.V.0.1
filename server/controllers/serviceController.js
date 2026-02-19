@@ -73,31 +73,43 @@ const createService = async (req, res) => {
         // NOTIFICATION LOGIC - Find target users in ALL targeted localities AND communities
         let allCommunities = [user.locality]; // Start with user's own community
 
-        // Add selected communities if provided
+        // Add selected communities if provided (NEW multiselect)
         if (selectedCommunities && Array.isArray(selectedCommunities) && selectedCommunities.length > 0) {
             allCommunities = [...new Set([...allCommunities, ...selectedCommunities])];
         }
 
-        // Also include targetLocalities for backward compatibility
-        if (allTargetLocalities && allTargetLocalities.length > 0) {
-            allCommunities = [...new Set([...allCommunities, ...allTargetLocalities])];
+        // Also include targetLocalities (OLD/Compatibility multiselect)
+        // Ensure we handle both string and array for safety
+        if (targetLocalities) {
+            if (Array.isArray(targetLocalities)) {
+                allCommunities = [...new Set([...allCommunities, ...targetLocalities])];
+            } else if (typeof targetLocalities === 'string') {
+                allCommunities = [...new Set([...allCommunities, targetLocalities])];
+            }
         }
 
         // NOTIFICATION LOGIC - Broaden to TOWN if no specific localities selected
+        const trimmedTown = (user.town || '').trim();
+        const townRegex = new RegExp(`^\\s*${trimmedTown}\\s*$`, 'i');
+
         let query = {
-            town: { $regex: new RegExp(`^\\s*${user.town.trim()}\\s*$`, 'i') },
+            town: { $regex: townRegex },
             _id: { $ne: user._id }
         };
 
-        // If specific communities were targeted, we restrict by those locality names
+        // If specific communities were targeted (more than just origin), we restrict by those locality names
         // otherwise we broadcast to everyone in the town
         if (allCommunities.length > 1) {
+            console.log(`[Service] Restricting to ${allCommunities.length} communities: ${allCommunities.join(', ')}`);
             query.locality = {
-                $in: allCommunities.map(loc => new RegExp(`^\\s*${loc.trim()}\\s*$`, 'i'))
+                $in: allCommunities.map(loc => new RegExp(`^\\s*${(loc || '').trim()}\\s*$`, 'i'))
             };
+        } else {
+            console.log(`[Service] Broadcasting to entire town: ${trimmedTown}`);
         }
 
         if (targetAudience === 'SPECIFIC' && professionArray.length > 0) {
+            console.log(`[Service] Restricting to professions: ${professionArray.join(', ')}`);
             query.$or = [
                 { professionCategory: { $in: professionArray } },
                 { 'professionDetails.jobRole': { $in: professionArray } },
@@ -108,7 +120,7 @@ const createService = async (req, res) => {
         }
 
         const targetUsers = await User.find(query);
-        console.log(`[Service] Found ${targetUsers.length} recipients in town: ${user.town}`);
+        console.log(`[Service] Found ${targetUsers.length} recipients. Query:`, JSON.stringify(query, (k, v) => v instanceof RegExp ? v.toString() : v));
 
         // Send notifications via unified service
         const { routeNotifications } = require('../services/notificationService');

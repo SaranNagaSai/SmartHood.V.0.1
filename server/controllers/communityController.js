@@ -1,25 +1,27 @@
-const User = require('../models/User');
-
-// @desc    Get professions by community (locality)
-// @route   GET /api/professions/by-community?community=X
+// @desc    Get professions by community (locality) - NOW UPDATED TO RETURN TOWN-WIDE BY DEFAULT IF REQUESTED
+// @route   GET /api/professions/by-community?community=X&town=Y
 // @access  Private
 const getProfessionsByCommunity = async (req, res) => {
     try {
-        const { community } = req.query;
+        const { community, town } = req.query;
 
-        if (!community) {
-            return res.status(400).json({ message: 'Community parameter is required' });
+        // Broaden search: If town is provided, we fetch professions from the whole town to give more options
+        // This solves the 'empty' profession list issue for newly registered communities.
+        let matchStage = {};
+        if (town) {
+            matchStage.town = { $regex: new RegExp(`^\\s*${town.trim()}\\s*$`, 'i') };
+        } else if (community) {
+            matchStage.locality = { $regex: new RegExp(`^\\s*${community.trim()}\\s*$`, 'i') };
+        } else {
+            return res.status(400).json({ message: 'Community or Town parameter is required' });
         }
 
-        // Aggregate specific Job Titles from users in the specified community (case-insensitive)
-        const communityRegex = new RegExp(`^\\s*${community.trim()}\\s*$`, 'i');
+        matchStage.professionCategory = { $exists: true, $ne: null, $ne: '' };
+
+        console.log(`[CommunityCtrl] Fetching professions. Match:`, JSON.stringify(matchStage));
+
         const professions = await User.aggregate([
-            {
-                $match: {
-                    locality: { $regex: communityRegex },
-                    professionCategory: { $exists: true, $ne: null, $ne: '' }
-                }
-            },
+            { $match: matchStage },
             {
                 $project: {
                     jobTitle: {
@@ -53,6 +55,7 @@ const getProfessionsByCommunity = async (req, res) => {
             }
         ]);
 
+        console.log(`[CommunityCtrl] Found ${professions.length} professions`);
         res.json(professions);
     } catch (error) {
         console.error('Error fetching professions by community:', error);
@@ -76,9 +79,9 @@ const getCommunitiesByTown = async (req, res) => {
 
         // Aggregate communities (localities) from users in the specified town
         const townRegex = new RegExp(`^\\s*${town.trim()}\\s*$`, 'i');
-        const localityExcludeRegex = new RegExp(`^\\s*${currentUser.locality.trim()}\\s*$`, 'i');
+        const localityExcludeRegex = new RegExp(`^\\s*${(currentUser.locality || '').trim()}\\s*$`, 'i');
 
-
+        console.log(`[CommunityCtrl] Fetching communities for town: ${town}. Excluding: ${currentUser.locality}`);
 
         const communities = await User.aggregate([
             {
@@ -110,7 +113,7 @@ const getCommunitiesByTown = async (req, res) => {
             }
         ]);
 
-
+        console.log(`[CommunityCtrl] Found ${communities.length} communities`);
         res.json(communities);
     } catch (error) {
         console.error('Error fetching communities by town:', error);

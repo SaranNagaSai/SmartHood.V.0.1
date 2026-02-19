@@ -1,0 +1,8 @@
+Connecting to: mongodb+srv:****@cluster0.ak4hxrn.mongodb.net/smarthood?retryWrites=true&w=majority&appName=Cluster0
+MongoDB Connected: ac-imy0xvq-shard-00-02.ak4hxrn.mongodb.net
+--- Normalizing 7 users in "Eluru" ---
+Cleaned up: Renuka Paleti | "Eluru " -> "Eluru" | "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru " -> "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru"
+Cleaned up: Lakshmi Prasad  | "Eluru " -> "Eluru" | "Old bus stand " -> "Old bus stand"
+Cleaned up: Saikumar Gubbala | "Eluru " -> "Eluru" | "Tangellamudi" -> "Tangellamudi"
+Cleaned up: Ganesh Aditya Varma Penmethsa | "eluru" -> "Eluru" | "santhi nagar" -> "santhi nagar"
+--- Cleanup Complete ---

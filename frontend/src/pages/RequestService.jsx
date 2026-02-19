@@ -58,17 +58,16 @@ const RequestService = () => {
                     console.error("Failed to fetch communities", err);
                 }
 
-                // 3. Fetch professions by locality (shows only professions in user's community)
+                // 3. Fetch professions TOWN-WIDE (shows professions from the entire town for more options)
                 try {
-                    const userLocality = user?.locality?.trim();
-                    console.log(`Fetching professions for locality: ${userLocality}`);
-                    const profRes = await axios.get(`${API_URL}/professions/by-community?community=${encodeURIComponent(userLocality)}`, {
+                    console.log(`Fetching professions for town: ${userTown}`);
+                    const profRes = await axios.get(`${API_URL}/professions/by-community?town=${encodeURIComponent(userTown)}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     console.log("Professions response:", profRes.data);
                     setJobTitles(profRes.data);
                 } catch (err) {
-                    console.error("Failed to fetch professions by locality", err);
+                    console.error("Failed to fetch professions by town", err);
                 }
             } else {
                 console.warn("No user town found in localStorage user object");

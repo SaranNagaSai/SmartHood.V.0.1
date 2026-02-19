@@ -1,0 +1,23 @@
+Connecting to: mongodb+srv:****@cluster0.ak4hxrn.mongodb.net/smarthood?retryWrites=true&w=majority&appName=Cluster0
+MongoDB Connected: ac-imy0xvq-shard-00-01.ak4hxrn.mongodb.net
+--- Users in Eluru (7) ---
+1. R. Sai Vijay | Locality: "Sai Nagar" | Town: "Eluru" | Profession: "Student"
+2. Seemakurthi Srinivas | Locality: "agraharam" | Town: "Eluru" | Profession: "Student"
+3. Munikoti Tharun Sai | Locality: "kothapeta" | Town: "Eluru" | Profession: "Student"
+4. Renuka Paleti | Locality: "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru " | Town: "Eluru " | Profession: "Student"
+5. Lakshmi Prasad  | Locality: "Old bus stand " | Town: "Eluru " | Profession: "Student"
+6. Saikumar Gubbala | Locality: "Tangellamudi" | Town: "Eluru " | Profession: "Employed"
+7. Ganesh Aditya Varma Penmethsa | Locality: "santhi nagar" | Town: "eluru" | Profession: "Student"
+--- Locality Aggregation ---
+[
+  { _id: 'Tangellamudi', count: 1 },
+  { _id: 'kothapeta', count: 1 },
+  { _id: 'Old bus stand ', count: 1 },
+  {
+    _id: '18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru ',
+    count: 1
+  },
+  { _id: 'Sai Nagar', count: 1 },
+  { _id: 'agraharam', count: 1 },
+  { _id: 'santhi nagar', count: 1 }
+]

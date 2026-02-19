@@ -1,0 +1,72 @@
+Connecting to: mongodb+srv:****@cluster0.ak4hxrn.mongodb.net/smarthood?retryWrites=true&w=majority&appName=Cluster0
+MongoDB Connected: ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+--- Debugging getLocalities Logic ---
+Match Stage: {"town":{"$regex":{}}}
+Locality Groups Found: 7
+[
+  {
+    "_id": "18-88,vidya nagar, gandhi bomma centre, sanivarapupeta, eluru ",
+    "displayName": "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru ",
+    "userCount": 1
+  },
+  {
+    "_id": "old bus stand ",
+    "displayName": "Old bus stand ",
+    "userCount": 1
+  },
+  {
+    "_id": "sai nagar",
+    "displayName": "Sai Nagar",
+    "userCount": 1
+  },
+  {
+    "_id": "tangellamudi",
+    "displayName": "Tangellamudi",
+    "userCount": 1
+  },
+  {
+    "_id": "agraharam",
+    "displayName": "agraharam",
+    "userCount": 1
+  },
+  {
+    "_id": "kothapeta",
+    "displayName": "kothapeta",
+    "userCount": 1
+  },
+  {
+    "_id": "santhi nagar",
+    "displayName": "santhi nagar",
+    "userCount": 1
+  }
+]
+
+--- Debugging getCommunitiesByTown Logic ---
+Locality Exclude Regex: /^\s*santhi nagar\s*$/i
+Communities Found: 6
+[
+  {
+    "memberCount": 1,
+    "communityName": "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru "
+  },
+  {
+    "memberCount": 1,
+    "communityName": "Old bus stand "
+  },
+  {
+    "memberCount": 1,
+    "communityName": "Sai Nagar"
+  },
+  {
+    "memberCount": 1,
+    "communityName": "Tangellamudi"
+  },
+  {
+    "memberCount": 1,
+    "communityName": "agraharam"
+  },
+  {
+    "memberCount": 1,
+    "communityName": "kothapeta"
+  }
+]

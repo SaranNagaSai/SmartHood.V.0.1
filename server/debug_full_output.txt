@@ -1,0 +1,52 @@
+Connecting to: mongodb+srv:****@cluster0.ak4hxrn.mongodb.net/smarthood?retryWrites=true&w=majority&appName=Cluster0
+MongoDB Connected: ac-imy0xvq-shard-00-00.ak4hxrn.mongodb.net
+
+--- Simulating getLocalities for "Eluru" ---
+1. User Aggregation found 7 groups.
+   Searching Locality collection for names: ["Tangellamudi","kothapeta","18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru ","agraharam","Sai Nagar","Old bus stand ","santhi nagar"]
+2. Locality collection found 0 matching docs.
+3. Final Merged Result (7 items):
+[
+  {
+    "_id": "Tangellamudi",
+    "name": "Tangellamudi",
+    "userCount": 1,
+    "coordinates": null
+  },
+  {
+    "_id": "kothapeta",
+    "name": "kothapeta",
+    "userCount": 1,
+    "coordinates": null
+  },
+  {
+    "_id": "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru ",
+    "name": "18-88,Vidya Nagar, Gandhi bomma Centre, Sanivarapupeta, Eluru",
+    "userCount": 1,
+    "coordinates": null
+  },
+  {
+    "_id": "agraharam",
+    "name": "agraharam",
+    "userCount": 1,
+    "coordinates": null
+  },
+  {
+    "_id": "Sai Nagar",
+    "name": "Sai Nagar",
+    "userCount": 1,
+    "coordinates": null
+  },
+  {
+    "_id": "Old bus stand ",
+    "name": "Old bus stand",
+    "userCount": 1,
+    "coordinates": null
+  },
+  {
+    "_id": "santhi nagar",
+    "name": "santhi nagar",
+    "userCount": 1,
+    "coordinates": null
+  }
+]

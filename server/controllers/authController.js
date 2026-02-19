@@ -61,21 +61,21 @@ const registerUser = async (req, res) => {
             profilePhotoPath = req.file.path;
         }
 
-        // Create user
+        // Create user with normalized geographic data
         const user = await User.create({
             uniqueId,
-            name,
+            name: (name || '').trim(),
             profilePhoto: profilePhotoPath,
-            phone,
+            phone: (phone || '').trim(),
             age: parseInt(age) || 0,
             gender,
-            email,
+            email: (email || '').trim().toLowerCase(),
             bloodGroup,
-            address,
-            locality,
-            town,
-            district,
-            state,
+            address: (address || '').trim(),
+            locality: (locality || '').trim(),
+            town: (town || '').trim().charAt(0).toUpperCase() + (town || '').trim().slice(1).toLowerCase(), // Normalize "Eluru"
+            district: (district || '').trim(),
+            state: (state || '').trim(),
             professionCategory,
             professionDetails,
             experience: parseInt(experience) || 0
