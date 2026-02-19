@@ -7,19 +7,22 @@ export const SERVER_URL = API_URL.replace('/api', '');
  * Handles Cloudinary URLs, local storage paths, and protocol upgrades.
  */
 export const getProfilePhotoUrl = (photoPath) => {
-    if (!photoPath) return null;
+    if (!photoPath || typeof photoPath !== 'string') return null;
+    const trimmedPath = photoPath.trim();
+    if (!trimmedPath || trimmedPath === 'null' || trimmedPath === 'undefined') return null;
 
     // If it's already a full URL (Cloudinary)
-    if (photoPath.startsWith('http')) {
+    if (trimmedPath.startsWith('http')) {
         // Upgrade Cloudinary URLs to HTTPS to avoid mixed content on hosted sites
-        if (photoPath.includes('cloudinary.com') && photoPath.startsWith('http:')) {
-            return photoPath.replace('http:', 'https:');
+        if (trimmedPath.includes('cloudinary.com') && trimmedPath.startsWith('http:')) {
+            return trimmedPath.replace('http:', 'https:');
         }
-        return photoPath;
+        return trimmedPath;
     }
 
     // Otherwise, it's a relative path from the server
-    return `${SERVER_URL}${photoPath}`;
+    const normalizedPath = trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`;
+    return `${SERVER_URL}${normalizedPath}`.replace(/\\/g, '/');
 };
 
 if (import.meta.env.PROD) {

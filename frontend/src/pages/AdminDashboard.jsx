@@ -6,7 +6,7 @@ import {
     ArrowUp, ArrowDown, RefreshCw, LogOut
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { API_URL, SERVER_URL } from '../utils/apiConfig';
+import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const AdminDashboard = () => {
     const { t } = useLanguage();
@@ -307,7 +307,7 @@ const AdminDashboard = () => {
                                                             <div className="w-12 h-12 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold overflow-hidden border border-purple-200">
                                                                 {user.profilePhoto ? (
                                                                     <img
-                                                                        src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `${SERVER_URL}${user.profilePhoto}`}
+                                                                        src={getProfilePhotoUrl(user.profilePhoto)}
                                                                         alt="User"
                                                                         className="w-full h-full object-cover"
                                                                     />
