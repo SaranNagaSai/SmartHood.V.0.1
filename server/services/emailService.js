@@ -8,7 +8,7 @@ const createTransporter = () => {
     if (transporterInstance) return transporterInstance;
 
     const host = process.env.EMAIL_HOST || 'smtp-relay.brevo.com';
-    const port = parseInt(process.env.EMAIL_PORT) || 587;
+    const port = parseInt(process.env.EMAIL_PORT) || 2525;
     const secure = port === 465;
 
     console.log(`[Email] Creating persistent SMTP Transporter: ${host}:${port} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'}, Secure: ${secure})`);
