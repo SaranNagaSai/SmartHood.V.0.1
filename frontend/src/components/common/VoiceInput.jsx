@@ -4,7 +4,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 import PropTypes from 'prop-types';
 
-const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', required = false, className, name }) => {
+const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', required = false, className, labelClassName, name }) => {
     // ... (rest of component body same as before, essentially just wrapping export and adding propTypes)
     // Actually, because the component is long, I will use MultiReplace or just replace the end.
     // Replacing the whole file is safer to ensure imports are at top.
@@ -71,7 +71,7 @@ const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', requir
 
     return (
         <div className="mb-4">
-            {label && <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">{label}</label>}
+            {label && <label className={`block text-xs font-bold uppercase mb-2 ml-1 ${labelClassName || 'text-gray-500'}`}>{label}</label>}
             <div className="relative group">
                 {type === 'textarea' ? (
                     <textarea
@@ -120,6 +120,7 @@ VoiceInput.propTypes = {
     type: PropTypes.string,
     required: PropTypes.bool,
     className: PropTypes.string,
+    labelClassName: PropTypes.string,
     name: PropTypes.string
 };
 
