@@ -129,79 +129,84 @@ const createService = async (req, res) => {
         // Generate rich HTML email
         const emailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase());
 
-        // SEND EMAILS DIRECTLY (bypassing notification pipeline for reliability)
-        let emailSuccessCount = 0;
-        let emailFailCount = 0;
-        let fcmCount = 0;
-        const { sendEmail } = require('../services/emailService');
-        const admin = require('../config/firebase');
+        // SEND EMAILS IN BACKGROUND (Non-blocking)
+        setImmediate(async () => {
+            console.log(`[Background] Starting email broadcast for Service ${service._id} to ${targetUsers.length} users`);
 
-        for (const targetUser of targetUsers) {
-            // Send Email directly
-            if (targetUser.email) {
-                try {
-                    const result = await sendEmail(
-                        targetUser.email,
-                        `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
-                        `${user.name} posted: ${title}`,
-                        emailHtml
-                    );
-                    if (result.success) {
-                        emailSuccessCount++;
-                        console.log(`[Service Email] SUCCESS to ${targetUser.email}`);
-                    } else {
-                        emailFailCount++;
-                        console.error(`[Service Email] FAILED to ${targetUser.email}: ${result.reason}`);
-                    }
-                } catch (emailErr) {
-                    emailFailCount++;
-                    console.error(`[Service Email] ERROR to ${targetUser.email}: ${emailErr.message}`);
-                }
-            }
+            let emailSuccessCount = 0;
+            let emailFailCount = 0;
+            let fcmCount = 0;
+            const { sendEmail } = require('../services/emailService');
+            const admin = require('../config/firebase');
 
-            // Send FCM push notification
-            if (targetUser.fcmToken) {
-                try {
-                    await admin.messaging().send({
-                        token: targetUser.fcmToken,
-                        notification: {
-                            title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}`,
-                            body: `${user.name} posted: ${title}`
-                        },
-                        data: { url: `/service/${service._id}`, type: 'service' }
-                    });
-                    fcmCount++;
-                } catch (fcmErr) {
-                    console.error(`[Service FCM] ERROR for ${targetUser.name}: ${fcmErr.message}`);
-                }
-            }
-
-            // Also create a DB notification entry
             try {
-                const Notification = require('../models/Notification');
-                await Notification.create({
-                    userId: targetUser._id,
-                    title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
-                    body: `${user.name} posted: ${title}`,
-                    type: 'service',
-                    link: `/service/${service._id}`,
-                    delivered: true,
-                    deliveryMethod: targetUser.email ? 'email' : (targetUser.fcmToken ? 'fcm' : 'none')
-                });
-            } catch (notifErr) {
-                console.error(`[Service DB Notif] ERROR for ${targetUser.name}: ${notifErr.message}`);
-            }
-        }
+                for (const targetUser of targetUsers) {
+                    // Send Email directly
+                    if (targetUser.email) {
+                        try {
+                            const result = await sendEmail(
+                                targetUser.email,
+                                `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
+                                `${user.name} posted: ${title}`,
+                                emailHtml
+                            );
+                            if (result.success) {
+                                emailSuccessCount++;
+                                console.log(`[Service Email] SUCCESS to ${targetUser.email}`);
+                            } else {
+                                emailFailCount++;
+                                console.error(`[Service Email] FAILED to ${targetUser.email}: ${result.reason}`);
+                            }
+                        } catch (emailErr) {
+                            emailFailCount++;
+                            console.error(`[Service Email] ERROR to ${targetUser.email}: ${emailErr.message}`);
+                        }
+                    }
 
-        console.log(`[Service] SUMMARY: ${emailSuccessCount} emails sent, ${emailFailCount} failed, ${fcmCount} FCM sent`);
+                    // Send FCM push notification
+                    if (targetUser.fcmToken) {
+                        try {
+                            await admin.messaging().send({
+                                token: targetUser.fcmToken,
+                                notification: {
+                                    title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}`,
+                                    body: `${user.name} posted: ${title}`
+                                },
+                                data: { url: `/service/${service._id}`, type: 'service' }
+                            });
+                            fcmCount++;
+                        } catch (fcmErr) {
+                            console.error(`[Service FCM] ERROR for ${targetUser.name}: ${fcmErr.message}`);
+                        }
+                    }
+
+                    // Also create a DB notification entry
+                    try {
+                        const Notification = require('../models/Notification');
+                        await Notification.create({
+                            userId: targetUser._id,
+                            title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
+                            body: `${user.name} posted: ${title}`,
+                            type: 'service',
+                            link: `/service/${service._id}`,
+                            delivered: true,
+                            deliveryMethod: targetUser.email ? 'email' : (targetUser.fcmToken ? 'fcm' : 'none')
+                        });
+                    } catch (notifErr) {
+                        console.error(`[Service DB Notif] ERROR for ${targetUser.name}: ${notifErr.message}`);
+                    }
+                }
+                console.log(`[Background] Service Broadcast COMPLETE: ${emailSuccessCount} sent, ${emailFailCount} failed, ${fcmCount} FCM`);
+            } catch (bgError) {
+                console.error(`[Background] Service Broadcast CRASHED: ${bgError.message}`);
+            }
+        });
 
         res.status(201).json({
             message: 'Service created successfully',
             service,
             recipientCount: targetUsers.length,
-            emailCount: emailSuccessCount,
-            emailFailed: emailFailCount,
-            browserCount: fcmCount
+            status: 'processing_in_background'
         });
     } catch (error) {
         console.error(error);

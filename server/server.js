@@ -62,6 +62,7 @@ app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/professions', require('./routes/professionRoutes'));
 app.use('/api/communities', require('./routes/communityRoutes'));
+app.use('/api/debug', require('./routes/debugRoutes'));
 
 app.get('/', (req, res) => res.json({ status: 'ok', message: 'SmartHood API Running' }));
 

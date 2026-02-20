@@ -51,79 +51,87 @@ const createAlert = async (req, res) => {
         // Generate rich HTML email with full details and sender info
         const emailHtml = generateAlertEmailTemplate(alert, req.user);
 
-        // SEND EMAILS DIRECTLY (bypassing notification pipeline for reliability)
-        let emailSuccessCount = 0;
-        let emailFailCount = 0;
-        let fcmCount = 0;
-        const { sendEmail } = require('../services/emailService');
-        const admin = require('../config/firebase');
+        // SEND EMAILS IN BACKGROUND (Non-blocking)
+        // Use setImmediate to process emails after the response is sent
+        setImmediate(async () => {
+            console.log(`[Background] Starting email broadcast for Alert ${alert._id} to ${targetUsers.length} users`);
 
-        for (const user of targetUsers) {
-            // Send Email directly
-            if (user.email) {
-                try {
-                    const result = await sendEmail(
-                        user.email,
-                        `ALERT: ${category} - ${subType || ''}`,
-                        description.substring(0, 200),
-                        emailHtml
-                    );
-                    if (result.success) {
-                        emailSuccessCount++;
-                        console.log(`[Alert Email] SUCCESS to ${user.email}`);
-                    } else {
-                        emailFailCount++;
-                        console.error(`[Alert Email] FAILED to ${user.email}: ${result.reason}`);
-                    }
-                } catch (emailErr) {
-                    emailFailCount++;
-                    console.error(`[Alert Email] ERROR to ${user.email}: ${emailErr.message}`);
-                }
-            }
+            let emailSuccessCount = 0;
+            let emailFailCount = 0;
+            let fcmCount = 0;
+            const { sendEmail } = require('../services/emailService');
+            const admin = require('../config/firebase');
 
-            // Send FCM push notification
-            if (user.fcmToken) {
-                try {
-                    await admin.messaging().send({
-                        token: user.fcmToken,
-                        notification: {
-                            title: `ALERT: ${category} - ${subType || ''}`,
-                            body: description.substring(0, 100)
-                        },
-                        data: { url: '/alerts', type: 'ALERT' }
-                    });
-                    fcmCount++;
-                } catch (fcmErr) {
-                    console.error(`[Alert FCM] ERROR for ${user.name}: ${fcmErr.message}`);
-                }
-            }
-
-            // Also create a DB notification entry
             try {
-                const Notification = require('../models/Notification');
-                await Notification.create({
-                    userId: user._id,
-                    title: `ALERT: ${category} - ${subType || ''}`,
-                    body: description.substring(0, 200),
-                    type: 'ALERT',
-                    link: '/alerts',
-                    delivered: true,
-                    deliveryMethod: user.email ? 'email' : (user.fcmToken ? 'fcm' : 'none')
-                });
-            } catch (notifErr) {
-                console.error(`[Alert DB Notif] ERROR for ${user.name}: ${notifErr.message}`);
-            }
-        }
+                for (const user of targetUsers) {
+                    // Send Email directly
+                    if (user.email) {
+                        try {
+                            const result = await sendEmail(
+                                user.email,
+                                `ALERT: ${category} - ${subType || ''}`,
+                                description.substring(0, 200),
+                                emailHtml
+                            );
+                            if (result.success) {
+                                emailSuccessCount++;
+                                // consoling every success might be too noisy for large numbers, but good for debug
+                                console.log(`[Alert Email] SUCCESS to ${user.email}`);
+                            } else {
+                                emailFailCount++;
+                                console.error(`[Alert Email] FAILED to ${user.email}: ${result.reason}`);
+                            }
+                        } catch (emailErr) {
+                            emailFailCount++;
+                            console.error(`[Alert Email] ERROR to ${user.email}: ${emailErr.message}`);
+                        }
+                    }
 
-        console.log(`[Alert] SUMMARY: ${emailSuccessCount} emails sent, ${emailFailCount} failed, ${fcmCount} FCM sent`);
+                    // Send FCM push notification
+                    if (user.fcmToken) {
+                        try {
+                            await admin.messaging().send({
+                                token: user.fcmToken,
+                                notification: {
+                                    title: `ALERT: ${category} - ${subType || ''}`,
+                                    body: description.substring(0, 100)
+                                },
+                                data: { url: '/alerts', type: 'ALERT' }
+                            });
+                            fcmCount++;
+                        } catch (fcmErr) {
+                            console.error(`[Alert FCM] ERROR for ${user.name}: ${fcmErr.message}`);
+                        }
+                    }
+
+                    // Also create a DB notification entry
+                    try {
+                        const Notification = require('../models/Notification');
+                        await Notification.create({
+                            userId: user._id,
+                            title: `ALERT: ${category} - ${subType || ''}`,
+                            body: description.substring(0, 200),
+                            type: 'ALERT',
+                            link: '/alerts',
+                            delivered: true,
+                            deliveryMethod: user.email ? 'email' : (user.fcmToken ? 'fcm' : 'none')
+                        });
+                    } catch (notifErr) {
+                        console.error(`[Alert DB Notif] ERROR for ${user.name}: ${notifErr.message}`);
+                    }
+                }
+
+                console.log(`[Background] Alert Broadcast COMLPETE: ${emailSuccessCount} sent, ${emailFailCount} failed, ${fcmCount} FCM`);
+            } catch (bgError) {
+                console.error(`[Background] Alert Broadcast CRASHED: ${bgError.message}`);
+            }
+        });
 
         res.status(201).json({
-            message: 'Alert broadcast successfully',
+            message: 'Alert broadcast started successfully',
             alert,
             recipientCount: targetUsers.length,
-            emailCount: emailSuccessCount,
-            emailFailed: emailFailCount,
-            browserCount: fcmCount
+            status: 'processing_in_background'
         });
     } catch (error) {
         console.error(error);
