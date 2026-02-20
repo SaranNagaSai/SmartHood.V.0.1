@@ -87,6 +87,7 @@ const Navbar = () => {
                                         <img
                                             src={getProfilePhotoUrl(user.profilePhoto)}
                                             alt="Profile"
+                                            crossOrigin="anonymous"
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
