@@ -13,6 +13,7 @@ const createTransporter = () => {
 
     console.log(`[Email] Creating persistent SMTP Transporter: ${host}:${port} (User: ${process.env.EMAIL_USER ? 'Present' : 'Missing'}, Secure: ${secure})`);
 
+    // Create transporter with timeouts
     transporterInstance = nodemailer.createTransport({
         host,
         port,
@@ -23,14 +24,17 @@ const createTransporter = () => {
         },
         tls: {
             rejectUnauthorized: false
-        }
+        },
+        // Render optimization: Increase timeouts
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 5000,    // 5 seconds
+        socketTimeout: 20000      // 20 seconds
     });
 
     return transporterInstance;
 };
 
-// Global verification status
-let isTransporterVerified = false;
+// Global verification status logic removed - sendMail will handle connection errors directly
 
 const sendEmail = async (to, subject, text, html = null) => {
     try {
@@ -41,17 +45,8 @@ const sendEmail = async (to, subject, text, html = null) => {
 
         const transporter = createTransporter();
 
-        // Verify connection once per session or if flag is false
-        if (!isTransporterVerified) {
-            try {
-                await transporter.verify();
-                isTransporterVerified = true;
-                console.log('[Email] SMTP Connection Verified (Cached)');
-            } catch (verifyError) {
-                console.error('[Email] SMTP Verification FAILED:', verifyError.message);
-                return { success: false, reason: 'SMTP Verification Failed', error: verifyError.message };
-            }
-        }
+        // Removed explicit verify() which caused timeouts on Render.
+        // transporter.sendMail will attempt connection automatically.
 
         const mailOptions = {
             // Use authenticated sender email to avoid DMARC 'p=reject' issues
