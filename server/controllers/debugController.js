@@ -7,11 +7,19 @@ const nodemailer = require('nodemailer');
 const testEmailConfig = async (req, res) => {
     try {
         const configReport = {
-            host: process.env.EMAIL_HOST || 'N/A',
-            port: process.env.EMAIL_PORT || 'N/A',
-            user: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.substring(0, 3)}***` : 'MISSING',
-            pass: process.env.EMAIL_PASSWORD ? 'PRESENT (Masked)' : 'MISSING',
-            from: process.env.EMAIL_FROM || 'N/A'
+            system: {
+                nodeEnv: process.env.NODE_ENV,
+                frontendUrl: process.env.FRONTEND_URL || 'MISSING',
+                clientUrl: process.env.CLIENT_URL || 'MISSING (Should match FRONTEND_URL)',
+                jwtSecret: process.env.JWT_SECRET ? 'PRESENT' : 'MISSING'
+            },
+            email: {
+                host: process.env.EMAIL_HOST || 'N/A',
+                port: process.env.EMAIL_PORT || 'N/A',
+                user: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.substring(0, 3)}***` : 'MISSING',
+                pass: process.env.EMAIL_PASSWORD ? 'PRESENT (Masked)' : 'MISSING',
+                from: process.env.EMAIL_FROM || 'N/A'
+            }
         };
 
         console.log('[Debug] Testing SMTP Config on Server:', configReport);
