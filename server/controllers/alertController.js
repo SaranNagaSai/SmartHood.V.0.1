@@ -57,7 +57,10 @@ const createAlert = async (req, res) => {
         }
 
         const targetUsers = await User.find(query);
-        console.log(`[Alert] ${category} - ${subType} created. Broadcast to ${targetUsers.length} users. (Targeted: ${targetIds.length > 0})`);
+        console.log(`[Alert Debug] Category: ${category}, SubType: ${subType}`);
+        console.log(`[Alert Debug] Initial targetIdsRaw: ${JSON.stringify(req.body.targetUserIds || req.body['targetUserIds[]'])}`);
+        console.log(`[Alert Debug] Normalized targetIds: ${JSON.stringify(targetIds)}`);
+        console.log(`[Alert Debug] Found ${targetUsers.length} target users in DB.`);
 
         // Store recipient IDs for tracking
         alert.sentTo = targetUsers.map(u => u._id);
@@ -73,12 +76,15 @@ const createAlert = async (req, res) => {
 
             let emailSuccessCount = 0;
             let emailFailCount = 0;
+            let emailSkipCount = 0;
             let fcmCount = 0;
             const { sendEmail } = require('../services/emailService');
             const admin = require('../config/firebase');
 
             try {
                 for (const user of targetUsers) {
+                    console.log(`[Alert Trace] Processing user: ${user.name} (${user._id}), email: ${user.email || 'MISSING'}`);
+
                     // Send Email directly
                     if (user.email) {
                         try {
@@ -90,7 +96,6 @@ const createAlert = async (req, res) => {
                             );
                             if (result.success) {
                                 emailSuccessCount++;
-                                // consoling every success might be too noisy for large numbers, but good for debug
                                 console.log(`[Alert Email] SUCCESS to ${user.email}`);
                             } else {
                                 emailFailCount++;
@@ -100,6 +105,9 @@ const createAlert = async (req, res) => {
                             emailFailCount++;
                             console.error(`[Alert Email] ERROR to ${user.email}: ${emailErr.message}`);
                         }
+                    } else {
+                        emailSkipCount++;
+                        console.log(`[Alert Email] SKIP user ${user.name} - No email provided.`);
                     }
 
                     // Send FCM push notification
@@ -136,7 +144,7 @@ const createAlert = async (req, res) => {
                     }
                 }
 
-                console.log(`[Background] Alert Broadcast COMLPETE: ${emailSuccessCount} sent, ${emailFailCount} failed, ${fcmCount} FCM`);
+                console.log(`[Background] Alert Broadcast COMPLETE: ${emailSuccessCount} sent, ${emailFailCount} failed, ${emailSkipCount} skipped (no email), ${fcmCount} FCM`);
             } catch (bgError) {
                 console.error(`[Background] Alert Broadcast CRASHED: ${bgError.message}`);
             }
