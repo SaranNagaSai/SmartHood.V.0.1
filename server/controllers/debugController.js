@@ -24,26 +24,10 @@ const testEmailConfig = async (req, res) => {
 
         console.log('[Debug] Testing SMTP Config on Server:', configReport);
 
-        // 1. Create temporary transporter to test connection
-        const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: parseInt(process.env.EMAIL_PORT),
-            secure: parseInt(process.env.EMAIL_PORT) === 465,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        });
+        // 1. SKIP Manual Verify: It causes timeouts on Render.
+        // We will rely on the actual sendEmail attempt below to test connection.
+        configReport.connection = 'SKIPPED (Implicit in Send Loop)';
 
-        // 2. Verify Connection
-        try {
-            await transporter.verify();
-            configReport.connection = 'SUCCESS';
-        } catch (err) {
-            configReport.connection = 'FAILED';
-            configReport.error = err.message;
-            return res.status(500).json({ message: 'SMTP Connection Failed', report: configReport });
-        }
 
         // 3. Send Test Email (if email query param provided, otherwise to sender/default)
         const targetEmail = req.query.email || 'sarannagasait@gmail.com';
