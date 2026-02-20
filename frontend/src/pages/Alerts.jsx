@@ -163,8 +163,8 @@ const Alerts = () => {
                 }
             });
 
-            const { recipientCount = 0, emailCount = 0, browserCount = 0 } = response.data;
-            alert(`${t('alert_success')}\n\nBroadcast to ${recipientCount} users\n${emailCount} emails sent, ${browserCount} browser notifications`);
+            const { recipientCount = 0 } = response.data;
+            alert(`${t('alert_success')}\n\n${t('broadcast_started', 'Broadcast started')} to ${recipientCount} recipients.\nEmails and notifications are being sent in the background.`);
             navigate('/home');
         } catch (error) {
             console.error('Alert broadcast error:', error);
