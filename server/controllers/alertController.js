@@ -32,17 +32,24 @@ const createAlert = async (req, res) => {
         // Broaden to TOWN-wide alerts for community emergency/general alerts
         const townRegex = new RegExp(`^\\s*${req.user.town.trim()}\\s*$`, 'i');
         let query = { town: { $regex: townRegex } };
-        query._id = { $ne: req.user._id };
 
-        if (category === 'Emergency' && subType === 'Blood Donation') {
-            // Strict Filtering: Only match blood group
-            if (bloodGroup) {
-                query.bloodGroup = bloodGroup;
+        // Handle Targeted Alerts (e.g., Blood Donation specific selection)
+        if (req.body.targetUserIds && Array.isArray(req.body.targetUserIds) && req.body.targetUserIds.length > 0) {
+            query._id = { $in: req.body.targetUserIds, $ne: req.user._id };
+        } else {
+            // Default Broadcast Logic
+            query._id = { $ne: req.user._id };
+
+            if (category === 'Emergency' && subType === 'Blood Donation') {
+                // Strict Filtering: Only match blood group
+                if (bloodGroup) {
+                    query.bloodGroup = bloodGroup;
+                }
             }
         }
 
         const targetUsers = await User.find(query);
-        console.log(`[Alert] ${category} - ${subType} created for ${targetUsers.length} users in ${req.user.town}`);
+        console.log(`[Alert] ${category} - ${subType} created for ${targetUsers.length} users in ${req.user.town} (Targeted: ${!!req.body.targetUserIds})`);
 
         // Store recipient IDs for tracking
         alert.sentTo = targetUsers.map(u => u._id);

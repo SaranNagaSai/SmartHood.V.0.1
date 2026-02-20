@@ -9,7 +9,8 @@ const {
     getActivity,
     updateFcmToken,
     getUsersByLocality,
-    uploadPhoto
+    uploadPhoto,
+    searchUsers
 } = require('../controllers/userController');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -21,5 +22,6 @@ router.post('/photo', protect, upload.single('profilePhoto'), uploadPhoto);
 router.get('/activity', protect, getActivity);
 router.put('/fcm-token', protect, updateFcmToken);
 router.get('/locality/:locality', protect, getUsersByLocality);
+router.get('/search', protect, searchUsers);
 
 module.exports = router;

@@ -320,5 +320,61 @@ module.exports = {
     getActivity,
     updateFcmToken,
     getUsersByLocality,
-    uploadPhoto
+    uploadPhoto,
+    searchUsers
+};
+
+// @desc    Search users (for Blood Donation etc)
+// @route   GET /api/users/search
+// @access  Private
+const searchUsers = async (req, res) => {
+    try {
+        const { town, locality, bloodGroup, q } = req.query;
+        const currentUser = req.user;
+
+        const query = {};
+
+        // Use provided Town or Fallback to User's Town
+        // Always scope to a town to prevent global leakage unless admin (which this is not)
+        const targetTown = town || currentUser.town;
+        if (targetTown) {
+            query.town = { $regex: new RegExp(`^\\s*${targetTown.trim()}\\s*$`, 'i') };
+        }
+
+        if (locality) {
+            query.locality = { $regex: new RegExp(`^${locality}$`, 'i') };
+        }
+
+        if (bloodGroup) {
+            query.bloodGroup = bloodGroup;
+        }
+
+        if (q) {
+            query.name = { $regex: q, $options: 'i' };
+        }
+
+        // Exclude current user from results (don't donate to self in alert list)
+        query._id = { $ne: currentUser._id };
+
+        const users = await User.find(query)
+            .select('name uniqueId locality phone profilePhoto bloodGroup professionCategory')
+            .limit(100);
+
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+module.exports = {
+    getLocalityStats,
+    getUsersByProfession,
+    getProfile,
+    updateProfile,
+    getActivity,
+    updateFcmToken,
+    getUsersByLocality,
+    uploadPhoto,
+    searchUsers
 };
