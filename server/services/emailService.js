@@ -95,7 +95,7 @@ const sendEmail = async (to, subject, text, html = null) => {
  * Send welcome email upon registration
  */
 const sendWelcomeEmail = async (user) => {
-    const subject = '🎉 Welcome to SmartHood! Your Community Awaits 🏠';
+    const subject = `🎉 Welcome to SmartHood, ${user.name}!`;
     const text = `Namaste ${user.name} 🙏,\n\nWelcome to SmartHood! Your registration is complete.\n\nYour Unique ID: ${user.uniqueId}\n\nLogin with this ID and your phone number: ${user.phone}`;
 
     const html = `
