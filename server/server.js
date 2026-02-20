@@ -22,17 +22,26 @@ app.use(morgan('dev'));
 // Rate Limiting
 app.use(rateLimiter);
 
+// Helper to normalize origins
+const normalizeOrigin = (url) => url ? url.replace(/\/$/, '') : '';
+
 const allowedOrigins = [
-    process.env.FRONTEND_URL,
+    normalizeOrigin(process.env.FRONTEND_URL),
+    'https://smarthood.onrender.com', // Safe fallback
     'http://localhost:5173',
     'http://localhost:5174'
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        // Allow requests with no origin (like mobile apps, curl)
+        if (!origin) return callback(null, true);
+
+        const normalizedOrigin = normalizeOrigin(origin);
+        if (allowedOrigins.includes(normalizedOrigin)) {
             callback(null, true);
         } else {
+            console.warn(`[CORS] Blocked request from origin: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
