@@ -184,7 +184,11 @@ const Register = () => {
 
             const res = await axios.post(`${API_URL}/auth/register`, formDataToSend);
 
-            alert(`Registration Successful! Your Unique ID: ${res.data.uniqueId}`);
+            let successMsg = `Registration Successful! Your Unique ID: ${res.data.uniqueId}`;
+            if (formData.email) {
+                successMsg += `\n\nA confirmation is sent to: ${formData.email}`;
+            }
+            alert(successMsg);
             login(res.data, res.data.token);
             navigate('/home');
         } catch (error) {
