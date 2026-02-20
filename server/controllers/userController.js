@@ -312,17 +312,7 @@ const uploadPhoto = async (req, res) => {
     }
 };
 
-module.exports = {
-    getLocalityStats,
-    getUsersByProfession,
-    getProfile,
-    updateProfile,
-    getActivity,
-    updateFcmToken,
-    getUsersByLocality,
-    uploadPhoto,
-    searchUsers
-};
+
 
 // @desc    Search users (for Blood Donation etc)
 // @route   GET /api/users/search
