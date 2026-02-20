@@ -347,7 +347,7 @@ const searchUsers = async (req, res) => {
         query._id = { $ne: currentUser._id };
 
         const users = await User.find(query)
-            .select('name uniqueId locality phone profilePhoto bloodGroup professionCategory')
+            .select('name uniqueId locality phone profilePhoto bloodGroup professionCategory email')
             .limit(100);
 
         res.json(users);

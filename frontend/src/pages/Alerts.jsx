@@ -519,6 +519,11 @@ const Alerts = () => {
                                             <span className="bg-gray-100 px-1.5 py-0.5 rounded">{donor.locality}</span>
                                             {donor.phone && <span>• {donor.phone}</span>}
                                         </div>
+                                        {!donor.email && (
+                                            <span className="text-[10px] text-red-400 font-bold uppercase mt-1 inline-block">
+                                                ⚠️ Email unavailable
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs shadow-sm">
                                         {donor.bloodGroup || bloodGroup}
