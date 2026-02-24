@@ -140,13 +140,13 @@ const StateUsers = () => {
                                                 {townUsers.map((u, uIdx) => (
                                                     <div
                                                         key={u._id || uIdx}
-                                                        className={`bg-[#0f0f13] backdrop-blur-xl rounded-3xl border border-white/10 p-5 group hover:border-indigo-500/60 transition-all duration-500 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] flex flex-col gap-5 ${cardAnimation}`}
+                                                        className={`bg-white rounded-[2rem] border border-slate-100 p-5 group hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500 flex flex-col gap-5 ${cardAnimation} shadow-xl shadow-black/20`}
                                                         style={{ animationDelay: `${uIdx * 50}ms` }}
                                                     >
                                                         <div className="flex gap-4">
                                                             {/* Avatar Component */}
                                                             <div className="relative">
-                                                                <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/20 bg-white/[0.08] p-1 group-hover:scale-110 transition-transform duration-500">
+                                                                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-slate-100 bg-slate-50 p-1 group-hover:scale-110 transition-transform duration-500 shadow-sm">
                                                                     {u.profilePhoto ? (
                                                                         <img
                                                                             src={getProfilePhotoUrl(u.profilePhoto)}
@@ -154,29 +154,29 @@ const StateUsers = () => {
                                                                             className="w-full h-full object-cover rounded-xl"
                                                                         />
                                                                     ) : (
-                                                                        <div className="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-400">
+                                                                        <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-indigo-400">
                                                                             <User size={24} />
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-[#15151a] rounded-full shadow-lg"></div>
+                                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full shadow-lg"></div>
                                                             </div>
 
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex justify-between items-start">
-                                                                    <h4 className="font-bold text-white text-base truncate group-hover:text-indigo-400 transition-colors">{u.name}</h4>
-                                                                    <span className="text-[8px] font-bold text-indigo-400 border border-indigo-400/30 px-1.5 py-0.5 rounded-lg opacity-60">
+                                                                    <h4 className="font-extrabold text-slate-900 text-base md:text-lg truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{u.name}</h4>
+                                                                    <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100/50">
                                                                         {u.uniqueId}
                                                                     </span>
                                                                 </div>
 
-                                                                <div className="mt-3 space-y-1.5">
-                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                                                                        <Briefcase size={12} className="text-indigo-400" />
+                                                                <div className="mt-2 space-y-1.5">
+                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
+                                                                        <Briefcase size={12} className="text-indigo-500" />
                                                                         <span className="truncate">{u.professionDetails?.jobRole || u.professionCategory}</span>
                                                                     </div>
-                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                                                                        <MapPin size={12} className="text-indigo-400" />
+                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                                                        <MapPin size={12} className="text-indigo-300" />
                                                                         <span className="truncate">{u.locality}</span>
                                                                     </div>
                                                                 </div>
@@ -184,16 +184,16 @@ const StateUsers = () => {
                                                         </div>
 
                                                         {/* Card Action Area */}
-                                                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-md group-hover:bg-indigo-700 transition-colors">
                                                                     <Phone size={14} />
                                                                 </div>
-                                                                <a href={`tel:${u.phone}`} className="text-xs font-bold text-white/80 hover:text-white transition-colors">
+                                                                <a href={`tel:${u.phone}`} className="text-xs font-black text-slate-800 hover:text-indigo-600 transition-colors">
                                                                     {u.phone}
                                                                 </a>
                                                             </div>
-                                                            <div className="flex items-center gap-2 text-amber-500 bg-amber-500/5 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                                                            <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 shadow-sm">
                                                                 <Star size={12} className="fill-amber-500" />
                                                                 <span className="text-[10px] font-black">{u.impactScore || 0} IMP</span>
                                                             </div>
