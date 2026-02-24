@@ -160,77 +160,7 @@ const ExploreCity = () => {
     }), []);
 
     const preciseSpots = React.useMemo(() => ({
-        // Hyderabad Localities
-        'Kukatpally': [17.4875, 78.4010],
-        'Madhapur': [17.4483, 78.3915],
-        'Gachibowli': [17.4401, 78.3489],
-        'Uppal': [17.3984, 78.5583],
-        'Banjara Hills': [17.4123, 78.4087],
-
-        // Vijayawada Localities
-        'Benz Circle': [16.5002, 80.6535],
-        'Patamata': [16.4950, 80.6700],
-        'Moghalrajpuram': [16.5100, 80.6500],
-        'Governorpet': [16.5070, 80.6200],
-        'Labbipet': [16.5150, 80.6250],
-        'Bhavanipuram': [16.5200, 80.6400],
-        'Autonagar': [16.5300, 80.6100],
-        'Gunadala': [16.4900, 80.6300],
-        'Kankipadu': [16.4350, 80.7100],
-        'Nunna': [16.5600, 80.7200],
-        'Gannavaram': [16.5400, 80.8000],
-
-        // Gudivada and Nearby Localities (Krishna District)
-        'Ventrapragada': [16.4300, 80.9800],
-        'Mudinepalli': [16.4500, 80.9700],
-        'Pedapalem': [16.4200, 81.0100],
-        'Kaikaluru': [16.5500, 81.2100],
-        'Mandavalli': [16.4600, 80.9500],
-        'Gudlavalleru': [16.3500, 81.0500],
-        'Bantumilli': [16.4100, 81.0300],
-        'Pamarru': [16.3100, 80.9600],
-        'Pedana': [16.2600, 81.1400],
-        'Avanigadda': [16.0200, 80.9200],
-        'Patimeeda': [16.4361, 80.9867],
-
-        // Eluru and Nearby Localities (West Godavari)
-        'Denduluru': [16.7800, 81.1200],
-        'Dwaraka Tirumala': [16.8100, 81.0800],
-        'Jangareddygudem': [17.1200, 81.7400],
-        'Kovvur': [17.0200, 81.7300],
-        'Nidadavole': [16.9100, 81.6700],
-        'Akividu': [16.5800, 81.3800],
-        'Undi': [16.5200, 81.4300],
-        'Attili': [16.7000, 81.6000],
-        'Ganapavaram': [16.6200, 81.3500],
-
-        // Guntur and Nearby Localities
-        'Mangalagiri': [16.4300, 80.5700],
-        'Ponnuru': [16.0700, 80.5500],
-        'Bapatla': [15.9050, 80.4670],
-        'Sattenapalle': [16.3950, 80.1500],
-        'Vinukonda': [16.0530, 79.7400],
-        'Gurazala': [16.5700, 79.5900],
-        'Macherla': [16.4800, 79.4300],
-        'Piduguralla': [16.4700, 79.8900],
-        'Repalle': [16.0200, 80.8300],
-
-        // Rajahmundry and East Godavari
-        'Rajahmundry': [17.0005, 81.8040],
-        'Kakinada': [16.9891, 82.2475],
-        'Tuni': [17.3500, 82.5500],
-        'Peddapuram': [17.0800, 82.1400],
-        'Samalkot': [17.0500, 82.1700],
-        'Mandapeta': [16.8600, 81.9300],
-        'Ramachandrapuram': [16.8400, 82.0300],
-
-        // Visakhapatnam Localities
-        'MVP Colony': [17.7300, 83.3300],
-        'Gajuwaka': [17.6900, 83.2100],
-        'Siripuram': [17.7200, 83.3100],
-        'Madhurawada': [17.7800, 83.3900],
-        'Rushikonda': [17.7900, 83.3800],
-        'Dwaraka Nagar': [17.7200, 83.3200]
+        // Keep empty to ensure only real database localities are shown
     }), []);
 
     // Effect to identify missing coords and fetch them

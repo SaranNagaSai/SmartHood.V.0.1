@@ -51,8 +51,34 @@ const getLocalityStats = async (req, res) => {
 
         // Aggregate State-wise Users (for Reach)
         const stateStats = await User.aggregate([
-            { $group: { _id: "$state", count: { $sum: 1 } } },
-            { $limit: 5 }
+            {
+                $project: {
+                    normalizedState: {
+                        $switch: {
+                            branches: [
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["AP", "ANDHRA PRADESH"]] }, then: "Andhra Pradesh" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["TS", "TELANGANA"]] }, then: "Telangana" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["TN", "TAMIL NADU"]] }, then: "Tamil Nadu" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["KA", "KARNATAKA"]] }, then: "Karnataka" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["KL", "KERALA"]] }, then: "Kerala" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["MH", "MAHARASHTRA"]] }, then: "Maharashtra" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["DL", "DELHI"]] }, then: "Delhi" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["UP", "UTTAR PRADESH"]] }, then: "Uttar Pradesh" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["MP", "MADHYA PRADESH"]] }, then: "Madhya Pradesh" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["WB", "WEST BENGAL"]] }, then: "West Bengal" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["GJ", "GUJARAT"]] }, then: "Gujarat" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["RJ", "RAJASTHAN"]] }, then: "Rajasthan" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["PB", "PUNJAB"]] }, then: "Punjab" },
+                                { case: { $in: [{ $toUpper: { $trim: { input: "$state" } } }, ["HR", "HARYANA"]] }, then: "Haryana" }
+                            ],
+                            default: "$state"
+                        }
+                    }
+                }
+            },
+            { $group: { _id: "$normalizedState", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 }
         ]);
 
         res.json({

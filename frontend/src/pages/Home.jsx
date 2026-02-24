@@ -159,14 +159,22 @@ const Home = () => {
 
                 {/* Static State Cards */}
                 <div className="flex flex-wrap justify-center gap-6 px-4">
-                    {(stats.states.length > 0
-                        ? stats.states.filter(st => !['Test State', 'telangana', 'Telangana'].includes(st._id) && !['Test State', 'telangana', 'Telangana'].includes(st._id.trim()))
-                        : []
-                    ).length > 0 ? (
-                        stats.states.filter(st => !['Test State', 'telangana', 'Telangana'].includes(st._id) && !['Test State', 'telangana', 'Telangana'].includes(st._id.trim())).map((st, idx) => {
-                            const stateName = getStateName(st._id);
+                    {stats.states.length > 0 ? (
+                        stats.states.map((st, idx) => {
+                            const stateName = st._id; // Already normalized by backend
                             const isAP = stateName.toLowerCase().includes('andhra');
                             const isTS = stateName.toLowerCase().includes('telangana');
+
+                            // Dynamic gradient fallback for other states
+                            const gradients = [
+                                'from-blue-600 to-indigo-800',
+                                'from-teal-500 to-emerald-700',
+                                'from-purple-600 to-indigo-700',
+                                'from-orange-500 to-red-600',
+                                'from-pink-500 to-rose-700',
+                                'from-indigo-500 to-purple-800'
+                            ];
+                            const gradient = gradients[idx % gradients.length];
 
                             return (
                                 <div
@@ -203,7 +211,7 @@ const Home = () => {
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                                         </div>
                                     ) : (
-                                        <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-500 to-purple-700"></div>
+                                        <div className={`absolute inset-0 z-0 bg-gradient-to-br ${gradient}`}></div>
                                     )}
 
                                     <Map className="text-white opacity-50 relative z-10" size={24} />
