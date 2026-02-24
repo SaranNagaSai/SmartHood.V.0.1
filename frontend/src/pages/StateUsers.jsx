@@ -32,8 +32,8 @@ const StateUsers = () => {
     const groupedData = useMemo(() => {
         const districts = {};
         users.forEach(u => {
-            const dName = u.district || 'Other Districts';
-            const tName = u.town || 'Other Towns';
+            const dName = u.district || 'Unspecified District';
+            const tName = u.town || 'Unspecified Town';
 
             if (!districts[dName]) districts[dName] = {};
             if (!districts[dName][tName]) districts[dName][tName] = [];
@@ -43,168 +43,190 @@ const StateUsers = () => {
         return districts;
     }, [users]);
 
-    // Animation variant for cards
-    const cardAnimation = "animate-in fade-in slide-in-from-right-6 duration-500 fill-mode-both";
+    const cardAnimation = "animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both";
 
     return (
-        <div className="min-h-screen relative overflow-hidden bg-white">
-            {/* VIBRANT GRADIENT BACKGROUND - REFINED */}
-            <div className="fixed inset-0 z-0 bg-gradient-to-tr from-indigo-50 via-white to-sky-50">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_15%_15%,rgba(99,102,241,0.08)_0,transparent_50%)]"></div>
-                <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_85%_85%,rgba(14,165,233,0.08)_0,transparent_50%)]"></div>
+        <div className="min-h-screen relative overflow-hidden bg-[#050507] text-white">
+            {/* PREMIUN STARFIELD BACKGROUND */}
+            <div className="fixed inset-0 z-0">
+                <div className="absolute inset-0 bg-[#050507]"></div>
+                {/* Simulated Starfield with Radial Gradients */}
+                <div className="absolute inset-0 opacity-40 bg-[radial-gradient(1px_1px_at_10%_10%,#fff_100%,transparent_0),radial-gradient(1px_1px_at_20%_30%,#fff_100%,transparent_0),radial-gradient(1px_1px_at_45%_50%,#fff_100%,transparent_0),radial-gradient(1.5px_1.5px_at_70%_20%,#fff_100%,transparent_0),radial-gradient(1px_1px_at_85%_75%,#fff_100%,transparent_0),radial-gradient(2px_2px_at_30%_80%,#fff_100%,transparent_0),radial-gradient(1px_1px_at_60%_60%,#fff_100%,transparent_0),radial-gradient(1.5px_1.5px_at_90%_40%,#fff_100%,transparent_0)] bg-[length:200px_200px] animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-purple-500/5"></div>
+
+                {/* Large Blurred Orbs */}
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]"></div>
             </div>
 
-            {/* Premium Header - More Compact */}
-            <div className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-indigo-100/40 px-6 py-4 flex items-center justify-between shadow-sm">
+            {/* Premium Glass Header */}
+            <div className="sticky top-0 z-50 bg-[#0a0a0c]/80 backdrop-blur-2xl border-b border-white/5 px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2.5 bg-white border border-indigo-50 text-indigo-600 rounded-xl shadow-sm hover:shadow-md hover:bg-white transition-all active:scale-95"
+                        className="p-2.5 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all active:scale-95"
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="font-black text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-900 to-indigo-600 tracking-tight leading-none">
-                            {stateName} <span className="text-indigo-400 font-light">{t('hub', 'Hub')}</span>
+                        <h1 className="font-extrabold text-xl lg:text-2xl text-white tracking-tight flex items-center gap-2">
+                            {stateName} <span className="text-indigo-400 font-medium opacity-80">{t('discovery_hub', 'Discovery Hub')}</span>
                         </h1>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                                {users.length} {t('active_users')}
-                            </span>
-                        </div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <Users size={10} className="text-indigo-400" />
+                            {users.length} {t('active_users')}
+                        </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="hidden sm:flex -space-x-2">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="h-7 w-7 rounded-full ring-2 ring-white bg-indigo-100 flex items-center justify-center border border-indigo-50">
-                                <User size={14} className="text-indigo-300" />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="h-8 w-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold shadow-lg shadow-indigo-200">
+                    <div className="h-10 w-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold">
                         {Object.keys(groupedData).length}
                     </div>
                 </div>
             </div>
 
-            <div className="relative z-10 w-full px-4 md:px-8 py-6 space-y-12">
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-16">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4">
-                        <div className="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-                        <p className="text-indigo-900/30 font-bold text-[10px] uppercase tracking-widest">{t('loading')}...</p>
+                    <div className="flex flex-col items-center justify-center py-40 gap-6">
+                        <div className="relative">
+                            <div className="w-12 h-12 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+                            <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full"></div>
+                        </div>
+                        <p className="text-indigo-400/50 font-bold text-[10px] uppercase tracking-[0.2em] animate-pulse">{t('searching_members')}...</p>
                     </div>
                 ) : users.length > 0 ? (
                     Object.entries(groupedData).map(([district, towns], dIdx) => (
-                        <div key={district} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both" style={{ animationDelay: `${dIdx * 100}ms` }}>
-                            {/* District Minimal Header */}
-                            <div className="flex items-center gap-4 border-b border-indigo-100/40 pb-3">
-                                <div className="p-2.5 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-100 text-white transform hover:scale-105 transition-transform">
-                                    <MapPin size={20} />
+                        <div key={district} className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both" style={{ animationDelay: `${dIdx * 150}ms` }}>
+
+                            {/* District Section Header */}
+                            <div className="flex flex-col gap-2 relative">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-indigo-400 shadow-2xl shadow-indigo-500/10 group overflow-hidden">
+                                        <div className="absolute inset-0 bg-indigo-500/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+                                        <Star size={24} className="relative z-10 fill-indigo-400/20" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h2 className="text-3xl font-black text-white tracking-tight">{district}</h2>
+                                        <p className="text-[10px] font-bold text-indigo-400/60 uppercase tracking-widest">
+                                            {Object.keys(towns).length} {t('major_towns', 'Major Towns')}
+                                        </p>
+                                    </div>
                                 </div>
-                                <h2 className="text-2xl font-black text-slate-800 tracking-tighter">{district}</h2>
-                                <div className="ml-auto">
-                                    <span className="bg-white/60 border border-slate-100 px-3 py-1 rounded-xl text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                                        {Object.keys(towns).length} {t('towns')}
-                                    </span>
-                                </div>
+                                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-transparent rounded-full opacity-50"></div>
                             </div>
 
-                            <div className="space-y-8">
-                                {Object.entries(towns).map(([town, townUsers], tIdx) => (
-                                    <div key={town} className="space-y-3">
-                                        {/* Town Subheader */}
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-2 group">
-                                                <div className="w-6 h-[2px] bg-indigo-300 group-hover:w-10 transition-all duration-300"></div>
-                                                <h3 className="font-black text-slate-600 uppercase text-[10px] tracking-[0.15em] group-hover:text-indigo-600 transition-colors">{town}</h3>
-                                            </div>
-                                            <span className="text-[9px] font-bold text-slate-300 uppercase letter-spacing-widest">
-                                                {townUsers.length} {t('members').toUpperCase()}
-                                            </span>
-                                        </div>
+                            <div className="space-y-12 pl-4 border-l border-white/5">
+                                {Object.entries(towns).map(([town, townUsers], tIdx) => {
+                                    // If Town is same as District, and it's the only town, we could style differently
+                                    // But user asked to display them once "with all the users at one place only"
+                                    const isRedundant = town.toLowerCase() === district.toLowerCase();
 
-                                        {/* COMPACT HORIZONTAL SCROLL - UPDATED WIDTH */}
-                                        <div className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar scroll-smooth -mx-4 px-4 md:-mx-8 md:px-8">
-                                            {townUsers.map((u, uIdx) => (
-                                                <div
-                                                    key={u._id || uIdx}
-                                                    className={`min-w-[280px] md:min-w-[320px] bg-white/90 backdrop-blur-sm rounded-[1.5rem] shadow-sm border border-indigo-50/50 overflow-hidden hover:shadow-xl hover:shadow-indigo-100/20 hover:-translate-y-1 transition-all duration-300 snap-start flex flex-col group/card ${cardAnimation}`}
-                                                    style={{ animationDelay: `${uIdx * 50}ms` }}
-                                                >
-                                                    <div className="p-4 md:p-5 flex gap-4 flex-1">
-                                                        {/* Avatar Space - Compact */}
-                                                        <div className="flex-shrink-0">
-                                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden border-2 border-white shadow-md bg-slate-50 flex items-center justify-center ring-1 ring-indigo-50/50 group-hover/card:scale-110 transition-transform duration-500">
-                                                                {u.profilePhoto ? (
-                                                                    <img
-                                                                        src={getProfilePhotoUrl(u.profilePhoto)}
-                                                                        alt={u.name}
-                                                                        className="w-full h-full object-cover"
-                                                                    />
-                                                                ) : (
-                                                                    <User size={24} className="text-slate-200" />
-                                                                )}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Info - Compact */}
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="flex justify-between items-start mb-1 gap-1">
-                                                                <h4 className="font-black text-slate-800 text-sm md:text-base truncate tracking-tight">{u.name}</h4>
-                                                                <span className="bg-indigo-50 text-indigo-500 px-1.5 py-0.5 rounded-lg text-[8px] font-black whitespace-nowrap border border-indigo-100/30 shadow-sm">
-                                                                    {u.uniqueId}
-                                                                </span>
-                                                            </div>
-
-                                                            <div className="space-y-1.5 mt-2">
-                                                                <div className="flex items-center gap-2 text-green-600 font-bold text-[10px]">
-                                                                    <Phone size={10} className="group-hover/card:animate-bounce" />
-                                                                    <a href={`tel:${u.phone}`} className="hover:underline">{u.phone}</a>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 text-indigo-500 text-[10px] font-bold">
-                                                                    <Briefcase size={10} />
-                                                                    <span className="truncate">{u.professionDetails?.jobRole || u.professionCategory}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-1.5 text-slate-400 text-[9px] font-medium pl-0.5 opacity-70">
-                                                                    <MapPin size={9} />
-                                                                    <span className="truncate lowercase">{u.locality}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Compact Footer */}
-                                                    <div className="bg-slate-50/50 px-4 py-2.5 flex justify-between items-center border-t border-slate-100/50">
-                                                        <div className="flex items-center gap-2 text-amber-500">
-                                                            <Award size={12} className="group-hover/card:rotate-12 transition-transform" />
-                                                            <span className="text-[10px] font-black uppercase tracking-tighter">{t('impact')} {u.impactScore || 0}</span>
-                                                        </div>
-                                                        <ChevronRight size={14} className="text-slate-300 group-hover/card:text-indigo-400 group-hover/card:translate-x-1 transition-all" />
-                                                    </div>
+                                    return (
+                                        <div key={town} className="space-y-6">
+                                            {/* Town Header - Only show if not redundant or if explicitly needed */}
+                                            {!isRedundant && (
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-px w-8 bg-indigo-500/30"></div>
+                                                    <h3 className="font-bold text-indigo-300 uppercase text-xs tracking-[0.2em]">{town}</h3>
+                                                    <span className="text-[9px] font-bold text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
+                                                        {townUsers.length} {t('members')}
+                                                    </span>
                                                 </div>
-                                            ))}
-                                            <div className="min-w-[1px] md:min-w-[1px]"></div>
+                                            )}
+
+                                            {/* Responsive Grid Layout */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                {townUsers.map((u, uIdx) => (
+                                                    <div
+                                                        key={u._id || uIdx}
+                                                        className={`bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-5 group hover:border-indigo-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col gap-5 ${cardAnimation}`}
+                                                        style={{ animationDelay: `${uIdx * 50}ms` }}
+                                                    >
+                                                        <div className="flex gap-4">
+                                                            {/* Avatar Component */}
+                                                            <div className="relative">
+                                                                <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-1 group-hover:scale-110 transition-transform duration-500">
+                                                                    {u.profilePhoto ? (
+                                                                        <img
+                                                                            src={getProfilePhotoUrl(u.profilePhoto)}
+                                                                            alt={u.name}
+                                                                            className="w-full h-full object-cover rounded-xl"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-400">
+                                                                            <User size={24} />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-[#15151a] rounded-full shadow-lg"></div>
+                                                            </div>
+
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex justify-between items-start">
+                                                                    <h4 className="font-bold text-white text-base truncate group-hover:text-indigo-400 transition-colors">{u.name}</h4>
+                                                                    <span className="text-[8px] font-bold text-indigo-400 border border-indigo-400/30 px-1.5 py-0.5 rounded-lg opacity-60">
+                                                                        {u.uniqueId}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="mt-3 space-y-1.5">
+                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                                                                        <Briefcase size={12} className="text-indigo-400" />
+                                                                        <span className="truncate">{u.professionDetails?.jobRole || u.professionCategory}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                                                                        <MapPin size={12} className="text-indigo-400" />
+                                                                        <span className="truncate">{u.locality}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Card Action Area */}
+                                                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                                                    <Phone size={14} />
+                                                                </div>
+                                                                <a href={`tel:${u.phone}`} className="text-xs font-bold text-white/80 hover:text-white transition-colors">
+                                                                    {u.phone}
+                                                                </a>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 text-amber-500 bg-amber-500/5 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                                                                <Star size={12} className="fill-amber-500" />
+                                                                <span className="text-[10px] font-black">{u.impactScore || 0} IMP</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-40">
-                        <Users size={48} className="text-slate-200 mx-auto mb-4" />
-                        <h3 className="text-lg font-black text-slate-700 tracking-tight">{t('community_horizon', 'Community Horizon')}</h3>
-                        <p className="text-slate-400 text-xs font-medium">{t('no_members_found', 'No members found in')} {stateName} {t('yet')}.</p>
+                    <div className="flex flex-col items-center justify-center py-40 text-center space-y-6">
+                        <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-gray-600 animate-pulse">
+                            <Users size={40} />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-bold text-white tracking-tight">{t('community_horizon', 'Community Horizon')}</h3>
+                            <p className="text-gray-500 text-sm max-w-xs">{t('no_members_found', 'No members found in')} {stateName} {t('yet')}.</p>
+                        </div>
                     </div>
                 )}
             </div>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                .hide-scrollbar::-webkit-scrollbar { display: none; }
-                .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                @keyframes pulse {
+                    0%, 100% { opacity: 0.4; }
+                    50% { opacity: 0.7; }
+                }
+                .animate-pulse { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
             `}} />
         </div>
     );
