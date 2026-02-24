@@ -276,7 +276,7 @@ const generateServiceEmailTemplate = (service, creator, type) => {
 
                 <!-- 3) Request Raised Info (Creator) -->
                 <div style="margin-bottom: 25px;">
-                    <strong style="color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">RAISED BY / ద్వారా పోస్ట్ చేయబడింది</strong>
+                    <strong style="color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">SENDER DETAILS / పంపినవారి వివరాలు</strong>
                     <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-top: 8px; background: #fcfcfc; display: flex; align-items: center;">
                         <div style="margin-right: 15px;">
                             ${creator.profilePhoto ? `
@@ -290,10 +290,18 @@ const generateServiceEmailTemplate = (service, creator, type) => {
                         <div>
                             <div style="font-weight: 700; color: #0f172a; font-size: 16px;">${creator.name}</div>
                             <div style="color: #64748b; font-size: 14px;">
-                                ${creator.professionCategory} ${!isOffer ? `• ${creator.locality}` : ''}
+                                ${creator.professionCategory} • <strong>${creator.town}</strong>
+                            </div>
+                            <div style="color: #059669; font-size: 14px; margin-top: 4px; font-weight: bold;">
+                                📞 ${creator.phone}
                             </div>
                         </div>
                     </div>
+                    ${service.broadcastGlobal ? `
+                    <div style="margin-top: 10px; padding: 8px; background: #fef2f2; border-radius: 6px; text-align: center;">
+                        <span style="color: #dc2626; font-size: 11px; font-weight: bold; text-transform: uppercase;">🌐 Global Website Broadcast</span>
+                    </div>
+                    ` : ''}
                 </div>
 
                 <!-- Action Button -->

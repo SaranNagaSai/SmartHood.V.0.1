@@ -26,10 +26,16 @@ const createCountIcon = (count) => {
 };
 
 // Component to handle map centering and bounds
-const MapUpdater = ({ centers }) => {
+const MapUpdater = ({ centers, townCenter }) => {
     const map = useMap();
     React.useEffect(() => {
-        if (centers && centers.length > 0) {
+        if (townCenter) {
+            console.log(`[MapUpdater] Flying to TOWN CENTER:`, townCenter);
+            map.flyTo(townCenter, 13, {
+                duration: 1.5,
+                easeLinearity: 0.25
+            });
+        } else if (centers && centers.length > 0) {
             // Create bounds from all points
             const bounds = L.latLngBounds(centers);
             map.flyToBounds(bounds, {
@@ -38,7 +44,7 @@ const MapUpdater = ({ centers }) => {
                 duration: 1.5
             });
         }
-    }, [centers, map]);
+    }, [centers, townCenter, map]);
     return null;
 };
 
@@ -105,21 +111,33 @@ const ExploreCity = () => {
     }), []);
 
     // Comprehensive Town Centers for Andhra Pradesh & Telangana
+    // COORDINATES ARE PRECISE REPRESENTATIONS OF TOWN CENTERS
     const townCenters = React.useMemo(() => ({
+        // Telangana Towns
         'Hyderabad': [17.3850, 78.4867],
-        'Warangal': [17.9689, 79.5941],
+        'Warangal': [17.9716, 79.5946],
         'Nizamabad': [18.6725, 78.0941],
         'Karimnagar': [18.4386, 79.1288],
         'Khammam': [17.2473, 80.1514],
-        'Mahbubnagar': [16.7488, 77.9882],
-        'Nalgonda': [17.0577, 79.2678],
-        'Adilabad': [19.6640, 78.5310],
-        'Suryapet': [17.1417, 79.6186],
-        'Siddipet': [18.1018, 78.8529],
-        'Medak': [18.0500, 78.2667],
-        'Sangareddy': [17.6147, 78.0833],
-        'Ramagundam': [18.7550, 79.4740],
-        'Miryalaguda': [16.8770, 79.5663],
+        'Mahbubnagar': [16.7428, 77.9892],
+        'Nalgonda': [17.0577, 79.2684],
+        'Adilabad': [19.6641, 78.5320],
+        'Suryapet': [17.1436, 79.6238],
+        'Siddipet': [18.1018, 78.8520],
+        'Medak': [18.0469, 78.2618],
+        'Sangareddy': [17.6133, 78.0833],
+        'Ramagundam': [18.7584, 79.4794],
+        'Miryalaguda': [16.8741, 79.5663],
+        'Jagtial': [18.7900, 78.9100],
+        'Mancherial': [18.8754, 79.4444],
+        'Kothagudem': [17.5500, 80.6200],
+        'Bodhan': [18.6600, 77.8900],
+        'KamaReddy': [18.3100, 78.3400],
+        'Nirmal': [19.1000, 78.3400],
+        'Wanaparthy': [16.3600, 78.0600],
+        'Gadwal': [16.2300, 77.5900],
+
+        // Andhra Pradesh Towns
         'Vijayawada': [16.5062, 80.6480],
         'Visakhapatnam': [17.6868, 83.2185],
         'Guntur': [16.3067, 80.4365],
@@ -156,7 +174,9 @@ const ExploreCity = () => {
         'Dharmavaram': [14.4144, 77.7211],
         'Gudur': [14.1500, 79.8500],
         'Tadipatri': [14.9078, 78.0100],
-        'Guntakal': [15.1667, 77.3667]
+        'Guntakal': [15.1667, 77.3667],
+        'Hindupuram': [13.8281, 77.4911],
+        'Madanapalli': [13.5500, 78.5000]
     }), []);
 
     const preciseSpots = React.useMemo(() => ({
@@ -524,7 +544,12 @@ const ExploreCity = () => {
                     />
 
                     {/* Only update map center/bounds if a town is selected */}
-                    {userTown && <MapUpdater centers={localityPositions} />}
+                    {userTown && (
+                        <MapUpdater
+                            centers={localityPositions}
+                            townCenter={Object.keys(townCenters).find(key => key.toLowerCase() === userTown?.toLowerCase()) ? townCenters[Object.keys(townCenters).find(key => key.toLowerCase() === userTown?.toLowerCase())] : null}
+                        />
+                    )}
 
                     {/* Only show markers if a town is selected */}
                     {userTown && localities.map((loc, idx) => {

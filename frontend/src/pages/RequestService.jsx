@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
-import { ArrowLeft, Send, Shield, Users, UserCheck, Paperclip, X, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Send, Shield, Users, UserCheck, Paperclip, X, AlertCircle, Globe } from 'lucide-react';
 import { API_URL } from '../utils/apiConfig';
 
 const RequestService = () => {
@@ -130,6 +130,7 @@ const RequestService = () => {
             formDataPayload.append('title', formData.title);
             formDataPayload.append('description', formData.description);
             formDataPayload.append('targetAudience', formData.targetAudience);
+            formDataPayload.append('broadcastGlobal', formData.broadcastGlobal); // NEW
 
             // Append targetProfessions array
             if (formData.targetProfessions && formData.targetProfessions.length > 0) {
@@ -170,7 +171,8 @@ const RequestService = () => {
 
             // NEW: Show recipient count in success message
             const recipientCount = response.data.recipientCount || 0;
-            alert(`${t('request_service_success')} - Broadcast to ${recipientCount} users`);
+            const broadcastMsg = formData.broadcastGlobal ? "Global Broadcast Initialized" : `Broadcast to ${recipientCount} users`;
+            alert(`${t('request_service_success')} - ${broadcastMsg}`);
             navigate('/home');
         } catch (error) {
             console.error(error);
@@ -381,18 +383,31 @@ const RequestService = () => {
 
                     <div className="flex bg-gray-100 p-1.5 rounded-xl mb-4">
                         <button
-                            onClick={() => setFormData({ ...formData, targetAudience: 'ALL' })}
-                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${formData.targetAudience === 'ALL' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500'}`}
+                            onClick={() => setFormData({ ...formData, targetAudience: 'ALL', broadcastGlobal: false })}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all ${formData.targetAudience === 'ALL' && !formData.broadcastGlobal ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500'}`}
                         >
-                            <Users size={16} /> {t('everyone')}
+                            <Users size={14} /> {t('everyone')}
                         </button>
                         <button
-                            onClick={() => setFormData({ ...formData, targetAudience: 'SPECIFIC' })}
-                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${formData.targetAudience === 'SPECIFIC' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500'}`}
+                            onClick={() => setFormData({ ...formData, targetAudience: 'SPECIFIC', broadcastGlobal: false })}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all ${formData.targetAudience === 'SPECIFIC' && !formData.broadcastGlobal ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500'}`}
                         >
-                            <UserCheck size={16} /> {t('specific_pro')}
+                            <UserCheck size={14} /> {t('specific_pro')}
+                        </button>
+                        <button
+                            onClick={() => setFormData({ ...formData, broadcastGlobal: true, targetAudience: 'ALL' })}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all ${formData.broadcastGlobal ? 'bg-green-600 text-white shadow-md' : 'text-gray-500'}`}
+                        >
+                            <Globe size={14} /> To All Users
                         </button>
                     </div>
+
+                    {formData.broadcastGlobal && (
+                        <div className="mb-4 animate-fade-in p-4 bg-green-50 rounded-xl border-2 border-dashed border-green-200 text-center">
+                            <p className="text-sm font-bold text-green-700">🌍 GLOBAL WEBSITE BROADCAST ACTIVE</p>
+                            <p className="text-[10px] text-green-500 mt-1">This request will reach every user across the website, bypassing location filters.</p>
+                        </div>
+                    )}
 
                     {formData.targetAudience === 'SPECIFIC' && (
                         <div className="animate-fade-in p-4 bg-green-50 rounded-xl border border-green-100">

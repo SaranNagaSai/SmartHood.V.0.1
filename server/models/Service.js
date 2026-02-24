@@ -11,6 +11,7 @@ const serviceSchema = new mongoose.Schema({
     // Target Logic
     targetAudience: { type: String, enum: ['ALL', 'SPECIFIC', 'all', 'specific'], default: 'ALL' },
     targetProfession: [{ type: String }], // Array of professions if targetAudience is SPECIFIC
+    broadcastGlobal: { type: Boolean, default: false }, // NEW: Global broadcast flag
     targetLocalities: [{ type: String }], // Array of additional localities to broadcast to
     selectedCommunities: [{ type: String }], // Array of additional communities to broadcast to (NEW)
 

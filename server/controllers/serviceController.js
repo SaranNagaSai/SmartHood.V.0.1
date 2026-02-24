@@ -14,7 +14,8 @@ const createService = async (req, res) => {
             targetAudience, targetProfession,
             targetLocality, // Legacy single target
             targetLocalities, // New multi target array
-            selectedCommunities // New multi-community array
+            selectedCommunities, // New multi-community array
+            broadcastGlobal // NEW: Global broadcast flag
         } = req.body;
 
         // Process attachments from multer if any
@@ -50,7 +51,7 @@ const createService = async (req, res) => {
         }
 
         console.log(`[Service] Creating ${type} for user: ${user.name} (${user.locality})`);
-        console.log(`[Service] Target Localities:`, targetLocalities, `Communities:`, selectedCommunities);
+        console.log(`[Service] Target Localities:`, targetLocalities, `Communities:`, selectedCommunities, `Global:`, broadcastGlobal);
 
         const service = await Service.create({
             createdBy: user._id,
@@ -60,6 +61,7 @@ const createService = async (req, res) => {
             attachments: attachmentPaths,
             targetAudience: targetAudience || 'ALL',
             targetProfession: professionArray,
+            broadcastGlobal: broadcastGlobal === 'true' || broadcastGlobal === true,
             locality: user.locality, // Primary origin
             targetLocalities: allTargetLocalities.filter(l => l !== user.locality), // Store *additional* targets
             selectedCommunities: selectedCommunities || [], // Store selected communities
@@ -70,42 +72,48 @@ const createService = async (req, res) => {
 
         console.log(`[Service] ID: ${service._id} Created.`);
 
-        // NOTIFICATION LOGIC - Find target users in ALL targeted localities AND communities
-        let allCommunities = [user.locality]; // Start with user's own community
-
-        // Add selected communities if provided (NEW multiselect)
-        if (selectedCommunities && Array.isArray(selectedCommunities) && selectedCommunities.length > 0) {
-            allCommunities = [...new Set([...allCommunities, ...selectedCommunities])];
-        }
-
-        // Also include targetLocalities (OLD/Compatibility multiselect)
-        // Ensure we handle both string and array for safety
-        if (targetLocalities) {
-            if (Array.isArray(targetLocalities)) {
-                allCommunities = [...new Set([...allCommunities, ...targetLocalities])];
-            } else if (typeof targetLocalities === 'string') {
-                allCommunities = [...new Set([...allCommunities, targetLocalities])];
-            }
-        }
-
-        // NOTIFICATION LOGIC - Broaden to TOWN if no specific localities selected
-        const trimmedTown = (user.town || '').trim();
-        const townRegex = new RegExp(`^\\s*${trimmedTown}\\s*$`, 'i');
-
+        // NOTIFICATION LOGIC - Find target users
         let query = {
-            town: { $regex: townRegex },
             _id: { $ne: user._id }
         };
 
-        // If specific communities were targeted (more than just origin), we restrict by those locality names
-        // otherwise we broadcast to everyone in the town
-        if (allCommunities.length > 1) {
-            console.log(`[Service] Restricting to ${allCommunities.length} communities: ${allCommunities.join(', ')}`);
-            query.locality = {
-                $in: allCommunities.map(loc => new RegExp(`^\\s*${(loc || '').trim()}\\s*$`, 'i'))
-            };
+        if (service.broadcastGlobal) {
+            console.log(`[Service] GLOBAL BROADCAST: Targeting all users.`);
+            // No geographic restrictions for global broadcast
         } else {
-            console.log(`[Service] Broadcasting to entire town: ${trimmedTown}`);
+            // NOTIFICATION LOGIC - Find target users in ALL targeted localities AND communities
+            let allCommunities = [user.locality]; // Start with user's own community
+
+            // Add selected communities if provided (NEW multiselect)
+            if (selectedCommunities && Array.isArray(selectedCommunities) && selectedCommunities.length > 0) {
+                allCommunities = [...new Set([...allCommunities, ...selectedCommunities])];
+            }
+
+            // Also include targetLocalities (OLD/Compatibility multiselect)
+            if (targetLocalities) {
+                if (Array.isArray(targetLocalities)) {
+                    allCommunities = [...new Set([...allCommunities, ...targetLocalities])];
+                } else if (typeof targetLocalities === 'string') {
+                    allCommunities = [...new Set([...allCommunities, targetLocalities])];
+                }
+            }
+
+            // NOTIFICATION LOGIC - Broaden to TOWN if no specific localities selected
+            const trimmedTown = (user.town || '').trim();
+            const townRegex = new RegExp(`^\\s*${trimmedTown}\\s*$`, 'i');
+
+            query.town = { $regex: townRegex };
+
+            // If specific communities were targeted (more than just origin), we restrict by those locality names
+            // otherwise we broadcast to everyone in the town
+            if (allCommunities.length > 1) {
+                console.log(`[Service] Restricting to ${allCommunities.length} communities: ${allCommunities.join(', ')}`);
+                query.locality = {
+                    $in: allCommunities.map(loc => new RegExp(`^\\s*${(loc || '').trim()}\\s*$`, 'i'))
+                };
+            } else {
+                console.log(`[Service] Broadcasting to entire town: ${trimmedTown}`);
+            }
         }
 
         if (targetAudience === 'SPECIFIC' && professionArray.length > 0) {
