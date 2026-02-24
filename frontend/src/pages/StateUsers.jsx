@@ -140,13 +140,13 @@ const StateUsers = () => {
                                                 {townUsers.map((u, uIdx) => (
                                                     <div
                                                         key={u._id || uIdx}
-                                                        className={`bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-5 group hover:border-indigo-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col gap-5 ${cardAnimation}`}
+                                                        className={`bg-[#0f0f13] backdrop-blur-xl rounded-3xl border border-white/10 p-5 group hover:border-indigo-500/60 transition-all duration-500 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] flex flex-col gap-5 ${cardAnimation}`}
                                                         style={{ animationDelay: `${uIdx * 50}ms` }}
                                                     >
                                                         <div className="flex gap-4">
                                                             {/* Avatar Component */}
                                                             <div className="relative">
-                                                                <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-1 group-hover:scale-110 transition-transform duration-500">
+                                                                <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/20 bg-white/[0.08] p-1 group-hover:scale-110 transition-transform duration-500">
                                                                     {u.profilePhoto ? (
                                                                         <img
                                                                             src={getProfilePhotoUrl(u.profilePhoto)}
