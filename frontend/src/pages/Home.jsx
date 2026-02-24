@@ -179,7 +179,8 @@ const Home = () => {
                             return (
                                 <div
                                     key={idx}
-                                    className={`min-w-[220px] h-64 rounded-2xl p-5 shadow-md flex flex-col justify-between hover:shadow-lg transition-all relative overflow-hidden group`}
+                                    onClick={() => navigate(`/state-users/${encodeURIComponent(stateName)}`)}
+                                    className={`min-w-[220px] h-64 rounded-2xl p-5 shadow-md flex flex-col justify-between hover:shadow-lg transition-all relative overflow-hidden group cursor-pointer active:scale-95`}
                                 >
                                     {/* Background Image or Gradient */}
                                     {isAP ? (

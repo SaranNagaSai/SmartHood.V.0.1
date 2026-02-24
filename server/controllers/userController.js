@@ -383,6 +383,35 @@ const searchUsers = async (req, res) => {
     }
 };
 
+// @desc    Get users by state (State Discovery)
+// @route   GET /api/users/state/:stateName
+// @access  Private
+const getUsersByState = async (req, res) => {
+    try {
+        const { stateName } = req.params;
+
+        // Normalize state name for query
+        let stateQuery = stateName;
+        if (stateName.toUpperCase() === 'AP') stateQuery = 'Andhra Pradesh';
+        if (stateName.toUpperCase() === 'TS') stateQuery = 'Telangana';
+
+        // Use regex for flexible searching (e.g., "Andhra" matches "Andhra Pradesh")
+        const query = {
+            state: { $regex: new RegExp(stateQuery, 'i') }
+        };
+
+        const users = await User.find(query)
+            .select('name uniqueId locality town district state professionCategory professionDetails profilePhoto phone impactScore')
+            .sort({ district: 1, town: 1, locality: 1 });
+
+        console.log(`[User] State Discovery: Found ${users.length} users in ${stateName}`);
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getLocalityStats,
     getUsersByProfession,
@@ -392,5 +421,6 @@ module.exports = {
     updateFcmToken,
     getUsersByLocality,
     uploadPhoto,
-    searchUsers
+    searchUsers,
+    getUsersByState
 };

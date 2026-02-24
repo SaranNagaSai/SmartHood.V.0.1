@@ -14,6 +14,7 @@ import ServiceDetail from './pages/ServiceDetail';
 import Alerts from './pages/Alerts';
 import ExploreCity from './pages/ExploreCity';
 import Profile from './pages/Profile';
+import StateUsers from './pages/StateUsers';
 import Notifications from './pages/Notifications';
 import Events from './pages/Events';
 import Complaints from './pages/Complaints';
@@ -118,6 +119,12 @@ function App() {
                 <Route path="/profile" element={
                     <AuthGuard>
                         <Profile />
+                    </AuthGuard>
+                } />
+
+                <Route path="/state-users/:stateName" element={
+                    <AuthGuard>
+                        <StateUsers />
                     </AuthGuard>
                 } />
 
