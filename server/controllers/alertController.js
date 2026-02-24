@@ -90,7 +90,7 @@ const createAlert = async (req, res) => {
                         try {
                             const result = await sendEmail(
                                 user.email,
-                                `ALERT: ${category} - ${subType || ''}`,
+                                `ALERT / హెచ్చరిక: ${category} - ${subType || ''}`,
                                 description.substring(0, 200),
                                 emailHtml
                             );
@@ -116,7 +116,7 @@ const createAlert = async (req, res) => {
                             await admin.messaging().send({
                                 token: user.fcmToken,
                                 notification: {
-                                    title: `ALERT: ${category} - ${subType || ''}`,
+                                    title: `ALERT / హెచ్చరిక: ${category}`,
                                     body: description.substring(0, 100)
                                 },
                                 data: { url: '/alerts', type: 'ALERT' }
@@ -132,7 +132,7 @@ const createAlert = async (req, res) => {
                         const Notification = require('../models/Notification');
                         await Notification.create({
                             userId: user._id,
-                            title: `ALERT: ${category} - ${subType || ''}`,
+                            title: `ALERT / హెచ్చరిక: ${category}`,
                             body: description.substring(0, 200),
                             type: 'ALERT',
                             link: '/alerts',

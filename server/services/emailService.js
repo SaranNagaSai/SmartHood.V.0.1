@@ -70,7 +70,7 @@ const sendEmail = async (to, subject, text, html = null) => {
                     </div>
                     <div style="padding: 20px; background: #f8fafc; text-align: center; border-top: 1px solid #eee;">
                         <p style="color: #64748b; margin: 0; font-size: 12px;">
-                            You received this email from SmartHood, your hyperlocal community platform.
+                            You received this email from SmartHood, your hyperlocal community platform. / మీకు ఈమెయిల్ మీ పరిసరాల వేదిక అయిన స్మార్ట్ హుడ్ నుండి పంపబడినది.
                         </p>
                         <p style="color: #94a3b8; margin: 10px 0 0; font-size: 12px;">
                             © ${new Date().getFullYear()} SmartHood. All rights reserved.
@@ -95,8 +95,8 @@ const sendEmail = async (to, subject, text, html = null) => {
  * Send welcome email upon registration
  */
 const sendWelcomeEmail = async (user) => {
-    const subject = `🎉 Welcome to SmartHood, ${user.name}!`;
-    const text = `Namaste ${user.name} 🙏,\n\nWelcome to SmartHood! Your registration is complete.\n\nYour Unique ID: ${user.uniqueId}\n\nLogin with this ID and your phone number: ${user.phone}`;
+    const subject = `🎉 Welcome to SmartHood / స్మార్ట్ హుడ్ కు స్వాగతం, ${user.name}!`;
+    const text = `Namaste ${user.name} 🙏,\n\nWelcome to SmartHood! Your registration is complete.\n\nస్వాగతం ${user.name}! మీ రిజిస్ట్రేషన్ పూర్తయింది.\n\nYour Unique ID / మీ ఐడి: ${user.uniqueId}\n\nLogin with this ID and your phone number / మీ ఐడి మరియు ఫోన్ నంబర్‌తో లాగిన్ అవ్వండి: ${user.phone}`;
 
     const html = `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);">
@@ -139,23 +139,23 @@ const sendWelcomeEmail = async (user) => {
 
                 <!-- Profile Summary Card -->
                 <div style="background: #f8fafc; border-radius: 16px; padding: 25px; margin-bottom: 30px; border: 1px solid #e2e8f0;">
-                    <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">📋 Your Profile Summary</h3>
+                    <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">📋 Your Profile / మీ ప్రొఫైల్</h3>
                     <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px;">
                         <tr>
-                            <td style="color: #64748b; font-size: 14px;">📛 Name</td>
+                            <td style="color: #64748b; font-size: 14px;">📛 Name / పేరు</td>
                             <td style="font-weight: 600; color: #1e293b;">${user.name}</td>
                         </tr>
                         <tr>
-                            <td style="color: #64748b; font-size: 14px;">📍 Locality</td>
+                            <td style="color: #64748b; font-size: 14px;">📍 Locality / ప్రాంతం</td>
                             <td style="font-weight: 600; color: #1e293b;">${user.locality}, ${user.town}</td>
                         </tr>
                         <tr>
-                            <td style="color: #64748b; font-size: 14px;">💼 Profession</td>
+                            <td style="color: #64748b; font-size: 14px;">💼 Profession / వృత్తి</td>
                             <td style="font-weight: 600; color: #1e293b;">${user.professionCategory}</td>
                         </tr>
                         ${user.professionDetails?.jobRole ? `
                         <tr>
-                            <td style="color: #64748b; font-size: 14px;">🛠️ Role</td>
+                            <td style="color: #64748b; font-size: 14px;">🛠️ Role / పాత్ర</td>
                             <td style="font-weight: 600; color: #1e293b;">${user.professionDetails.jobRole}</td>
                         </tr>` : ''}
                          ${user.professionDetails?.educationLevel ? `
@@ -181,7 +181,7 @@ const sendWelcomeEmail = async (user) => {
 
                 <!-- CTA Button -->
                 <div style="text-align: center; margin-top: 40px; margin-bottom: 20px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); font-size: 16px;">Login to Your Dashboard &rarr;</a>
+                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); font-size: 16px;">Login to Dashboard / డాష్‌బోర్డ్ లాగిన్ &rarr;</a>
                 </div>
             </div>
 
@@ -229,7 +229,7 @@ const sendFollowUpEmail = async (userEmail, serviceName, daysAgo) => {
                 <div style="text-align: center; margin-top: 30px;">
                     <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/services" 
                        style="background: #f59e0b; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
-                        Update Status
+                        Update Status / అప్‌డేట్ చేయండి
                     </a>
                 </div>
             </div>
@@ -308,10 +308,10 @@ const generateServiceEmailTemplate = (service, creator, type) => {
                 <div style="text-align: center; margin-top: 30px;">
                     <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/service/${service._id}" 
                        style="background: ${actionColor}; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">
-                        View Request / అభ్యర్థనను చూడండి
+                        View Details / వివరాలను చూడండి
                     </a>
                     <p style="margin-top: 15px; font-size: 13px; color: #94a3b8;">
-                         Click to view who else has seen this request.
+                         మీరు దీనికి సహాయం చేయాలనుకుంటే బటన్‌ను క్లిక్ చేయండి.
                     </p>
                 </div>
             </div>
@@ -335,7 +335,7 @@ const generateInterestEmailTemplate = (service, interestedUser) => {
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
             <div style="background: ${actionColor}; padding: 25px; text-align: center; color: white;">
                 <h1 style="margin: 0; font-size: 24px; font-weight: 700;">New Interest! / కొత్త ఆసక్తి</h1>
-                <p style="margin: 5px 0 0; opacity: 0.9;">Someone is interested in your request</p>
+                <p style="margin: 5px 0 0; opacity: 0.9;">Interested neighbors / సహాయం చేయడానికి ఆసక్తిని వ్యక్తం చేశారు</p>
             </div>
 
             <div style="padding: 30px;">
@@ -350,7 +350,7 @@ const generateInterestEmailTemplate = (service, interestedUser) => {
                 </div>
 
                 <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; background: #fcfcfc;">
-                    <h3 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Interested User / ఆసక్తిగల వ్యక్తి</h3>
+                    <h3 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Interested Neighbor / ఆసక్తిగల వ్యక్తి</h3>
                     <div style="display: flex; align-items: center;">
                          <div style="margin-right: 15px;">
                             ${interestedUser.profilePhoto ? `
@@ -377,7 +377,7 @@ const generateInterestEmailTemplate = (service, interestedUser) => {
                 <div style="text-align: center;">
                     <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/service/${service._id}" 
                        style="background: ${actionColor}; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
-                        View Request / అభ్యర్థనను చూడండి
+                        View Details / వివరాలను చూడండి
                     </a>
                 </div>
             </div>
@@ -398,7 +398,7 @@ const generateCompletionEmailTemplate = (service, provider, amount) => {
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
             <div style="background: ${actionColor}; padding: 25px; text-align: center; color: white;">
                 <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Service Completed! / సేవ పూర్తయింది</h1>
-                <p style="margin: 5px 0 0; opacity: 0.9;">Impact made in ${service.locality}</p>
+                <p style="margin: 5px 0 0; opacity: 0.9;">Impact made / మీ సేవ విజయవంతమైంది</p>
             </div>
 
             <div style="padding: 30px;">
@@ -411,7 +411,7 @@ const generateCompletionEmailTemplate = (service, provider, amount) => {
                 <div style="background: #ecfdf5; border: 1px dashed #10b981; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 25px;">
                     <h3 style="margin: 0 0 5px 0; color: #065f46; font-size: 18px;">${service.title}</h3>
                     <p style="font-size: 24px; font-weight: bold; color: #059669; margin: 10px 0;">₹${amount}</p>
-                    <p style="margin: 0; color: #047857; font-size: 12px; text-transform: uppercase; font-weight: 600;">TRANSFERRED REVENUE</p>
+                    <p style="margin: 0; color: #047857; font-size: 12px; text-transform: uppercase; font-weight: 600;">AMOUNT TRANSFERRED / బదిలీ చేయబడిన నగదు</p>
                 </div>
 
                 <div style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
@@ -497,7 +497,7 @@ const generateAlertEmailTemplate = (alert, sender) => {
 
                 <!-- Sender Information -->
                 <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; background: #fcfcfc;">
-                    <h3 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Raised By / ద్వారా పోస్ట్ చేయబడింది</h3>
+                    <h3 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">SENDER / పంపినవారు</h3>
                     <div style="display: flex; align-items: center;">
                         <div style="margin-right: 15px;">
                             ${sender.profilePhoto ? `

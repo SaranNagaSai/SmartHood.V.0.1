@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 
 const LanguageContext = createContext();
 
@@ -12,6 +13,20 @@ export const LanguageProvider = ({ children }) => {
             localStorage.removeItem('language');
         }
     }, [language]);
+
+    // Global Axios Interceptor for Language Propagation
+    useEffect(() => {
+        const interceptor = axios.interceptors.request.use(
+            (config) => {
+                const currentLanguage = localStorage.getItem('language') || 'English';
+                config.headers['language'] = currentLanguage;
+                return config;
+            },
+            (error) => Promise.reject(error)
+        );
+
+        return () => axios.interceptors.request.eject(interceptor);
+    }, []);
 
     const translations = {
         'English': {
@@ -256,10 +271,73 @@ export const LanguageProvider = ({ children }) => {
             'users_count_suffix': 'users',
             'post_confirmation_msg': 'This will be posted to all users in your locality.',
             'select_profession_alert': 'Please select at least one profession when targeting specific professionals',
-            'new_user_prompt': "Don't have an account? Register",
-            'views': 'Views',
-            'viewed_by': 'Viewed By',
-            'no_views_yet': 'No views yet'
+            'telugu_only_error': 'Registration failed. Please use Telugu script for specific fields.',
+            'broadcast_started': 'Broadcast started',
+            'to_all_users': 'To All Users',
+            'global_broadcast_active': 'Global Broadcast Active',
+            'global_broadcast_desc': 'This will reach every user on the platform.',
+            'recipients': 'Recipients',
+            'select_recipients': 'Select Recipients',
+            'searching_donors': 'Searching Donors...',
+            'no_donors_found': 'No donors found in your town.',
+            'only_selected_warning': 'Only selected users will receive this.',
+            'confirm_send': 'Confirm & Send',
+            'cancel': 'Cancel',
+            'confirm_broadcast': 'Confirm Broadcast',
+            'broadcast_now': 'Broadcast Now',
+            'alert_description': 'Alert Description',
+            'describe_situation': 'Describe the situation...',
+            'attachments': 'Attachments',
+            'attach_files_hint': 'Click to attach files (max 5)',
+            'choose_alert_cat': 'Choose Alert Category',
+            'choose_alert_desc': 'Select a category to broadcast to your community',
+            'review_alert_msg': 'Review your alert before sending',
+            'select_recipients_hint': 'Select recipients for this alert',
+            'email_unavailable': 'Email unavailable',
+            'emergency_type_error': 'Please select an emergency type',
+            'take_photo': 'Take Photo',
+            'upload_photo': 'Upload',
+            'camera_upload_title': 'Add a Profile Photo',
+            'camera_upload_desc': 'Help your neighbors recognize you.',
+            'photo': 'Photo',
+            'address_placeholder': 'House No, Street Name...',
+            'locality_placeholder': 'Your neighborhood name',
+            'town_placeholder': 'Town name',
+            'district_placeholder': 'District',
+            'state_placeholder': 'State',
+            'select_state': 'Select State',
+            'job_role_placeholder': 'e.g., Software Engineer',
+            'sector_placeholder': 'e.g., IT, Healthcare',
+            'business_type_placeholder': 'e.g., Retail, Restaurant',
+            'course_placeholder': 'e.g., Computer Science, B.Com',
+            'description_placeholder': 'Provide more details...',
+            'districts': 'Districts',
+            'towns': 'Towns',
+            'discovery_hub': 'Discovery Hub',
+            'hub': 'Hub',
+            'community_horizon': 'Community Horizon',
+            'no_members_found': 'No members found in',
+            'yet': 'yet',
+            'major_towns': 'Major Towns',
+            'district_horizon': 'District Horizon',
+            'members': 'Members',
+            'reputation': 'Reputation',
+            'impact': 'Impact',
+            'searching_members': 'Searching members...',
+            'discover_subtitle': 'Find spots, events and communities',
+            'login_failed': 'Login Failed',
+            'registration_failed': 'Registration Failed',
+            'fill_all_error': 'Please fill all required fields',
+            'fill_location_error': 'Please fill all location fields',
+            'select_profession_cat_error': 'Please select a profession category',
+            'male': 'Male',
+            'female': 'Female',
+            'other_gender': 'Other',
+            'employed': 'Employed',
+            'business': 'Business',
+            'student': 'Student',
+            'homemaker': 'Homemaker',
+            'others_cat': 'Others'
         },
         'Telugu': {
             'welcome': 'స్వాగతం',
@@ -493,7 +571,75 @@ export const LanguageProvider = ({ children }) => {
             'loading': 'లోడ్ అవుతోంది...',
             'views': 'వీక్షణలు',
             'viewed_by': 'వీక్షించిన వారు',
-            'no_views_yet': 'ఇంకా ఎవరూ చూడలేదు'
+            'no_views_yet': 'ఇంకా ఎవరూ చూడలేదు',
+            'telugu_only_error': 'నమోదు విఫలమైంది. దయచేసి నిర్దిష్ట వివరాలను తెలుగులో మాత్రమే నమోదు చేయండి.',
+            'broadcast_started': 'ప్రసారం ప్రారంభించబడింది',
+            'to_all_users': 'వినియోగదారులందరికీ',
+            'global_broadcast_active': 'గ్లోబల్ వెబ్‌సైట్ బ్రాడ్‌కాస్ట్ సక్రియంగా ఉంది',
+            'global_broadcast_desc': 'ఇది వెబ్‌సైట్‌లోని ప్రతి వినియోగదారుని చేరుకుంటుంది.',
+            'recipients': 'స్వీకర్తలు',
+            'select_recipients': 'స్వీకర్తలను ఎంచుకోండి',
+            'searching_donors': 'దాతల కోసం వెతుకుతోంది...',
+            'no_donors_found': 'మీ పట్టణంలో దాతలు ఎవరూ కనుగొనబడలేదు.',
+            'only_selected_warning': 'ఎంచుకున్న వినియోగదారులు మాత్రమే ఈ అలర్ట్‌ను అందుకుంటారు.',
+            'confirm_send': 'నిర్ధారించి పంపండి',
+            'cancel': 'రద్దు చేయి',
+            'confirm_broadcast': 'అలర్ట్‌ను నిర్ధారించండి',
+            'broadcast_now': 'ఇప్పుడే పంపండి',
+            'alert_description': 'అలర్ట్ వివరాలు',
+            'describe_situation': 'పరిస్థితిని వివరించండి...',
+            'attachments': 'జత చేసినవి',
+            'attach_files_hint': 'ఫైళ్లను జత చేయడానికి క్లిక్ చేయండి (గరిష్టంగా 5)',
+            'choose_alert_cat': 'అలర్ట్ రకాన్ని ఎంచుకోండి',
+            'choose_alert_desc': 'మీ కమ్యూనిటీకి తెలియజేయడానికి ఒక వర్గాన్ని ఎంచుకోండి',
+            'review_alert_msg': 'పంపే ముందు మీ హెచ్చరికను సమీక్షించండి',
+            'select_recipients_hint': 'ఈ హెచ్చరిక కోసం స్వీకర్తలను ఎంచుకోండి',
+            'email_unavailable': 'ఈమెయిల్ అందుబాటులో లేదు',
+            'emergency_type_error': 'దయచేసి ఒక అత్యవసర రకాన్ని ఎంచుకోండి',
+            'take_photo': 'ఫోటో తీయండి',
+            'upload_photo': 'అప్‌లోడ్ చేయండి',
+            'camera_upload_title': 'ప్రొఫైల్ ఫోటోను జోడించండి',
+            'camera_upload_desc': 'మీ పొరుగువారు మిమ్మల్ని గుర్తించడంలో సహాయపడండి.',
+            'photo': 'ఫోటో',
+            'address_placeholder': 'ఇంటి నంబర్, వీధి పేరు...',
+            'locality_placeholder': 'మీ ప్రాంతం పేరు',
+            'town_placeholder': 'పట్టణం పేరు',
+            'district_placeholder': 'జిల్లా',
+            'state_placeholder': 'రాష్ట్రం',
+            'select_state': 'రాష్ట్రాన్ని ఎంచుకోండి',
+            'job_role_placeholder': 'ఉదా: సాఫ్ట్‌వేర్ ఇంజనీర్',
+            'sector_placeholder': 'ఉదా: ఐటీ, హెల్త్‌కేర్',
+            'business_type_placeholder': 'ఉదా: రిటైల్, రెస్టారెంట్',
+            'course_placeholder': 'ఉదా: కంప్యూటర్ సైన్స్, బి.కామ్',
+            'description_placeholder': 'మరిన్ని వివరాలను తెలియజేయండి...',
+            'districts': 'జిల్లాలు',
+            'towns': 'పట్టణాలు',
+            'discovery_hub': 'డిస్కవరీ హబ్',
+            'hub': 'హబ్',
+            'community_horizon': 'కమ్యూనిటీ హోరైజన్',
+            'no_members_found': 'లో ఇంతవరకు ఎవరూ సభ్యులు లేరు',
+            'yet': '',
+            'major_towns': 'ప్రధాన పట్టణాలు',
+            'district_horizon': 'జిల్లా పరిధి',
+            'members': 'సభ్యులు',
+            'reputation': 'కీర్తి',
+            'impact': 'ప్రభావం',
+            'searching_members': 'సభ్యుల కోసం వెతుకుతోంది...',
+            'active_users_live': 'లైవ్ క్రియాశీల వినియోగదారులు',
+            'discover_subtitle': 'స్థలాలు, ఈవెంట్‌లు మరియు కమ్యూనిటీలను కనుగొనండి',
+            'login_failed': 'లాగిన్ విఫలమైంది',
+            'registration_failed': 'నమోదు విఫలమైంది',
+            'fill_all_error': 'దయచేసి అన్ని వివరాలను పూరించండి',
+            'fill_location_error': 'దయచేసి అన్ని స్థల వివరాలను పూరించండి',
+            'select_profession_cat_error': 'దయచేసి ఒక వృత్తి రకాన్ని ఎంచుకోండి',
+            'male': 'పురుషుడు',
+            'female': 'స్త్రీ',
+            'other_gender': 'ఇతరులు',
+            'employed': 'ఉద్యోగి',
+            'business': 'వ్యాపారం',
+            'student': 'విద్యార్థి',
+            'homemaker': 'గృహిణి',
+            'others_cat': 'ఇతరులు'
         }
     };
 

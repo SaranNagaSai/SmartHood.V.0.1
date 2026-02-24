@@ -2,6 +2,12 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { sendWelcomeEmail } = require('../services/emailService');
 
+const isTelugu = (text) => {
+    if (!text) return true;
+    const teluguRegex = /^[\u0C00-\u0C7F0-9\s.,!?-]+$/;
+    return teluguRegex.test(text);
+};
+
 // Generate Unique ID (e.g., random chars + random numbers)
 const generateUniqueId = async () => {
     let uniqueId;
@@ -30,6 +36,18 @@ const registerUser = async (req, res) => {
             address, locality, town, district, state,
             professionCategory, experience
         } = req.body;
+
+        const { language } = req.headers; // Expect language preference in headers
+
+        // Server-side Telugu validation
+        if (language === 'Telugu') {
+            const fieldsToValidate = { name, locality, town, district };
+            for (const [field, value] of Object.entries(fieldsToValidate)) {
+                if (value && !isTelugu(value)) {
+                    return res.status(400).json({ message: `దయచేసి ${field} లో తెలుగు అక్షరాలను మాత్రమే ఉపయోగించండి. (Please use Telugu script for ${field})` });
+                }
+            }
+        }
 
         // Robust parsing for professionDetails (handles flattened bracketed keys from FormData)
         let professionDetails = req.body.professionDetails || {};
@@ -105,8 +123,8 @@ const registerUser = async (req, res) => {
             const { createNotification } = require('./notificationController');
             await createNotification(
                 user._id,
-                'Welcome to SmartHood!',
-                `Hi ${user.name}, we're glad to have you in the ${user.locality} community. Start by exploring services or help your neighbors!`,
+                'Welcome to SmartHood / స్మార్ట్ హుడ్ కు స్వాగతం!',
+                `Hi ${user.name}, welcome to the ${user.locality} community. / ${user.name} గారు, ${user.locality} కమ్యూనిటీలోకి మీకు స్వాగతం.`,
                 'system',
                 '/home',
                 null,

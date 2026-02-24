@@ -17,6 +17,12 @@ const Alerts = () => {
     const fileInputRef = React.useRef(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
+    const isTelugu = (text) => {
+        if (!text) return true;
+        const teluguRegex = /^[\u0C00-\u0C7F0-9\s.,!?-]+$/;
+        return teluguRegex.test(text);
+    };
+    const { language } = useLanguage();
 
     // Blood Donation Logic
     const [donors, setDonors] = useState([]);
@@ -67,11 +73,11 @@ const Alerts = () => {
         }
     ];
 
-    const emergencySubTypes = ['Blood Donation', 'Accident', 'Cash Donation', 'Climate', 'Theft', 'General'];
+    const emergencySubTypes = ['blood_donation', 'accident', 'cash_donation', 'climate_alert', 'theft', 'general_alert'];
 
     // Fetch Donors when Blood Donation is selected
     useEffect(() => {
-        if (selectedCategory === 'Emergency' && subType === 'Blood Donation' && bloodGroup) {
+        if (selectedCategory === 'Emergency' && subType === 'blood_donation' && bloodGroup) {
             fetchDonors();
         } else {
             setIsPanelOpen(false);
@@ -119,11 +125,15 @@ const Alerts = () => {
 
     const handleConfirmSubmit = () => {
         if (!description) {
-            alert('Please provide a description');
+            alert(t('fill_all_error'));
+            return;
+        }
+        if (language === 'Telugu' && !isTelugu(description)) {
+            alert(t('telugu_only_error'));
             return;
         }
         if (selectedCategory === 'Emergency' && !subType) {
-            alert('Please select an emergency type');
+            alert(t('emergency_type_error', 'Please select an emergency type'));
             return;
         }
         setShowConfirm(true);
@@ -138,7 +148,7 @@ const Alerts = () => {
             const formData = new FormData();
             formData.append('category', selectedCategory);
             formData.append('subType', selectedCategory === 'Emergency' ? subType : selectedCategory);
-            if (subType === 'Blood Donation') {
+            if (subType === 'blood_donation') {
                 formData.append('bloodGroup', bloodGroup);
                 if (selectedDonorIds.size > 0) {
                     Array.from(selectedDonorIds).forEach(id => {
@@ -208,8 +218,8 @@ const Alerts = () => {
                         <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl shadow-xl animate-bounce">
                             📣
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Choose Alert Category</h2>
-                        <p className="text-gray-600">Select a category to broadcast to your community</p>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('choose_alert_cat', 'Choose Alert Category')}</h2>
+                        <p className="text-gray-600">{t('choose_alert_desc', 'Select a category to broadcast to your community')}</p>
                     </div>
                 )}
 
@@ -261,14 +271,14 @@ const Alerts = () => {
                         >
                             <option value="">{t('start_here')}</option>
                             {emergencySubTypes.map(type => (
-                                <option key={type} value={type}>🔴 {type}</option>
+                                <option key={type} value={type}>🔴 {t(type)}</option>
                             ))}
                         </select>
                     </div>
                 )}
 
                 {/* Blood Donation UI - Enhanced */}
-                {subType === 'Blood Donation' && (
+                {subType === 'blood_donation' && (
                     <div className="animate-fade-in bg-gradient-to-br from-red-50 via-pink-50 to-red-50 p-8 rounded-3xl shadow-2xl border-2 border-red-300">
                         <div className="text-center mb-6">
                             <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl shadow-xl animate-pulse">
@@ -340,7 +350,7 @@ const Alerts = () => {
                             className="w-full p-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 transition-all flex items-center justify-center gap-3 group"
                         >
                             <Paperclip size={24} className="group-hover:rotate-12 transition-transform" />
-                            <span className="font-medium">Click to attach files (max 5)</span>
+                            <span className="font-medium">{t('attach_files_hint', 'Click to attach files (max 5)')}</span>
                         </button>
                         {attachments.length > 0 && (
                             <div className="mt-4 space-y-2">
@@ -381,23 +391,23 @@ const Alerts = () => {
                             <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl mx-auto mb-4 flex items-center justify-center text-4xl">
                                 {selectedCat?.emoji}
                             </div>
-                            <h3 className="text-2xl font-bold text-center">Confirm Broadcast</h3>
-                            <p className="text-center text-white/80 text-sm mt-2">Review your alert before sending</p>
+                            <h3 className="text-2xl font-bold text-center">{t('confirm_broadcast')}</h3>
+                            <p className="text-center text-white/80 text-sm mt-2">{t('review_alert_msg', 'Review your alert before sending')}</p>
                         </div>
                         <div className="p-8 space-y-4">
                             <div className="bg-gray-50 p-4 rounded-2xl">
-                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">Category</p>
-                                <p className="font-bold text-gray-800">{selectedCategory}</p>
+                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">{t('category')}</p>
+                                <p className="font-bold text-gray-800">{t(selectedCategory?.toLowerCase())}</p>
                             </div>
                             {selectedCategory === 'Emergency' && (
                                 <div className="bg-gray-50 p-4 rounded-2xl">
-                                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">Type</p>
-                                    <p className="font-bold text-gray-800">{subType}</p>
+                                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">{t('emergency_type')}</p>
+                                    <p className="font-bold text-gray-800">{t(subType)}</p>
                                 </div>
                             )}
-                            {subType === 'Blood Donation' && (
+                            {subType === 'blood_donation' && (
                                 <div className="bg-red-50 p-4 rounded-2xl border-2 border-red-200">
-                                    <p className="text-xs text-red-500 uppercase font-bold mb-1">Blood Group</p>
+                                    <p className="text-xs text-red-500 uppercase font-bold mb-1">{t('blood_group')}</p>
                                     <p className="font-bold text-red-600 flex items-center gap-2">
                                         <Droplet size={16} fill="currentColor" />
                                         {bloodGroup}
@@ -405,7 +415,7 @@ const Alerts = () => {
                                 </div>
                             )}
                             <div className="bg-gray-50 p-4 rounded-2xl max-h-32 overflow-y-auto">
-                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">Description</p>
+                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">{t('alert_description')}</p>
                                 <p className="text-gray-700">{description}</p>
                             </div>
                         </div>
@@ -415,7 +425,7 @@ const Alerts = () => {
                                 disabled={loading}
                                 className="flex-1 px-6 py-4 border-2 border-gray-300 rounded-2xl text-gray-700 font-bold hover:bg-gray-100 transition-all"
                             >
-                                Cancel
+                                {t('cancel')}
                             </button>
                             <button
                                 onClick={handleSubmit}
@@ -425,12 +435,12 @@ const Alerts = () => {
                                 {loading ? (
                                     <>
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        Broadcasting...
+                                        {t('processing')}
                                     </>
                                 ) : (
                                     <>
                                         <Send size={20} />
-                                        Confirm & Send
+                                        {t('confirm_send')}
                                     </>
                                 )}
                             </button>
@@ -447,9 +457,9 @@ const Alerts = () => {
                         <div>
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <Users size={24} />
-                                Donors ({donors.length})
+                                {t('recipients')} ({donors.length})
                             </h2>
-                            <p className="text-xs text-red-100 opacity-90 mt-1">Select recipients for this alert</p>
+                            <p className="text-xs text-red-100 opacity-90 mt-1">{t('select_recipients_hint', 'Select recipients for this alert')}</p>
                         </div>
                         <button onClick={() => setIsPanelOpen(false)} className="p-2 hover:bg-white/20 rounded-full transition">
                             <X size={24} />
@@ -463,10 +473,10 @@ const Alerts = () => {
                             className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-primary transition"
                         >
                             {selectedDonorIds.size === donors.length ? <CheckSquare className="text-primary" /> : <Square />}
-                            {selectedDonorIds.size === donors.length ? 'Deselect All' : 'Select All'}
+                            {selectedDonorIds.size === donors.length ? t('deselect_all') : t('select_all')}
                         </button>
                         <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
-                            Selected: {selectedDonorIds.size}
+                            {t('selected_count')}: {selectedDonorIds.size}
                         </span>
                     </div>
 
@@ -475,12 +485,12 @@ const Alerts = () => {
                         {loadingDonors ? (
                             <div className="flex flex-col items-center justify-center h-40 text-gray-400">
                                 <div className="w-8 h-8 border-4 border-gray-200 border-t-primary rounded-full animate-spin mb-2"></div>
-                                <span className="text-sm">Searching Donors...</span>
+                                <span className="text-sm">{t('searching_donors')}</span>
                             </div>
                         ) : donors.length === 0 ? (
                             <div className="text-center py-10 text-gray-400">
                                 <Search size={48} className="mx-auto mb-3 opacity-20" />
-                                <p>No {bloodGroup} donors found in your town.</p>
+                                <p>{t('no_donors_found')}</p>
                             </div>
                         ) : (
                             donors.map(donor => (
@@ -521,7 +531,7 @@ const Alerts = () => {
                                         </div>
                                         {!donor.email && (
                                             <span className="text-[10px] text-red-400 font-bold uppercase mt-1 inline-block">
-                                                ⚠️ Email unavailable
+                                                ⚠️ {t('email_unavailable', 'Email unavailable')}
                                             </span>
                                         )}
                                     </div>
@@ -535,7 +545,7 @@ const Alerts = () => {
 
                     {/* Footer Warning */}
                     <div className="p-4 bg-yellow-50 text-yellow-800 text-xs text-center border-t border-yellow-100">
-                        Only selected users will receive this emergency alert.
+                        {t('only_selected_warning')}
                     </div>
                 </div>
             </div>

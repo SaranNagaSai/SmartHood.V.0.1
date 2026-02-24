@@ -141,7 +141,7 @@ const Home = () => {
                                 {user.uniqueId}
                             </span>
                             <span className="bg-black/20 px-1.5 py-0.5 rounded text-[9px] md:text-xs flex items-center gap-1 whitespace-nowrap">
-                                <MapPin size={8} md:size={10} /> {user.locality}
+                                <MapPin size={8} md:size={10} /> {t(user.locality) || user.locality}
                             </span>
                         </div>
                     </div>
@@ -153,7 +153,7 @@ const Home = () => {
             {/* State Cards (Marquee) */}
             <div className="mt-8 px-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[var(--col-text-primary)]">{t('community_reach')}</h2>
+                    <h2 className="text-lg font-bold text-[var(--col-text-primary)]">{t('neighborhood_reach')}</h2>
                     <span className="text-xs font-bold text-primary bg-blue-50 px-2 py-1 rounded-md">{t('live')}</span>
                 </div>
 
@@ -246,7 +246,7 @@ const Home = () => {
                                         {style.icon}
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="font-bold text-gray-800 text-xs md:text-sm truncate max-w-[100px]">{prof._id}</h3>
+                                        <h3 className="font-bold text-gray-800 text-xs md:text-sm truncate max-w-[100px]">{t(prof._id.toLowerCase()) || prof._id}</h3>
                                         <span className="text-[9px] md:text-[10px] font-bold text-gray-400 mt-0.5 md:mt-1 block">{prof.count} {t('pros_nearby')}</span>
                                     </div>
                                 </div>
@@ -295,7 +295,7 @@ const Home = () => {
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
                         <div className="bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] p-4 flex items-center justify-between">
                             <div>
-                                <h3 className="text-white font-bold text-lg">{selectedProfession}</h3>
+                                <h3 className="text-white font-bold text-lg">{t(selectedProfession?.toLowerCase()) || selectedProfession}</h3>
                                 <p className="text-white/70 text-xs">{t('professionals_locality')}</p>
                             </div>
                             <button onClick={closeModal} className="text-white/80 hover:text-white p-1">

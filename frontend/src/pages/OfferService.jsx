@@ -20,6 +20,13 @@ const OfferService = () => {
     const [loading, setLoading] = useState(false);
     const [titleError, setTitleError] = useState('');
     const [localities, setLocalities] = useState([]);
+    const { language } = useLanguage();
+
+    const isTelugu = (text) => {
+        if (!text) return true;
+        const teluguRegex = /^[\u0C00-\u0C7F0-9\s.,!?-]+$/;
+        return teluguRegex.test(text);
+    };
 
     const [jobTitles, setJobTitles] = useState([]);
     const [communities, setCommunities] = useState([]); // NEW: Available communities in town
@@ -109,10 +116,16 @@ const OfferService = () => {
             alert(t('fill_all_fields'));
             return;
         }
+        if (language === 'Telugu') {
+            if (!isTelugu(formData.title) || !isTelugu(formData.description)) {
+                alert(t('telugu_only_error'));
+                return;
+            }
+        }
         // Validate profession selection when "To Specific" is selected
         if (formData.targetAudience === 'SPECIFIC' && formData.targetProfessions.length === 0) {
-            setProfessionError('Please select at least one profession');
-            alert('Please select at least one profession when targeting specific professionals');
+            setProfessionError(t('select_profession_alert'));
+            alert(t('select_profession_alert'));
             return;
         }
         setProfessionError('');
@@ -171,7 +184,7 @@ const OfferService = () => {
 
             // NEW: Show recipient count in success message
             const recipientCount = response.data.recipientCount || 0;
-            const broadcastMsg = formData.broadcastGlobal ? "Global Broadcast Initialized" : `Broadcast to ${recipientCount} users`;
+            const broadcastMsg = formData.broadcastGlobal ? t('global_broadcast_active') : `${t('broadcast')} ${recipientCount} ${t('users_count_suffix')}`;
             alert(`${t('offer_service_success')} - ${broadcastMsg}`);
             navigate('/home');
         } catch (error) {
@@ -396,8 +409,8 @@ const OfferService = () => {
 
                     {formData.broadcastGlobal && (
                         <div className="mb-4 animate-fade-in p-4 bg-indigo-50 rounded-xl border-2 border-dashed border-indigo-200 text-center">
-                            <p className="text-sm font-bold text-indigo-700">🌍 GLOBAL WEBSITE BROADCAST ACTIVE</p>
-                            <p className="text-[10px] text-indigo-500 mt-1">This will reach every user on the platform, bypassing location filters.</p>
+                            <p className="text-sm font-bold text-indigo-700">🌍 {t('global_broadcast_active')}</p>
+                            <p className="text-[10px] text-indigo-500 mt-1">{t('global_broadcast_desc')}</p>
                         </div>
                     )}
 

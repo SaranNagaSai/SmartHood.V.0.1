@@ -1,5 +1,11 @@
 const User = require('../models/User');
 
+const isTelugu = (text) => {
+    if (!text) return true;
+    const teluguRegex = /^[\u0C00-\u0C7F0-9\s.,!?-]+$/;
+    return teluguRegex.test(text);
+};
+
 // @desc    Get stats for the user's locality
 // @route   GET /api/users/stats
 // @access  Private
@@ -180,6 +186,18 @@ const updateProfile = async (req, res) => {
         if (user) {
             const { address, locality, town, district, state, email,
                 professionCategory, professionDetails, experience, bloodGroup } = req.body;
+
+            const { language } = req.headers; // Expect language preference in headers
+
+            // Server-side Telugu validation on update
+            if (language === 'Telugu') {
+                const fieldsToValidate = { locality, town, district };
+                for (const [field, value] of Object.entries(fieldsToValidate)) {
+                    if (value && !isTelugu(value)) {
+                        return res.status(400).json({ message: `దయచేసి ${field} లో తెలుగు అక్షరాలను మాత్రమే ఉపయోగించండి. (Please use Telugu script for ${field})` });
+                    }
+                }
+            }
 
             // Update all editable fields
             user.address = address || user.address;

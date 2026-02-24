@@ -18,6 +18,13 @@ const Register = () => {
     const [profilePhotoPreview, setProfilePhotoPreview] = useState(null);
     const [cameraMode, setCameraMode] = useState(false);
     const webcamRef = React.useRef(null);
+    const isTelugu = (text) => {
+        if (!text) return true;
+        // Telugu Unicode Range: 0C00-0C7F
+        // Also allow numbers, spaces, and common punctuation
+        const teluguRegex = /^[\u0C00-\u0C7F0-9\s.,!?-]+$/;
+        return teluguRegex.test(text);
+    };
 
     const [formData, setFormData] = useState({
         name: '',
@@ -44,9 +51,9 @@ const Register = () => {
     });
 
     const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-    const genders = ['Male', 'Female', 'Other'];
-    const professionCategories = ['Employed', 'Business', 'Student', 'Homemaker', 'Others'];
-    const educationLevels = ['High School', 'Intermediate', 'Undergraduate', 'Postgraduate', 'PhD', 'Other'];
+    const genders = ['male', 'female', 'other_gender'];
+    const professionCategories = ['employed', 'business', 'student', 'homemaker', 'others_cat'];
+    const educationLevels = ['high_school', 'intermediate', 'undergraduate', 'postgraduate', 'phd', 'other_gender'];
 
     const indianStates = [
         "Andaman and Nicobar Islands",
@@ -103,21 +110,34 @@ const Register = () => {
         // Validation for each step
         if (step === 1) {
             if (!formData.name || !formData.phone || !formData.age || !formData.bloodGroup) {
-                alert('Please fill all required fields');
+                alert(t('fill_all_error'));
                 return;
             }
         }
         if (step === 2) {
             if (!formData.locality || !formData.town || !formData.district || !formData.state) {
-                alert('Please fill all location fields');
+                alert(t('fill_location_error'));
                 return;
+            }
+            if (language === 'Telugu') {
+                if (!isTelugu(formData.locality) || !isTelugu(formData.town) || !isTelugu(formData.district)) {
+                    alert(t('telugu_only_error'));
+                    return;
+                }
             }
         }
         if (step === 3) {
-            // Basic validation for profession (can be stricter)
             if (!formData.professionCategory) {
-                alert('Please select a profession category');
+                alert(t('select_profession_cat_error'));
                 return;
+            }
+            if (language === 'Telugu') {
+                const pd = formData.professionDetails;
+                const fieldsToVerify = [pd.jobRole, pd.sector, pd.businessType, pd.course, pd.description];
+                if (fieldsToVerify.some(f => f && !isTelugu(f))) {
+                    alert(t('telugu_only_error'));
+                    return;
+                }
             }
         }
         setStep(step + 1);
@@ -193,7 +213,7 @@ const Register = () => {
             navigate('/home');
         } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Registration Failed');
+            alert(error.response?.data?.message || t('registration_failed'));
         }
         setLoading(false);
     };
@@ -219,7 +239,7 @@ const Register = () => {
                         </div>
                         <span className={`text-[8px] md:text-[10px] uppercase tracking-wider mt-2 md:mt-3 font-bold transition-colors ${s === current ? 'text-primary' : 'text-gray-400'
                             }`}>
-                            {s === 1 ? t('personal') : s === 2 ? t('location') : s === 3 ? t('work') : t('photo') || 'PHOTO'}
+                            {s === 1 ? t('personal') : s === 2 ? t('location') : s === 3 ? t('work') : t('photo')}
                         </span>
                     </div>
                     {idx < 3 && (
@@ -288,7 +308,7 @@ const Register = () => {
                                                 onChange={handleChange}
                                                 className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-primary outline-none transition-all"
                                             >
-                                                {genders.map(g => <option key={g} value={g}>{g}</option>)}
+                                                {genders.map(g => <option key={g} value={g}>{t(g)}</option>)}
                                             </select>
                                         </div>
                                     </div>
@@ -335,7 +355,7 @@ const Register = () => {
                                         label={t('address_label')}
                                         value={formData.address}
                                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                        placeholder="House No, Street Name..."
+                                        placeholder={t('address_placeholder')}
                                         type="textarea"
                                         className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl"
                                     />
@@ -345,7 +365,7 @@ const Register = () => {
                                         label={t('locality_label') + " *"}
                                         value={formData.locality}
                                         onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
-                                        placeholder="Your neighborhood name"
+                                        placeholder={t('locality_placeholder')}
                                         className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
                                         required
                                     />
@@ -356,7 +376,7 @@ const Register = () => {
                                             label={t('town_label') + " *"}
                                             value={formData.town}
                                             onChange={(e) => setFormData({ ...formData, town: e.target.value })}
-                                            placeholder="Town name"
+                                            placeholder={t('town_placeholder')}
                                             className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
                                             required
                                         />
@@ -365,7 +385,7 @@ const Register = () => {
                                             label={t('district_label') + " *"}
                                             value={formData.district}
                                             onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                                            placeholder="District"
+                                            placeholder={t('district_placeholder')}
                                             className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
                                             required
                                         />
@@ -428,7 +448,7 @@ const Register = () => {
                                                 label={t('job_role_label') + " *"}
                                                 value={formData.professionDetails.jobRole}
                                                 onChange={(e) => handleProfessionDetailChange('jobRole', e.target.value)}
-                                                placeholder="e.g., Software Engineer"
+                                                placeholder={t('job_role_placeholder')}
                                                 className="bg-white border-gray-200 rounded-xl py-3"
                                                 required
                                             />
@@ -436,7 +456,7 @@ const Register = () => {
                                                 label={t('sector_label')}
                                                 value={formData.professionDetails.sector}
                                                 onChange={(e) => handleProfessionDetailChange('sector', e.target.value)}
-                                                placeholder="e.g., IT, Healthcare"
+                                                placeholder={t('sector_placeholder')}
                                                 className="bg-white border-gray-200 rounded-xl py-3"
                                             />
                                             <VoiceInput
@@ -456,7 +476,7 @@ const Register = () => {
                                                 label={t('business_type_label') + " *"}
                                                 value={formData.professionDetails.businessType}
                                                 onChange={(e) => handleProfessionDetailChange('businessType', e.target.value)}
-                                                placeholder="e.g., Retail, Restaurant"
+                                                placeholder={t('business_type_placeholder')}
                                                 className="bg-white border-gray-200 rounded-xl py-3"
                                                 required
                                             />
@@ -483,7 +503,7 @@ const Register = () => {
                                                 >
                                                     <option value="">-- {t('choose_role')} --</option>
                                                     {educationLevels.map(level => (
-                                                        <option key={level} value={level}>{t(level.toLowerCase().replace(' ', '_')) || level}</option>
+                                                        <option key={level} value={level}>{t(level)}</option>
                                                     ))}
                                                 </select>
                                             </div>
@@ -491,7 +511,7 @@ const Register = () => {
                                                 label={t('course_label') + " *"}
                                                 value={formData.professionDetails.course}
                                                 onChange={(e) => handleProfessionDetailChange('course', e.target.value)}
-                                                placeholder="e.g., Computer Science, B.Com"
+                                                placeholder={t('course_placeholder')}
                                                 className="bg-white border-gray-200 rounded-xl py-3"
                                                 required
                                             />
@@ -512,7 +532,7 @@ const Register = () => {
                                                 label={t('description_label')}
                                                 value={formData.professionDetails.description}
                                                 onChange={(e) => handleProfessionDetailChange('description', e.target.value)}
-                                                placeholder="Provide more details..."
+                                                placeholder={t('description_placeholder')}
                                                 className="bg-white border-gray-200 rounded-xl py-3"
                                             />
                                             <VoiceInput

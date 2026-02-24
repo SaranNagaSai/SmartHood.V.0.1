@@ -154,7 +154,7 @@ const createService = async (req, res) => {
                         try {
                             const result = await sendEmail(
                                 targetUser.email,
-                                `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
+                                `${type === 'offer' ? 'Service Offer / కొత్త ఆఫర్' : 'Help Request / కొత్త సహాయం'}: ${title}`,
                                 `${user.name} posted: ${title}`,
                                 emailHtml
                             );
@@ -177,8 +177,8 @@ const createService = async (req, res) => {
                             await admin.messaging().send({
                                 token: targetUser.fcmToken,
                                 notification: {
-                                    title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}`,
-                                    body: `${user.name} posted: ${title}`
+                                    title: `${type === 'offer' ? 'Service Offer / కొత్త ఆఫర్' : 'Help Request / కొత్త సహాయం'}`,
+                                    body: `${user.name}: ${title}`
                                 },
                                 data: { url: `/service/${service._id}`, type: 'service' }
                             });
@@ -193,8 +193,8 @@ const createService = async (req, res) => {
                         const Notification = require('../models/Notification');
                         await Notification.create({
                             userId: targetUser._id,
-                            title: `New ${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`,
-                            body: `${user.name} posted: ${title}`,
+                            title: `${type === 'offer' ? 'Service Offer / కొత్త ఆఫర్' : 'Help Request / కొత్త సహాయం'}: ${title}`,
+                            body: `${user.name}: ${title}`,
                             type: 'service',
                             link: `/service/${service._id}`,
                             delivered: true,
@@ -342,15 +342,24 @@ const expressInterest = async (req, res) => {
             service.interestedProviders.push(req.user._id);
 
             // Notify service creator
-            const emailHtml = generateInterestEmailTemplate(service, req.user);
+            if (creator && creator.email) {
+                await sendEmail(
+                    creator.email,
+                    `New Interest / కొత్త ఆసక్తి: ${service.title}`,
+                    `${req.user.name} is interested in your request.`,
+                    generateInterestEmailTemplate(service, req.user)
+                );
+            }
 
+            // Create DB Notification for Creator
             await createNotification(
                 service.createdBy,
-                'New Interest in Your Request',
-                `${req.user.name} is interested in helping with "${service.title}"`,
-                'service',
+                `New Interest / కొత్త ఆసక్తి`,
+                `${req.user.name} is interested in: ${service.title}`,
+                'interest',
                 `/service/${service._id}`,
-                emailHtml
+                null,
+                true // Notification already sent via email above
             );
         }
 
@@ -413,15 +422,26 @@ const completeService = async (req, res) => {
         });
 
         // Notify provider
-        const emailHtml = generateCompletionEmailTemplate(service, provider, amountSpent || 0);
+        const amount = amountSpent || 0; // Define amount for clarity
 
+        if (provider.email) {
+            await sendEmail(
+                provider.email,
+                `Service Completed / సేవ పూర్తయింది: ${service.title}`,
+                `Congratulations! Your service has been marked as completed.`,
+                generateCompletionEmailTemplate(service, provider, amount)
+            );
+        }
+
+        // Notification for Provider
         await createNotification(
-            provider._id,
-            'Service Completed!',
-            `${req.user.name} marked your service as complete. Your impact score increased!`,
-            'service',
-            `/service/${service._id}`, // Adding link for consistency
-            emailHtml
+            service.completedBy,
+            `Service Completed / సేవ పూర్తయింది`,
+            `Your service "${service.title}" has been completed. Revenue: ₹${amount}`,
+            'completion',
+            `/service/${service._id}`,
+            null,
+            true // Email already sent
         );
 
         res.json({

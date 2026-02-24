@@ -65,7 +65,7 @@ const StateUsers = () => {
                     </button>
                     <div>
                         <h1 className="font-black text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-900 to-indigo-600 tracking-tight leading-none">
-                            {stateName} <span className="text-indigo-400 font-light">Hub</span>
+                            {stateName} <span className="text-indigo-400 font-light">{t('hub', 'Hub')}</span>
                         </h1>
                         <div className="flex items-center gap-2 mt-1">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
@@ -106,7 +106,7 @@ const StateUsers = () => {
                                 <h2 className="text-2xl font-black text-slate-800 tracking-tighter">{district}</h2>
                                 <div className="ml-auto">
                                     <span className="bg-white/60 border border-slate-100 px-3 py-1 rounded-xl text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                                        {Object.keys(towns).length} Towns
+                                        {Object.keys(towns).length} {t('towns')}
                                     </span>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@ const StateUsers = () => {
                                                 <h3 className="font-black text-slate-600 uppercase text-[10px] tracking-[0.15em] group-hover:text-indigo-600 transition-colors">{town}</h3>
                                             </div>
                                             <span className="text-[9px] font-bold text-slate-300 uppercase letter-spacing-widest">
-                                                {townUsers.length} MEMBERS
+                                                {townUsers.length} {t('members').toUpperCase()}
                                             </span>
                                         </div>
 
@@ -179,7 +179,7 @@ const StateUsers = () => {
                                                     <div className="bg-slate-50/50 px-4 py-2.5 flex justify-between items-center border-t border-slate-100/50">
                                                         <div className="flex items-center gap-2 text-amber-500">
                                                             <Award size={12} className="group-hover/card:rotate-12 transition-transform" />
-                                                            <span className="text-[10px] font-black uppercase tracking-tighter">Impact {u.impactScore || 0}</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-tighter">{t('impact')} {u.impactScore || 0}</span>
                                                         </div>
                                                         <ChevronRight size={14} className="text-slate-300 group-hover/card:text-indigo-400 group-hover/card:translate-x-1 transition-all" />
                                                     </div>
@@ -195,8 +195,8 @@ const StateUsers = () => {
                 ) : (
                     <div className="text-center py-40">
                         <Users size={48} className="text-slate-200 mx-auto mb-4" />
-                        <h3 className="text-lg font-black text-slate-700 tracking-tight">Community Horizon</h3>
-                        <p className="text-slate-400 text-xs font-medium">No members found in {stateName} yet.</p>
+                        <h3 className="text-lg font-black text-slate-700 tracking-tight">{t('community_horizon', 'Community Horizon')}</h3>
+                        <p className="text-slate-400 text-xs font-medium">{t('no_members_found', 'No members found in')} {stateName} {t('yet')}.</p>
                     </div>
                 )}
             </div>

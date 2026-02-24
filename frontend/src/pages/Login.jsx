@@ -19,7 +19,7 @@ const Login = () => {
             login(res.data, res.data.token);
             navigate('/home');
         } catch (error) {
-            alert(error.response?.data?.message || 'Login Failed');
+            alert(error.response?.data?.message || t('login_failed'));
         }
     };
 
