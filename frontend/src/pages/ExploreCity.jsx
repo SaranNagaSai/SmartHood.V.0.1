@@ -48,8 +48,9 @@ const createTownLabelIcon = (townName) => {
 };
 
 // Component to handle map centering, bounds restriction, and district labels
-const MapController = ({ centers, townCenter, districtBounds, districtTownMarkers }) => {
+const MapController = ({ localityPositions, townCenter, districtBounds, hasLocalities }) => {
     const map = useMap();
+    const hasFlownToTown = React.useRef('');
 
     // Set max bounds to restrict panning to the district
     React.useEffect(() => {
@@ -58,21 +59,23 @@ const MapController = ({ centers, townCenter, districtBounds, districtTownMarker
                 [districtBounds.minLat, districtBounds.minLng],
                 [districtBounds.maxLat, districtBounds.maxLng]
             );
-            map.setMaxBounds(bounds.pad(0.05)); // 5% padding for smooth edge navigation
-            map.options.maxBoundsViscosity = 1.0; // Hard limit - can't pan outside
-            map.setMinZoom(9); // Don't allow zooming out too far beyond district
+            map.setMaxBounds(bounds.pad(0.1)); // 10% padding for smooth edge navigation
+            map.options.maxBoundsViscosity = 1.0;
+            map.setMinZoom(8);
         }
     }, [districtBounds, map]);
 
-    // Fly to town when selected
+    // Step 1: When a town is first selected, fly to the town center
     React.useEffect(() => {
-        if (townCenter) {
+        if (townCenter && hasFlownToTown.current !== JSON.stringify(townCenter)) {
+            hasFlownToTown.current = JSON.stringify(townCenter);
             map.flyTo(townCenter, 13, {
-                duration: 1.5,
+                duration: 1.2,
                 easeLinearity: 0.25
             });
-        } else if (districtBounds) {
-            // Initially show the whole district
+        } else if (!townCenter && districtBounds) {
+            // No town selected — show the whole district
+            hasFlownToTown.current = '';
             const bounds = L.latLngBounds(
                 [districtBounds.minLat, districtBounds.minLng],
                 [districtBounds.maxLat, districtBounds.maxLng]
@@ -82,15 +85,29 @@ const MapController = ({ centers, townCenter, districtBounds, districtTownMarker
                 maxZoom: 11,
                 duration: 1.5
             });
-        } else if (centers && centers.length > 0) {
-            const bounds = L.latLngBounds(centers);
-            map.flyToBounds(bounds, {
-                padding: [50, 50],
-                maxZoom: 14,
-                duration: 1.5
-            });
         }
-    }, [centers, townCenter, districtBounds, map]);
+    }, [townCenter, districtBounds, map]);
+
+    // Step 2: After localities are loaded, fit the map to show ALL locality markers
+    React.useEffect(() => {
+        if (!hasLocalities || !localityPositions || localityPositions.length === 0) return;
+
+        // Small delay to let the initial town fly complete
+        const timer = setTimeout(() => {
+            if (localityPositions.length === 1) {
+                map.flyTo(localityPositions[0], 14, { duration: 1 });
+            } else {
+                const bounds = L.latLngBounds(localityPositions);
+                map.flyToBounds(bounds, {
+                    padding: [60, 60],
+                    maxZoom: 15,
+                    duration: 1.2
+                });
+            }
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, [localityPositions, hasLocalities, map]);
 
     return null;
 };
@@ -416,27 +433,33 @@ const ExploreCity = () => {
     // Dynamic Geocoding State
     const [dynamicCoords, setDynamicCoords] = React.useState({});
     const requestedLocs = React.useRef(new Set());
+    const geocodeAbortRef = React.useRef(null);
 
     // Effect to geocode missing localities within district constraints
+    // NOTE: dynamicCoords is NOT in the dependency array to avoid infinite loops.
+    // We use requestedLocs ref to track what's already been requested.
     React.useEffect(() => {
         if (!userTown || localities.length === 0) return;
 
+        // Cancel any previous geocode chain when town changes
+        if (geocodeAbortRef.current) geocodeAbortRef.current.cancelled = true;
+        const abortToken = { cancelled: false };
+        geocodeAbortRef.current = abortToken;
+
         const missingLocs = localities.filter(loc => {
             if (loc.coordinates && loc.coordinates.lat) return false;
-            if (dynamicCoords[loc.name]) return false;
             if (requestedLocs.current.has(loc.name)) return false;
             return true;
         });
 
         const fetchNext = async (index) => {
-            if (index >= missingLocs.length) return;
+            if (index >= missingLocs.length || abortToken.cancelled) return;
             const loc = missingLocs[index];
             requestedLocs.current.add(loc.name);
 
             try {
                 // Use district and state for better geocoding accuracy
                 const state = districtInfo ?
-                    // Determine state from district bounds
                     (districtInfo.bounds.maxLat > 18.5 || districtInfo.bounds.minLng < 79 ? 'Telangana' : 'Andhra Pradesh')
                     : 'Andhra Pradesh';
 
@@ -444,13 +467,12 @@ const ExploreCity = () => {
                 const res = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
-                if (data && data.length > 0 && districtInfo) {
+                if (data && data.length > 0 && districtInfo && !abortToken.cancelled) {
                     const db = districtInfo.bounds;
                     for (const result of data) {
                         const lat = parseFloat(result.lat);
                         const lon = parseFloat(result.lon);
 
-                        // Validate: must be within district bounds
                         if (lat >= db.minLat && lat <= db.maxLat &&
                             lon >= db.minLng && lon <= db.maxLng) {
                             setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
@@ -462,13 +484,18 @@ const ExploreCity = () => {
                 console.error("Geocoding failed for", loc.name, err);
             }
 
-            setTimeout(() => fetchNext(index + 1), 1200);
+            if (!abortToken.cancelled) {
+                setTimeout(() => fetchNext(index + 1), 1000);
+            }
         };
 
         if (missingLocs.length > 0) {
             fetchNext(0);
         }
-    }, [localities, userTown, dynamicCoords, districtInfo, userDistrict]);
+
+        return () => { abortToken.cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [localities, userTown, districtInfo, userDistrict]);
 
 
     const handleTownChange = async (townName) => {
@@ -549,7 +576,7 @@ const ExploreCity = () => {
 
     // Helper to get coordinates with district-aware validation
     const getCoordinates = React.useCallback((town, localityName) => {
-        // Find town center from district data first, then from hardcoded list
+        // Find town center from district data first
         let center = [16.5, 79.5]; // Default fallback
         if (districtInfo && districtInfo.towns) {
             const townKey = Object.keys(districtInfo.towns).find(k => k.toLowerCase() === town?.toLowerCase());
@@ -570,24 +597,27 @@ const ExploreCity = () => {
             }
         }
 
-        // 2. Fallback Scatter around town center
+        // 2. Fallback Scatter around town center — spread them out more clearly
         if (localityName) {
-            const hash = localityName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            const latOffset = (hash % 100 - 50) / 1200;
-            const lngOffset = ((hash * 7) % 100 - 50) / 1200;
+            // Use a more varied hash + prime multipliers to avoid overlapping
+            let hash = 0;
+            for (let i = 0; i < localityName.length; i++) {
+                hash = ((hash << 5) - hash + localityName.charCodeAt(i)) | 0;
+            }
+            const angle = (Math.abs(hash) % 360) * (Math.PI / 180);
+            const radius = 0.008 + (Math.abs(hash) % 50) / 5000; // ~0.008 to 0.018 degrees (~1-2 km)
+            const latOffset = Math.cos(angle) * radius;
+            const lngOffset = Math.sin(angle) * radius;
             return [center[0] + latOffset, center[1] + lngOffset];
         }
 
         return center;
     }, [districtInfo, dynamicCoords]);
 
-    // Memoize locality positions for map
+    // Memoize locality positions for map — each locality gets a resolved coordinate
     const localityPositions = React.useMemo(() => {
         if (!userTown) return [];
-        if (localities.length === 0) {
-            const center = getCoordinates(userTown);
-            return [center];
-        }
+        if (localities.length === 0) return [];
         return localities.map(loc => {
             if (loc.coordinates && loc.coordinates.lat && loc.coordinates.lng) {
                 return [loc.coordinates.lat, loc.coordinates.lng];
@@ -598,9 +628,13 @@ const ExploreCity = () => {
 
     // Get town center for flying to
     const currentTownCenter = React.useMemo(() => {
-        if (!userTown || !districtInfo) return null;
-        const townKey = Object.keys(districtInfo.towns || {}).find(k => k.toLowerCase() === userTown.toLowerCase());
-        return townKey ? districtInfo.towns[townKey] : null;
+        if (!userTown) return null;
+        // Try from district data first
+        if (districtInfo && districtInfo.towns) {
+            const townKey = Object.keys(districtInfo.towns).find(k => k.toLowerCase() === userTown.toLowerCase());
+            if (townKey) return districtInfo.towns[townKey];
+        }
+        return null;
     }, [userTown, districtInfo]);
 
     return (
@@ -810,10 +844,10 @@ const ExploreCity = () => {
 
                     {/* Map Controller - handles bounds restriction, flying to town, etc. */}
                     <MapController
-                        centers={localityPositions}
+                        localityPositions={localityPositions}
                         townCenter={currentTownCenter}
                         districtBounds={districtInfo?.bounds || null}
-                        districtTownMarkers={districtTownMarkers}
+                        hasLocalities={localities.length > 0}
                     />
 
                     {/* Town Name Labels on Map */}
