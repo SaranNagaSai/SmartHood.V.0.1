@@ -337,6 +337,26 @@ const DISTRICT_DATA = {
     },
 };
 
+// Helper: find a town's coordinates + district info from ALL districts
+const findTownInAllDistricts = (townName) => {
+    if (!townName) return null;
+    const lower = townName.trim().toLowerCase();
+    for (const [districtKey, districtData] of Object.entries(DISTRICT_DATA)) {
+        if (districtData.towns) {
+            const townKey = Object.keys(districtData.towns).find(k => k.toLowerCase() === lower);
+            if (townKey) {
+                return {
+                    coords: districtData.towns[townKey],
+                    districtKey,
+                    districtData,
+                    townDisplayName: townKey
+                };
+            }
+        }
+    }
+    return null;
+};
+
 const ExploreCity = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
@@ -356,18 +376,22 @@ const ExploreCity = () => {
     const [searchTown, setSearchTown] = React.useState('');
     const [isListening, setIsListening] = React.useState(false);
 
-    // District data derived from user's registered info
+    // District data derived from user's registered info (for map bounds restriction ONLY)
     const districtInfo = React.useMemo(() => {
         if (!userDistrict) return null;
         const key = userDistrict.trim().toLowerCase();
-        // Try exact match first, then partial match
         if (DISTRICT_DATA[key]) return DISTRICT_DATA[key];
-        // Try finding a key that contains or is contained by the user's district
         const foundKey = Object.keys(DISTRICT_DATA).find(k =>
             k.includes(key) || key.includes(k)
         );
         return foundKey ? DISTRICT_DATA[foundKey] : null;
     }, [userDistrict]);
+
+    // District data for the CURRENTLY SELECTED town (for coordinate resolution)
+    const selectedTownInfo = React.useMemo(() => {
+        if (!userTown) return null;
+        return findTownInAllDistricts(userTown);
+    }, [userTown]);
 
     // Get town markers for the current district (for showing town names on map)
     const districtTownMarkers = React.useMemo(() => {
@@ -431,25 +455,40 @@ const ExploreCity = () => {
             requestedLocs.current.add(loc.name);
 
             try {
-                // Use district and state for better geocoding accuracy
-                const state = districtInfo ?
-                    (districtInfo.bounds.maxLat > 18.5 || districtInfo.bounds.minLng < 79 ? 'Telangana' : 'Andhra Pradesh')
-                    : 'Andhra Pradesh';
+                // Use the SELECTED town's district for geocoding, not the user's registered district
+                const townInfo = findTownInAllDistricts(userTown);
+                const townDistrictName = townInfo ? townInfo.districtKey : '';
+                const townBounds = townInfo ? townInfo.districtData.bounds : null;
 
-                const query = `${loc.name}, ${userTown}, ${userDistrict} district, ${state}, India`;
+                // Determine state from the town's district bounds
+                let state = 'Andhra Pradesh';
+                if (townBounds && (townBounds.maxLat > 18.5 || townBounds.minLng < 79)) {
+                    state = 'Telangana';
+                }
+
+                const query = `${loc.name}, ${userTown}, ${townDistrictName} district, ${state}, India`;
                 const res = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
-                if (data && data.length > 0 && districtInfo && !abortToken.cancelled) {
-                    const db = districtInfo.bounds;
+                if (data && data.length > 0 && !abortToken.cancelled) {
+                    // Validate against the TOWN's district bounds (or accept any Indian result if no bounds)
                     for (const result of data) {
                         const lat = parseFloat(result.lat);
                         const lon = parseFloat(result.lon);
 
-                        if (lat >= db.minLat && lat <= db.maxLat &&
-                            lon >= db.minLng && lon <= db.maxLng) {
-                            setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
-                            break;
+                        if (townBounds) {
+                            // Check if within the town's district bounds (with some padding)
+                            if (lat >= townBounds.minLat - 0.2 && lat <= townBounds.maxLat + 0.2 &&
+                                lon >= townBounds.minLng - 0.2 && lon <= townBounds.maxLng + 0.2) {
+                                setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
+                                break;
+                            }
+                        } else {
+                            // No bounds info — accept if it's in India (rough check)
+                            if (lat > 8 && lat < 35 && lon > 68 && lon < 98) {
+                                setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
+                                break;
+                            }
                         }
                     }
                 }
@@ -547,45 +586,35 @@ const ExploreCity = () => {
         setLoadingUsers(false);
     };
 
-    // Helper to get coordinates with district-aware validation
+    // Helper to get coordinates - searches ALL districts for town center, not just user's
     const getCoordinates = React.useCallback((town, localityName) => {
-        // Find town center from district data first
+        // Find town center from ALL district data
         let center = [16.5, 79.5]; // Default fallback
-        if (districtInfo && districtInfo.towns) {
-            const townKey = Object.keys(districtInfo.towns).find(k => k.toLowerCase() === town?.toLowerCase());
-            if (townKey) center = districtInfo.towns[townKey];
+        const townInfo = findTownInAllDistricts(town);
+        if (townInfo) {
+            center = townInfo.coords;
         }
 
-        // 1. Dynamic Geocoded Spot with district bounds validation
+        // 1. Dynamic Geocoded Spot (always accept — already validated during geocoding)
         if (localityName && dynamicCoords[localityName]) {
-            const [dLat, dLng] = dynamicCoords[localityName];
-            if (districtInfo) {
-                const db = districtInfo.bounds;
-                if (dLat >= db.minLat && dLat <= db.maxLat &&
-                    dLng >= db.minLng && dLng <= db.maxLng) {
-                    return dynamicCoords[localityName];
-                }
-            } else {
-                return dynamicCoords[localityName];
-            }
+            return dynamicCoords[localityName];
         }
 
         // 2. Fallback Scatter around town center — spread them out more clearly
         if (localityName) {
-            // Use a more varied hash + prime multipliers to avoid overlapping
             let hash = 0;
             for (let i = 0; i < localityName.length; i++) {
                 hash = ((hash << 5) - hash + localityName.charCodeAt(i)) | 0;
             }
             const angle = (Math.abs(hash) % 360) * (Math.PI / 180);
-            const radius = 0.008 + (Math.abs(hash) % 50) / 5000; // ~0.008 to 0.018 degrees (~1-2 km)
+            const radius = 0.008 + (Math.abs(hash) % 50) / 5000;
             const latOffset = Math.cos(angle) * radius;
             const lngOffset = Math.sin(angle) * radius;
             return [center[0] + latOffset, center[1] + lngOffset];
         }
 
         return center;
-    }, [districtInfo, dynamicCoords]);
+    }, [dynamicCoords]);
 
     // Memoize locality positions for map — each locality gets a resolved coordinate
     const localityPositions = React.useMemo(() => {
@@ -599,16 +628,12 @@ const ExploreCity = () => {
         });
     }, [localities, userTown, getCoordinates]);
 
-    // Get town center for flying to
+    // Get town center for flying to — searches ALL districts
     const currentTownCenter = React.useMemo(() => {
         if (!userTown) return null;
-        // Try from district data first
-        if (districtInfo && districtInfo.towns) {
-            const townKey = Object.keys(districtInfo.towns).find(k => k.toLowerCase() === userTown.toLowerCase());
-            if (townKey) return districtInfo.towns[townKey];
-        }
-        return null;
-    }, [userTown, districtInfo]);
+        const townInfo = findTownInAllDistricts(userTown);
+        return townInfo ? townInfo.coords : null;
+    }, [userTown]);
 
     return (
         <div className="h-screen w-full flex flex-col relative overflow-hidden bg-gray-50">
