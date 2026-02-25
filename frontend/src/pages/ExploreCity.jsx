@@ -372,6 +372,7 @@ const ExploreCity = () => {
 
     // Town Selection State
     const [availableTowns, setAvailableTowns] = React.useState([]);
+    const [townStateMap, setTownStateMap] = React.useState({}); // town -> {state, district}
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [searchTown, setSearchTown] = React.useState('');
     const [isListening, setIsListening] = React.useState(false);
@@ -408,6 +409,10 @@ const ExploreCity = () => {
                     const sortedTowns = filterData.towns.sort((a, b) => a.localeCompare(b));
                     setAvailableTowns(sortedTowns);
                 }
+                // Store town-to-state mapping for geocoding accuracy
+                if (filterData.townStateMap) {
+                    setTownStateMap(filterData.townStateMap);
+                }
             } catch (err) {
                 console.error("[ExploreCity] Failed to fetch initial data", err);
             }
@@ -441,8 +446,10 @@ const ExploreCity = () => {
             requestedLocs.current.add(loc.name);
 
             try {
-                // Simple, reliable geocoding: just use "locality, town, India"
-                const query = `${loc.name}, ${userTown}, India`;
+                // Use state info from registration data for accurate geocoding
+                const townInfo = townStateMap[userTown] || townStateMap[userTown.charAt(0).toUpperCase() + userTown.slice(1).toLowerCase()] || {};
+                const stateStr = townInfo.state || 'India';
+                const query = `${loc.name}, ${userTown}, ${stateStr}, India`;
                 const res = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
@@ -502,9 +509,11 @@ const ExploreCity = () => {
                 if (hardcoded) {
                     setTownCenterCache(prev => ({ ...prev, [key]: hardcoded.coords }));
                 } else {
-                    // Geocode the town itself via Nominatim
+                    // Geocode the town itself via Nominatim — use state from registration data
                     try {
-                        const geoRes = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(townName + ', India')}`);
+                        const townInfo = townStateMap[townName] || townStateMap[townName.charAt(0).toUpperCase() + townName.slice(1).toLowerCase()] || {};
+                        const stateStr = townInfo.state ? `${townName}, ${townInfo.state}, India` : `${townName}, India`;
+                        const geoRes = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(stateStr)}`);
                         const geoData = await geoRes.json();
                         if (geoData && geoData.length > 0) {
                             const lat = parseFloat(geoData[0].lat);

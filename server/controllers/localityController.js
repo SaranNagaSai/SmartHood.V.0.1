@@ -103,7 +103,26 @@ const getFilters = async (req, res) => {
             t ? t.trim().charAt(0).toUpperCase() + t.trim().slice(1).toLowerCase() : t
         ))].filter(Boolean).sort();
 
-        res.json({ states, districts, towns: uniqueTowns });
+        // Build town-to-state mapping from User data (for geocoding accuracy)
+        // This tells the frontend which state each town belongs to
+        const townStateData = await User.aggregate([
+            { $match: { town: { $exists: true, $ne: '' }, state: { $exists: true, $ne: '' } } },
+            {
+                $group: {
+                    _id: { $toLower: { $trim: { input: '$town' } } },
+                    state: { $first: '$state' },
+                    district: { $first: '$district' }
+                }
+            }
+        ]);
+
+        const townStateMap = {};
+        townStateData.forEach(item => {
+            const normalizedTown = item._id.charAt(0).toUpperCase() + item._id.slice(1);
+            townStateMap[normalizedTown] = { state: item.state, district: item.district };
+        });
+
+        res.json({ states, districts, towns: uniqueTowns, townStateMap });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
