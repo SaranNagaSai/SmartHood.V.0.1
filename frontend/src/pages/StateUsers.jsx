@@ -28,19 +28,42 @@ const StateUsers = () => {
         fetchUsers();
     }, [stateName]);
 
-    // Grouping Logic: District -> Town -> Users
+    // Helper: Title case a string (first letter of each word uppercase)
+    const toTitleCase = (str) => {
+        return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    };
+
+    // Grouping Logic: District -> Town -> Users (case-insensitive, alphabetically sorted)
     const groupedData = useMemo(() => {
-        const districts = {};
+        const tempMap = {}; // key: lowercased district -> { displayName, towns: { lowercased town -> { displayName, users[] } } }
+
         users.forEach(u => {
-            const dName = u.district || 'Unspecified District';
-            const tName = u.town || 'Unspecified Town';
+            const rawDistrict = u.district || 'Unspecified District';
+            const rawTown = u.town || 'Unspecified Town';
+            const dKey = rawDistrict.trim().toLowerCase();
+            const tKey = rawTown.trim().toLowerCase();
 
-            if (!districts[dName]) districts[dName] = {};
-            if (!districts[dName][tName]) districts[dName][tName] = [];
-
-            districts[dName][tName].push(u);
+            if (!tempMap[dKey]) {
+                tempMap[dKey] = { displayName: toTitleCase(rawDistrict.trim()), towns: {} };
+            }
+            if (!tempMap[dKey].towns[tKey]) {
+                tempMap[dKey].towns[tKey] = { displayName: toTitleCase(rawTown.trim()), users: [] };
+            }
+            tempMap[dKey].towns[tKey].users.push(u);
         });
-        return districts;
+
+        // Sort districts alphabetically, then sort towns alphabetically within each district
+        const sortedDistricts = {};
+        Object.keys(tempMap).sort((a, b) => a.localeCompare(b)).forEach(dKey => {
+            const districtInfo = tempMap[dKey];
+            const sortedTowns = {};
+            Object.keys(districtInfo.towns).sort((a, b) => a.localeCompare(b)).forEach(tKey => {
+                sortedTowns[districtInfo.towns[tKey].displayName] = districtInfo.towns[tKey].users;
+            });
+            sortedDistricts[districtInfo.displayName] = sortedTowns;
+        });
+
+        return sortedDistricts;
     }, [users]);
 
 
