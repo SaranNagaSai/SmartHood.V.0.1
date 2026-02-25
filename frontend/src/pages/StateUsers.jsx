@@ -119,7 +119,7 @@ const StateUsers = () => {
                     </div>
                 ) : users.length > 0 ? (
                     Object.entries(groupedData).map(([district, towns], dIdx) => (
-                        <div key={district} className="space-y-8" style={{ animation: `fadeSlideIn 0.8s ease-out ${dIdx * 150}ms both` }}>
+                        <div key={district} className="space-y-8" style={{ animation: "fadeSlideIn 0.8s ease-out " + (dIdx * 150) + "ms both" }}>
 
                             {/* District Section Header */}
                             <div className="flex flex-col gap-2 relative">
@@ -163,7 +163,7 @@ const StateUsers = () => {
                                                         key={u._id || uIdx}
                                                         className="bg-white rounded-[1.5rem] border border-slate-100 p-5 group hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500 flex flex-col gap-4 shadow-xl shadow-black/20"
                                                         style={{
-                                                            animation: `fadeSlideIn 0.5s ease-out ${uIdx * 60}ms both`
+                                                            animation: "fadeSlideIn 0.5s ease-out " + (uIdx * 60) + "ms both"
                                                         }}
                                                     >
                                                         <div className="flex gap-4">

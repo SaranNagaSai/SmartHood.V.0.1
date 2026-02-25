@@ -387,7 +387,7 @@ const AdminUserStats = () => {
                                 </div>
                                 Weekly Orbit
                             </h3>
-                            <span className="text-[10px] font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-full uppercase tracking-widest border border-purple-100">Network Flow</span>
+                            <span className="text-[10px] font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-full uppercase tracking-widest border border-indigo-100">Network Flow</span>
                         </div>
 
                         <div className="flex items-end gap-5 h-52 mt-4 px-2">
@@ -635,25 +635,26 @@ const AdminUserStats = () => {
                     </div>
                 </div>
             </div>
-            );
+        </div>
+    );
 };
 
-            /* ──── Sub-components ──── */
-            const QuickStat = ({icon: Icon, label, value, color }) => (
-            <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300 group">
-                <div className={"mx-auto mb-3 p-3 bg-" + color + "-50 text-" + color + "-600 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-inner border border-" + color + "-100/50"}>
-                    <Icon size={22} />
-                </div>
-                <p className="text-2xl font-black text-gray-900 tracking-tight">{value}</p>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-2 leading-tight">{label}</p>
-            </div>
-            );
+/* ──── Sub-components ──── */
+const QuickStat = ({ icon: Icon, label, value, color }) => (
+    <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300 group">
+        <div className={"mx-auto mb-3 p-3 bg-" + color + "-50 text-" + color + "-600 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-inner border border-" + color + "-100/50"}>
+            <Icon size={22} />
+        </div>
+        <p className="text-2xl font-black text-gray-900 tracking-tight">{value}</p>
+        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-2 leading-tight">{label}</p>
+    </div>
+);
 
-            const ProfileRow = ({label, value}) => (
-            <div className="flex flex-col text-left py-3 border-b border-gray-50 last:border-0 group">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">{label}</span>
-                <span className="text-sm font-black text-gray-800 truncate">{value || 'UNSPECIFIED'}</span>
-            </div>
-            );
+const ProfileRow = ({ label, value }) => (
+    <div className="flex flex-col text-left py-3 border-b border-gray-50 last:border-0 group">
+        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">{label}</span>
+        <span className="text-sm font-black text-gray-800 truncate">{value || 'UNSPECIFIED'}</span>
+    </div>
+);
 
-            export default AdminUserStats;
+export default AdminUserStats;

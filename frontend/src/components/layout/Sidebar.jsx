@@ -110,7 +110,7 @@ const Sidebar = () => {
                                     {isActive && (
                                         <div
                                             className="absolute inset-0 opacity-30 blur-xl pointer-events-none"
-                                            style={{ background: `radial-gradient(circle at 30% 50%, ${link.glow}, transparent 70%)` }}
+                                            style={{ background: "radial-gradient(circle at 30% 50%, " + link.glow + ", transparent 70%)" }}
                                         />
                                     )}
 

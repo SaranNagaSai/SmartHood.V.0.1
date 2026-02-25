@@ -216,7 +216,7 @@ const AdminDashboard = () => {
                                                 return (
                                                     <div key={idx} className="flex-1 flex flex-col items-center gap-5 group/bar h-full justify-end">
                                                         <div
-                                                            style={{ height: `${height}%` }}
+                                                            style={{ height: height + "%" }}
                                                             className="w-full bg-gradient-to-t from-indigo-500 to-primary rounded-t-2xl transition-all hover:from-primary hover:to-indigo-400 cursor-pointer shadow-lg group-hover/bar:scale-x-110 relative"
                                                         >
                                                             <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-2 bg-gray-900 text-white text-[10px] font-black rounded-xl opacity-0 group-hover/bar:opacity-100 transition-all shadow-2xl z-20 whitespace-nowrap scale-90 group-hover/bar:scale-100">
@@ -326,7 +326,7 @@ const AdminDashboard = () => {
                                                 <tr
                                                     key={user._id}
                                                     className="group hover:bg-indigo-50/30 transition-all cursor-pointer relative"
-                                                    onClick={() => navigate(`/admin/user/${user._id}`)}
+                                                    onClick={() => navigate("/admin/user/" + user._id)}
                                                 >
                                                     <td className="px-8 py-6">
                                                         <div className="flex items-center gap-5">
@@ -467,7 +467,7 @@ const AdminDashboard = () => {
                                 </p>
                                 <p className="text-[12px] text-emerald-400 font-black uppercase tracking-[0.4em] mt-6">Ack Received</p>
                                 <div className="mt-8 h-2 bg-emerald-100 rounded-full overflow-hidden shadow-inner">
-                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${stats.notificationStats?.sent > 0 ? (stats.notificationStats.delivered / stats.notificationStats.sent) * 100 : 0}%` }}></div>
+                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: (stats.notificationStats?.sent > 0 ? (stats.notificationStats.delivered / stats.notificationStats.sent) * 100 : 0) + "%" }}></div>
                                 </div>
                             </div>
                         </div>
@@ -483,10 +483,10 @@ const AdminDashboard = () => {
 const SummaryCard = ({ title, value, icon: Icon, trend, color, onClick }) => (
     <div
         onClick={onClick}
-        className={`bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 hover:shadow-indigo-500/10 transition-all duration-500 group relative overflow-hidden ${onClick ? 'cursor-pointer hover:-translate-y-2' : ''}`}
+        className={"bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 hover:shadow-indigo-500/10 transition-all duration-500 group relative overflow-hidden " + (onClick ? 'cursor-pointer hover:-translate-y-2' : '')}
     >
-        <div className={`absolute -right-4 -bottom-4 bg-${color}-50 p-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`}>
-            <Icon size={64} className={`text-${color}-200`} />
+        <div className={"absolute -right-4 -bottom-4 bg-" + color + "-50 p-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"}>
+            <Icon size={64} className={"text-" + color + "-200"} />
         </div>
 
         <div className="flex items-start justify-between relative z-10">
