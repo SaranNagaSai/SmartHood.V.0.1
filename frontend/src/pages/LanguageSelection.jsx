@@ -9,7 +9,7 @@ const LanguageSelection = () => {
     const { t, setLanguage } = useLanguage();
     const { setDeviceType } = useDevice();
     const navigate = useNavigate();
-    const [selectedDevice, setSelectedDevice] = useState(localStorage.getItem('deviceType') || '');
+    const [selectedDevice, setSelectedDevice] = useState(sessionStorage.getItem('deviceType') || '');
 
     const handleSelect = (lang) => {
         if (!selectedDevice) {
@@ -43,8 +43,8 @@ const LanguageSelection = () => {
                             <button
                                 onClick={() => setSelectedDevice('mobile')}
                                 className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 ${selectedDevice === 'mobile'
-                                        ? 'bg-white/20 border-white/60 shadow-lg shadow-white/10 scale-105'
-                                        : 'bg-white/5 border-white/15 hover:bg-white/10 hover:border-white/30'
+                                    ? 'bg-white/20 border-white/60 shadow-lg shadow-white/10 scale-105'
+                                    : 'bg-white/5 border-white/15 hover:bg-white/10 hover:border-white/30'
                                     }`}
                             >
                                 <Smartphone size={28} className={`${selectedDevice === 'mobile' ? 'text-white' : 'text-white/60'}`} />
@@ -56,8 +56,8 @@ const LanguageSelection = () => {
                             <button
                                 onClick={() => setSelectedDevice('desktop')}
                                 className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 ${selectedDevice === 'desktop'
-                                        ? 'bg-white/20 border-white/60 shadow-lg shadow-white/10 scale-105'
-                                        : 'bg-white/5 border-white/15 hover:bg-white/10 hover:border-white/30'
+                                    ? 'bg-white/20 border-white/60 shadow-lg shadow-white/10 scale-105'
+                                    : 'bg-white/5 border-white/15 hover:bg-white/10 hover:border-white/30'
                                     }`}
                             >
                                 <Monitor size={28} className={`${selectedDevice === 'desktop' ? 'text-white' : 'text-white/60'}`} />

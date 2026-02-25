@@ -4,7 +4,7 @@ const DeviceContext = createContext();
 
 export const DeviceProvider = ({ children }) => {
     const [isMobile, setIsMobile] = useState(() => {
-        const stored = localStorage.getItem('deviceType');
+        const stored = sessionStorage.getItem('deviceType');
         return stored === 'mobile';
     });
 
@@ -19,7 +19,7 @@ export const DeviceProvider = ({ children }) => {
     }, [isMobile]);
 
     const setDeviceType = (type) => {
-        localStorage.setItem('deviceType', type);
+        sessionStorage.setItem('deviceType', type);
         setIsMobile(type === 'mobile');
     };
 

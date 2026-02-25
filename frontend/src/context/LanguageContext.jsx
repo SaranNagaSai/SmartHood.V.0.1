@@ -4,13 +4,13 @@ import axios from 'axios';
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-    const [language, setLanguage] = useState(localStorage.getItem('language') || null);
+    const [language, setLanguage] = useState(sessionStorage.getItem('language') || null);
 
     useEffect(() => {
         if (language) {
-            localStorage.setItem('language', language);
+            sessionStorage.setItem('language', language);
         } else {
-            localStorage.removeItem('language');
+            sessionStorage.removeItem('language');
         }
     }, [language]);
 
@@ -18,7 +18,7 @@ export const LanguageProvider = ({ children }) => {
     useEffect(() => {
         const interceptor = axios.interceptors.request.use(
             (config) => {
-                const currentLanguage = localStorage.getItem('language') || 'English';
+                const currentLanguage = sessionStorage.getItem('language') || 'English';
                 config.headers['language'] = currentLanguage;
                 return config;
             },
