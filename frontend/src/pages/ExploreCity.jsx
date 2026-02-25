@@ -387,20 +387,8 @@ const ExploreCity = () => {
         return foundKey ? DISTRICT_DATA[foundKey] : null;
     }, [userDistrict]);
 
-    // District data for the CURRENTLY SELECTED town (for coordinate resolution)
-    const selectedTownInfo = React.useMemo(() => {
-        if (!userTown) return null;
-        return findTownInAllDistricts(userTown);
-    }, [userTown]);
-
-    // Get town markers for the current district (for showing town names on map)
-    const districtTownMarkers = React.useMemo(() => {
-        if (!districtInfo || !districtInfo.towns) return [];
-        return Object.entries(districtInfo.towns).map(([name, coords]) => ({
-            name,
-            position: coords
-        }));
-    }, [districtInfo]);
+    // Cache for town center coordinates (both hardcoded + dynamically geocoded)
+    const [townCenterCache, setTownCenterCache] = React.useState({});
 
     React.useEffect(() => {
         const fetchInitialData = async () => {
@@ -432,9 +420,7 @@ const ExploreCity = () => {
     const requestedLocs = React.useRef(new Set());
     const geocodeAbortRef = React.useRef(null);
 
-    // Effect to geocode missing localities within district constraints
-    // NOTE: dynamicCoords is NOT in the dependency array to avoid infinite loops.
-    // We use requestedLocs ref to track what's already been requested.
+    // Effect to geocode missing localities
     React.useEffect(() => {
         if (!userTown || localities.length === 0) return;
 
@@ -455,41 +441,17 @@ const ExploreCity = () => {
             requestedLocs.current.add(loc.name);
 
             try {
-                // Use the SELECTED town's district for geocoding, not the user's registered district
-                const townInfo = findTownInAllDistricts(userTown);
-                const townDistrictName = townInfo ? townInfo.districtKey : '';
-                const townBounds = townInfo ? townInfo.districtData.bounds : null;
-
-                // Determine state from the town's district bounds
-                let state = 'Andhra Pradesh';
-                if (townBounds && (townBounds.maxLat > 18.5 || townBounds.minLng < 79)) {
-                    state = 'Telangana';
-                }
-
-                const query = `${loc.name}, ${userTown}, ${townDistrictName} district, ${state}, India`;
+                // Simple, reliable geocoding: just use "locality, town, India"
+                const query = `${loc.name}, ${userTown}, India`;
                 const res = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
                 if (data && data.length > 0 && !abortToken.cancelled) {
-                    // Validate against the TOWN's district bounds (or accept any Indian result if no bounds)
-                    for (const result of data) {
-                        const lat = parseFloat(result.lat);
-                        const lon = parseFloat(result.lon);
-
-                        if (townBounds) {
-                            // Check if within the town's district bounds (with some padding)
-                            if (lat >= townBounds.minLat - 0.2 && lat <= townBounds.maxLat + 0.2 &&
-                                lon >= townBounds.minLng - 0.2 && lon <= townBounds.maxLng + 0.2) {
-                                setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
-                                break;
-                            }
-                        } else {
-                            // No bounds info — accept if it's in India (rough check)
-                            if (lat > 8 && lat < 35 && lon > 68 && lon < 98) {
-                                setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
-                                break;
-                            }
-                        }
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    // Accept any result in India
+                    if (lat > 6 && lat < 36 && lon > 68 && lon < 98) {
+                        setDynamicCoords(prev => ({ ...prev, [loc.name]: [lat, lon] }));
                     }
                 }
             } catch (err) {
@@ -507,7 +469,7 @@ const ExploreCity = () => {
 
         return () => { abortToken.cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [localities, userTown, districtInfo, userDistrict]);
+    }, [localities, userTown]);
 
 
     const handleTownChange = async (townName) => {
@@ -515,13 +477,47 @@ const ExploreCity = () => {
         setIsDropdownOpen(false);
         setSearchTown('');
 
+        // Reset previous locality data
+        setDynamicCoords({});
+        requestedLocs.current = new Set();
+        setSelectedLocality(null);
+        setLocalityUsers([]);
+
         try {
             const token = localStorage.getItem('token');
+
+            // Step 1: Fetch localities for this town
             const locRes = await fetch(`${API_URL}/localities?town=${encodeURIComponent(townName)}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const locData = await locRes.json();
             setLocalities(locData || []);
+
+            // Step 2: Resolve town center coordinates
+            const key = townName.toLowerCase();
+
+            // Check hardcoded cache first
+            if (!townCenterCache[key]) {
+                const hardcoded = findTownInAllDistricts(townName);
+                if (hardcoded) {
+                    setTownCenterCache(prev => ({ ...prev, [key]: hardcoded.coords }));
+                } else {
+                    // Geocode the town itself via Nominatim
+                    try {
+                        const geoRes = await fetch(`${API_URL}/localities/geocode?q=${encodeURIComponent(townName + ', India')}`);
+                        const geoData = await geoRes.json();
+                        if (geoData && geoData.length > 0) {
+                            const lat = parseFloat(geoData[0].lat);
+                            const lon = parseFloat(geoData[0].lon);
+                            if (lat > 6 && lat < 36 && lon > 68 && lon < 98) {
+                                setTownCenterCache(prev => ({ ...prev, [key]: [lat, lon] }));
+                            }
+                        }
+                    } catch (geoErr) {
+                        console.error("Failed to geocode town", townName, geoErr);
+                    }
+                }
+            }
         } catch (err) {
             console.error("Failed to fetch localities for town", err);
         }
@@ -586,21 +582,18 @@ const ExploreCity = () => {
         setLoadingUsers(false);
     };
 
-    // Helper to get coordinates - searches ALL districts for town center, not just user's
+    // Helper to get coordinates for a locality — fully dynamic, no hardcoded dependency
     const getCoordinates = React.useCallback((town, localityName) => {
-        // Find town center from ALL district data
-        let center = [16.5, 79.5]; // Default fallback
-        const townInfo = findTownInAllDistricts(town);
-        if (townInfo) {
-            center = townInfo.coords;
-        }
+        // Get town center from cache (hardcoded or geocoded)
+        const key = town?.toLowerCase();
+        let center = townCenterCache[key] || [16.5, 79.5];
 
-        // 1. Dynamic Geocoded Spot (always accept — already validated during geocoding)
+        // 1. Dynamic Geocoded Spot (already validated during geocoding)
         if (localityName && dynamicCoords[localityName]) {
             return dynamicCoords[localityName];
         }
 
-        // 2. Fallback Scatter around town center — spread them out more clearly
+        // 2. Fallback: scatter around town center
         if (localityName) {
             let hash = 0;
             for (let i = 0; i < localityName.length; i++) {
@@ -614,9 +607,9 @@ const ExploreCity = () => {
         }
 
         return center;
-    }, [dynamicCoords]);
+    }, [dynamicCoords, townCenterCache]);
 
-    // Memoize locality positions for map — each locality gets a resolved coordinate
+    // Memoize locality positions for map
     const localityPositions = React.useMemo(() => {
         if (!userTown) return [];
         if (localities.length === 0) return [];
@@ -628,12 +621,11 @@ const ExploreCity = () => {
         });
     }, [localities, userTown, getCoordinates]);
 
-    // Get town center for flying to — searches ALL districts
+    // Get town center for flying the map — fully dynamic
     const currentTownCenter = React.useMemo(() => {
         if (!userTown) return null;
-        const townInfo = findTownInAllDistricts(userTown);
-        return townInfo ? townInfo.coords : null;
-    }, [userTown]);
+        return townCenterCache[userTown.toLowerCase()] || null;
+    }, [userTown, townCenterCache]);
 
     return (
         <div className="h-screen w-full flex flex-col relative overflow-hidden bg-gray-50">
@@ -790,15 +782,10 @@ const ExploreCity = () => {
                         <span className="w-3 h-3 rounded-full bg-red-500 opacity-50 border border-red-500"></span>
                         <span className="text-xs text-gray-600">Active Users</span>
                     </div>
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-blue-500 opacity-50 border border-blue-500"></span>
                         <span className="text-xs text-gray-600">No Users Yet</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-gradient-to-r from-blue-800 to-blue-500 border border-white shadow-sm"></span>
-                        <span className="text-xs text-gray-600">Town Labels</span>
-                    </div>
-
                 </div>
             )}
 
@@ -822,25 +809,6 @@ const ExploreCity = () => {
                         districtBounds={districtInfo?.bounds || null}
                         hasLocalities={localities.length > 0}
                     />
-
-                    {/* Town Name Labels on Map */}
-                    {districtTownMarkers.map((marker, idx) => (
-                        <Marker
-                            key={`town-label-${idx}`}
-                            position={marker.position}
-                            icon={createTownLabelIcon(marker.name)}
-                            eventHandlers={{
-                                click: () => handleTownChange(marker.name),
-                            }}
-                        >
-                            <Popup>
-                                <div className="text-center cursor-pointer" onClick={() => handleTownChange(marker.name)}>
-                                    <strong className="block text-primary text-sm">{marker.name}</strong>
-                                    <div className="text-xs text-blue-500 mt-1">Click to explore</div>
-                                </div>
-                            </Popup>
-                        </Marker>
-                    ))}
 
                     {/* Locality markers - only shown when a town is selected */}
                     {userTown && localities.map((loc, idx) => {
