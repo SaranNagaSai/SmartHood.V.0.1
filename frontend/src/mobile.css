@@ -57,9 +57,9 @@ body.device-mobile .leaflet-container {
 /* Map Navbar Fix */
 body.device-mobile .absolute.top-4.left-4.z-\[1000\].flex.gap-3.items-start {
     top: 12px !important;
-    left: 8px !important;
-    right: 50px !important;
-    /* Leave room for hamburger */
+    left: 60px !important;
+    right: 12px !important;
+    /* Leave room for hamburger on left */
     display: flex !important;
     gap: 8px !important;
     z-index: 1001 !important;
@@ -156,9 +156,23 @@ body.device-mobile .min-w-\[220px\] h3 {
     animation: slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+.animate-slide-right {
+    animation: slideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 @keyframes slideLeft {
     from {
         transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideRight {
+    from {
+        transform: translateX(-100%);
     }
 
     to {
@@ -178,10 +192,7 @@ body.device-mobile .w-10.h-10.rounded-full.flex {
 }
 
 /* 9. BOTTOM NAVIGATION */
-body.device-mobile .bg-white\/95.backdrop-blur-xl.border-t.shadow-\[0_-8px_30px_-12px_rgba\(0,
-0,
-0,
-0.12\)\] {
+body.device-mobile .bg-white\/95.backdrop-blur-xl {
     height: 74px !important;
     z-index: 5000 !important;
     padding-bottom: env(safe-area-inset-bottom, 12px) !important;
@@ -239,4 +250,133 @@ body.device-mobile ::-webkit-scrollbar {
 
 body.device-mobile {
     scrollbar-width: none;
+}
+
+/* 13. PREMIUM ANIMATIONS */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes dash {
+    from {
+        stroke-dashoffset: 100;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-down {
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-dash {
+    animation: dash 1.5s ease-out forwards;
+}
+
+/* 14. LEAFLET POPUP REFINEMENTS */
+.premium-popup .leaflet-popup-content-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.premium-popup .leaflet-popup-content {
+    margin: 12px;
+    line-height: 1.4;
+}
+
+.premium-popup .leaflet-popup-tip {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+/* 15. CUSTOM SCROLLBAR FOR MODERN FEEL */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Admin Card Shake for Alerts */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-2px) rotate(-1deg);
+    }
+
+    75% {
+        transform: translateX(2px) rotate(1deg);
+    }
+}
+
+.shake {
+    animation: shake 0.2s ease-in-out infinite;
 }

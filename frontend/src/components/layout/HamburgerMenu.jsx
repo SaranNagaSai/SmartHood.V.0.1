@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
     Menu, X, Home, Map, HeartHandshake,
     Heart, Megaphone, User, BarChart2,
-    Bell, Siren, MessageSquare, LogOut
+    Bell, Siren, MessageSquare, LogOut, Shield
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -25,6 +25,7 @@ const HamburgerMenu = () => {
         { name: t('notifications'), path: '/notifications', icon: Bell },
         { name: t('emergency'), path: '/emergency', icon: Siren },
         { name: t('complaints'), path: '/complaints', icon: MessageSquare },
+        { name: t('admin_access'), path: '/admin', icon: Shield },
     ];
 
     const handleLogout = () => {
@@ -37,7 +38,7 @@ const HamburgerMenu = () => {
             {/* Hamburger Toggle Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed top-4 right-4 z-[2000] p-2 bg-white rounded-full shadow-lg border border-gray-100 text-gray-700 active:scale-90 transition-transform md:hidden"
+                className="fixed top-4 left-4 z-[2000] p-2 bg-white rounded-full shadow-lg border border-gray-100 text-gray-700 active:scale-90 transition-transform md:hidden"
             >
                 <Menu size={24} />
             </button>
@@ -50,7 +51,7 @@ const HamburgerMenu = () => {
                 >
                     {/* Drawer */}
                     <div
-                        className="absolute top-0 right-0 h-full w-[280px] bg-white shadow-2xl flex flex-col animate-slide-left"
+                        className="absolute top-0 left-0 h-full w-[280px] bg-white shadow-2xl flex flex-col animate-slide-right"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
