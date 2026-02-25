@@ -1,1145 +1,242 @@
 /* ===============================================================
-   SMARTHOOD MOBILE OVERRIDES
-   Applied when body has class "device-mobile" (auto-detected < 768px)
-   This file uses high-specificity selectors to override Tailwind 
-   inline utility classes for mobile viewport adaptation.
+   SMARTHOOD MOBILE OVERRIDES - ULTIMATE
    =============================================================== */
 
-/* ---------------------------------------------------------------
-   1. GLOBAL MOBILE ADJUSTMENTS
-   --------------------------------------------------------------- */
+/* 1. GLOBAL MOBILE ADJUSTMENTS */
 body.device-mobile {
-    font-size: 15px;
+    font-size: 13px;
+    line-height: 1.4;
     -webkit-text-size-adjust: 100%;
     touch-action: manipulation;
     overflow-x: hidden;
     width: 100vw;
-    max-width: 100vw;
+    background-color: #f9fafb;
 }
 
 body.device-mobile * {
-    /* Ensure nothing overflows the viewport */
     max-width: 100vw;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body.device-mobile input,
-body.device-mobile textarea,
-body.device-mobile select,
-body.device-mobile button {
-    font-size: 16px !important;
-    /* Prevents iOS zoom on focus */
-    -webkit-appearance: none;
-    appearance: none;
-    border-radius: 12px;
-}
-
+/* Fix iOS Input Zoom & Sizing */
 body.device-mobile input,
 body.device-mobile textarea,
 body.device-mobile select {
-    min-height: 48px;
-    padding: 12px 14px !important;
-}
-
-body.device-mobile button {
-    min-height: 44px;
-    cursor: pointer;
-}
-
-/* Safe area padding for notched devices */
-body.device-mobile .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 16px);
-}
-
-body.device-mobile .mb-safe {
-    margin-bottom: env(safe-area-inset-bottom, 16px);
-}
-
-/* ---------------------------------------------------------------
-   2. LAYOUT — SIDEBAR & MAIN CONTENT
-   --------------------------------------------------------------- */
-
-/* Hide desktop sidebar on mobile */
-body.device-mobile .hidden.md\:block {
-    display: none !important;
-}
-
-/* Remove sidebar margin from main content */
-body.device-mobile .md\:ml-64 {
-    margin-left: 0 !important;
-}
-
-/* Ensure main content has proper bottom padding for bottom nav */
-body.device-mobile .flex-1.md\:ml-64 {
-    margin-left: 0 !important;
-    padding-bottom: 80px !important;
-    width: 100% !important;
-    overflow-x: hidden;
-}
-
-/* Show bottom nav on mobile */
-body.device-mobile .md\:hidden {
-    display: block !important;
-}
-
-/* Ensure content doesn't exceed viewport */
-body.device-mobile .min-h-screen {
-    min-height: 100dvh;
-}
-
-/* ---------------------------------------------------------------
-   3. BOTTOM NAVIGATION — MOBILE ENHANCEMENTS
-   --------------------------------------------------------------- */
-body.device-mobile .md\:hidden.fixed.bottom-0 {
-    display: block !important;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 50 !important;
-}
-
-body.device-mobile .md\:hidden.fixed.bottom-0>div {
-    padding: 8px 4px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
-    background: rgba(255, 255, 255, 0.98) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
-    box-shadow: 0 -4px 24px -4px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Bottom nav links */
-body.device-mobile .md\:hidden.fixed.bottom-0 a {
-    min-width: 56px !important;
-    padding: 6px 8px !important;
-    gap: 2px !important;
-}
-
-body.device-mobile .md\:hidden.fixed.bottom-0 a span {
-    font-size: 9px !important;
-    width: auto !important;
-    max-width: 60px;
-}
-
-/* ---------------------------------------------------------------
-   4. ENTRY PAGES — LANGUAGE SELECTION
-   --------------------------------------------------------------- */
-body.device-mobile .bg-gradient-brand {
-    padding: 16px !important;
-}
-
-body.device-mobile .bg-gradient-brand .max-w-\[450px\] {
-    max-width: 100% !important;
-    width: 100% !important;
-}
-
-body.device-mobile .bg-gradient-brand img {
-    width: 120px !important;
-    height: 120px !important;
-}
-
-body.device-mobile .bg-gradient-brand h2.text-4xl {
-    font-size: 2rem !important;
-}
-
-body.device-mobile .bg-gradient-brand .p-8 {
-    padding: 20px !important;
-}
-
-body.device-mobile .bg-gradient-brand .rounded-3xl {
-    border-radius: 20px !important;
-}
-
-/* Decorative orbs - reduce size on mobile */
-body.device-mobile .bg-gradient-brand .w-96 {
-    width: 200px !important;
-    height: 200px !important;
-}
-
-/* ---------------------------------------------------------------
-   5. LOGIN PAGE
-   --------------------------------------------------------------- */
-body.device-mobile .bg-gradient-brand .space-y-6 {
-    gap: 16px !important;
-}
-
-body.device-mobile .bg-gradient-brand .space-y-6 .space-y-4 {
-    gap: 12px !important;
-}
-
-body.device-mobile .bg-gradient-brand button.bg-primary {
-    padding: 16px !important;
     font-size: 16px !important;
-    border-radius: 14px !important;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
 }
 
-/* ---------------------------------------------------------------
-   6. REGISTER PAGE — MULTI-STEP FORM
-   --------------------------------------------------------------- */
-
-/* Main container */
-body.device-mobile .min-h-screen.bg-gradient-brand .max-w-2xl,
-body.device-mobile .min-h-screen.bg-gradient-brand .max-w-xl,
-body.device-mobile .min-h-screen .max-w-2xl,
-body.device-mobile .min-h-screen .max-w-xl {
+/* 2. LAYOUT - CONTAINER FIXES */
+body.device-mobile .max-w-2xl,
+body.device-mobile .max-w-xl,
+body.device-mobile .max-w-4xl,
+body.device-mobile .max-w-7xl {
     max-width: 100% !important;
+    width: 100% !important;
     padding-left: 12px !important;
     padding-right: 12px !important;
+    margin: 0 auto !important;
 }
 
-/* Stepper steps */
-body.device-mobile .flex.items-center.justify-between {
-    gap: 4px !important;
+/* Main Content Area */
+body.device-mobile .flex-1.pb-24.pt-4 {
+    padding-top: 10px !important;
+    padding-bottom: 180px !important;
+    /* Huge padding to clear bottom nav + dynamic buttons */
 }
 
-/* Step indicators */
-body.device-mobile .flex.items-center.justify-between .w-8.h-8,
-body.device-mobile .flex.items-center.justify-between .w-10.h-10 {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    font-size: 12px !important;
+/* 3. EXPLORE CITY PAGE - HIGHEST PREFERENCE */
+body.device-mobile .leaflet-container {
+    height: calc(100vh - 150px) !important;
+    margin-top: 65px !important;
+    border-radius: 0 !important;
 }
 
-/* Form fields container */
-body.device-mobile .space-y-4,
-body.device-mobile .space-y-5,
-body.device-mobile .space-y-6 {
-    display: flex;
-    flex-direction: column;
-}
-
-body.device-mobile .space-y-4>*,
-body.device-mobile .space-y-5>*,
-body.device-mobile .space-y-6>* {
-    width: 100% !important;
-}
-
-/* Form labels */
-body.device-mobile label {
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    margin-bottom: 4px !important;
-    display: block !important;
-}
-
-/* Form grid layouts - collapse to single column */
-body.device-mobile .grid.grid-cols-2,
-body.device-mobile .grid.grid-cols-3,
-body.device-mobile .grid.md\:grid-cols-2,
-body.device-mobile .grid.md\:grid-cols-3 {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-}
-
-/* Profile photo section */
-body.device-mobile .w-32.h-32,
-body.device-mobile .w-28.h-28,
-body.device-mobile .w-24.h-24 {
-    width: 100px !important;
-    height: 100px !important;
-}
-
-/* Camera section */
-body.device-mobile video {
-    width: 100% !important;
-    max-height: 250px !important;
-    border-radius: 16px !important;
-    object-fit: cover;
-}
-
-body.device-mobile canvas {
-    max-width: 100% !important;
-}
-
-/* Select dropdowns */
-body.device-mobile select {
-    width: 100% !important;
-    padding: 12px 14px !important;
-    font-size: 16px !important;
-    border-radius: 12px !important;
-    background-color: white !important;
-}
-
-/* Radio/checkbox groups */
-body.device-mobile .flex.flex-wrap.gap-2 button,
-body.device-mobile .flex.flex-wrap.gap-3 button {
-    padding: 10px 16px !important;
-    font-size: 14px !important;
-    border-radius: 12px !important;
-    min-height: 44px !important;
-}
-
-/* ---------------------------------------------------------------
-   7. HOME PAGE
-   --------------------------------------------------------------- */
-
-/* Home header/welcome section */
-body.device-mobile .bg-gradient-to-br.from-\[var\(--col-primary\)\] {
-    border-radius: 0 0 24px 24px !important;
-    padding: 20px 16px !important;
-}
-
-/* Stats grid on home */
-body.device-mobile .grid.grid-cols-3 {
-    grid-template-columns: 1fr 1fr 1fr !important;
+/* Map Navbar Fix */
+body.device-mobile .absolute.top-4.left-4.z-\[1000\].flex.gap-3.items-start {
+    top: 12px !important;
+    left: 8px !important;
+    right: 50px !important;
+    /* Leave room for hamburger */
+    display: flex !important;
     gap: 8px !important;
+    z-index: 1001 !important;
 }
 
-body.device-mobile .grid.grid-cols-3>div {
-    padding: 10px 8px !important;
-}
-
-body.device-mobile .grid.grid-cols-3 .text-2xl,
-body.device-mobile .grid.grid-cols-3 .text-xl {
-    font-size: 1.2rem !important;
-}
-
-body.device-mobile .grid.grid-cols-3 .text-xs {
-    font-size: 10px !important;
-}
-
-/* State cards container */
-body.device-mobile .flex.flex-wrap.justify-center.gap-6 {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 12px !important;
-    padding: 0 4px !important;
-}
-
-/* State cards */
-body.device-mobile .min-w-\[220px\].h-64 {
-    min-width: 100% !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 180px !important;
-    padding: 16px !important;
-}
-
-/* Professional tiles - horizontal scroll */
-body.device-mobile .flex.overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 8px !important;
-}
-
-body.device-mobile .flex.overflow-x-auto>div {
-    scroll-snap-align: start;
-    flex-shrink: 0;
-}
-
-/* Profession grid */
-body.device-mobile .grid.grid-cols-4 {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 8px !important;
-}
-
-body.device-mobile .grid.grid-cols-4>div {
+body.device-mobile .absolute.top-4.left-4.z-\[1000\] button:first-child {
     padding: 8px !important;
 }
 
-/* Explore City button on home */
-body.device-mobile .bg-gradient-to-r.from-emerald-500 {
-    margin: 0 12px !important;
-    padding: 16px !important;
-    border-radius: 16px !important;
+body.device-mobile .relative.flex-grow button {
+    padding: 6px 12px !important;
+    height: 40px !important;
 }
 
-/* Admin login button */
-body.device-mobile button.bg-gradient-to-r {
-    padding: 14px 20px !important;
-    font-size: 14px !important;
-    border-radius: 14px !important;
+/* Map Drawer for Users */
+body.device-mobile .absolute.top-0.right-0.h-full.w-full.md\:w-96.bg-white {
+    z-index: 4000 !important;
+    width: 100vw !important;
+}
+
+/* Town Search Overlay */
+body.device-mobile .absolute.inset-0.z-\[900\].bg-black\/40 {
+    z-index: 2001 !important;
+}
+
+/* 4. SERVICE PAGES & SUBMIT BUTTONS */
+/* Ensure the fixed bottom button area doesn't overlap with navigation */
+body.device-mobile .fixed.bottom-0.left-0.right-0.p-4.bg-white.border-t,
+body.device-mobile .fixed.bottom-0.md\:bottom-auto.md\:relative.left-0.right-0.p-4.bg-white {
+    bottom: 74px !important;
+    /* Height of BottomNav + small gap */
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
+    padding: 10px 16px !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
 }
 
-/* Section headings on home */
-body.device-mobile .text-lg.font-bold {
-    font-size: 16px !important;
-}
-
-/* Professional modal overlay */
-body.device-mobile .fixed.inset-0.z-50 {
-    padding: 0 !important;
-}
-
-body.device-mobile .fixed.inset-0.z-50>div {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-}
-
-/* Professional modal - inner content scroll */
-body.device-mobile .fixed.inset-0.z-50 .overflow-y-auto {
-    max-height: calc(100dvh - 120px) !important;
+body.device-mobile button.w-full.bg-green-600.p-4,
+body.device-mobile button.w-full.bg-\[var\(--col-secondary\)\].p-4 {
     padding: 12px !important;
-}
-
-/* ---------------------------------------------------------------
-   8. OFFER SERVICE & REQUEST SERVICE PAGES
-   --------------------------------------------------------------- */
-
-/* Page container */
-body.device-mobile .min-h-screen.pb-24,
-body.device-mobile .min-h-screen.pb-20 {
-    padding-bottom: 100px !important;
-}
-
-/* Form cards */
-body.device-mobile .max-w-2xl.mx-auto {
-    max-width: 100% !important;
-    padding: 0 12px !important;
-}
-
-body.device-mobile .max-w-3xl.mx-auto,
-body.device-mobile .max-w-4xl.mx-auto {
-    max-width: 100% !important;
-    padding: 0 12px !important;
-}
-
-/* Form header sections */
-body.device-mobile .p-6.rounded-b-\[2rem\],
-body.device-mobile .p-8.rounded-b-\[3rem\],
-body.device-mobile .rounded-b-\[2rem\],
-body.device-mobile .rounded-b-\[3rem\] {
-    border-bottom-left-radius: 20px !important;
-    border-bottom-right-radius: 20px !important;
-    padding: 20px 16px !important;
-}
-
-/* Targeting options */
-body.device-mobile .flex.gap-2 button,
-body.device-mobile .flex.gap-3 button {
-    min-height: 44px !important;
-    padding: 10px 14px !important;
-    font-size: 13px !important;
-    border-radius: 10px !important;
-}
-
-/* Textarea fields */
-body.device-mobile textarea {
-    min-height: 120px !important;
-    font-size: 16px !important;
-    padding: 14px !important;
-    border-radius: 14px !important;
-    width: 100% !important;
-}
-
-/* File attachment area */
-body.device-mobile .border-dashed {
-    padding: 20px !important;
-    min-height: 80px !important;
-}
-
-/* Community selection checkboxes */
-body.device-mobile .space-y-2 label,
-body.device-mobile .space-y-3 label {
-    padding: 12px !important;
-    font-size: 14px !important;
-    min-height: 48px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-}
-
-/* Profession multi-select pills */
-body.device-mobile .flex-wrap.gap-2>button,
-body.device-mobile .flex-wrap.gap-2>div,
-body.device-mobile .flex-wrap.gap-3>button,
-body.device-mobile .flex-wrap.gap-3>div {
-    padding: 8px 14px !important;
-    font-size: 13px !important;
-    min-height: 40px !important;
-}
-
-/* Confirm dialog / overlay */
-body.device-mobile .fixed.inset-0 .bg-white.rounded-3xl,
-body.device-mobile .fixed.inset-0 .bg-white.rounded-2xl {
-    width: calc(100vw - 32px) !important;
-    max-width: 100% !important;
-    max-height: 90dvh !important;
-    overflow-y: auto !important;
-    margin: auto !important;
-    padding: 20px !important;
-    border-radius: 20px !important;
-}
-
-/* Action buttons (Publish, Broadcast, etc.) */
-body.device-mobile .bg-gradient-to-r.rounded-2xl,
-body.device-mobile button.rounded-2xl {
-    padding: 16px !important;
-    font-size: 16px !important;
-    width: 100% !important;
-    border-radius: 14px !important;
-}
-
-/* ---------------------------------------------------------------
-   9. ALERTS PAGE
-   --------------------------------------------------------------- */
-
-/* Alert category selection grid */
-body.device-mobile .grid.grid-cols-2.gap-3,
-body.device-mobile .grid.grid-cols-2.gap-4 {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-}
-
-/* Alert category cards */
-body.device-mobile .grid.grid-cols-2>div,
-body.device-mobile .grid.grid-cols-2>button {
-    padding: 14px 10px !important;
-    border-radius: 14px !important;
-    min-height: 80px !important;
-}
-
-/* Alert form fields */
-body.device-mobile .space-y-4 textarea {
-    min-height: 100px !important;
-}
-
-/* Blood group selector */
-body.device-mobile .grid.grid-cols-4.gap-2 {
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 6px !important;
-}
-
-body.device-mobile .grid.grid-cols-4.gap-2>button {
-    padding: 10px 6px !important;
-    font-size: 12px !important;
-    min-height: 42px !important;
-    border-radius: 10px !important;
-}
-
-/* Recipient list */
-body.device-mobile .space-y-2>div {
-    padding: 10px 12px !important;
+    font-size: 15px !important;
     border-radius: 12px !important;
 }
 
-/* Alert tabs */
-body.device-mobile .flex.overflow-x-auto.gap-2 {
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    gap: 6px !important;
-    padding: 4px 0 !important;
+/* 5. PROFILE PAGE - COMPACT VIEW */
+body.device-mobile .bg-gradient-to-r.from-\[var\(--col-primary\)\].to-\[var\(--col-secondary\)\].p-6.sm\:p-8 {
+    padding: 20px 15px !important;
+    border-radius: 0 0 30px 30px !important;
 }
 
-body.device-mobile .flex.overflow-x-auto.gap-2>button {
-    flex-shrink: 0 !important;
-    scroll-snap-align: start;
-    padding: 8px 14px !important;
-    font-size: 12px !important;
-    white-space: nowrap !important;
+body.device-mobile .w-28.h-28.sm\:w-40.h-40 {
+    width: 90px !important;
+    height: 90px !important;
 }
 
-/* ---------------------------------------------------------------
-   10. PROFILE PAGE
-   --------------------------------------------------------------- */
-
-/* Profile header */
-body.device-mobile .bg-gradient-to-br .flex.items-center.gap-6,
-body.device-mobile .bg-gradient-to-br .flex.items-center.gap-4 {
-    flex-direction: column !important;
-    text-align: center !important;
-    gap: 12px !important;
-}
-
-/* Profile photo */
-body.device-mobile .w-36.h-36,
-body.device-mobile .w-32.h-32 {
-    width: 100px !important;
-    height: 100px !important;
-}
-
-/* Profile stats row */
-body.device-mobile .grid.grid-cols-3.gap-4,
-body.device-mobile .grid.grid-cols-3.gap-6 {
-    grid-template-columns: 1fr 1fr 1fr !important;
+body.device-mobile .grid.grid-cols-3.gap-2.sm\:gap-4 {
     gap: 8px !important;
 }
 
-body.device-mobile .grid.grid-cols-3>div {
-    padding: 10px !important;
-    text-align: center !important;
-}
-
-/* Profile info fields */
-body.device-mobile .grid.md\:grid-cols-2.gap-4 {
+body.device-mobile .grid.grid-cols-2 {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
 }
 
-/* Edit profile sections */
+/* Profile Sections Spacing */
+body.device-mobile .px-4.mt-6.space-y-6.pb-8 {
+    margin-top: 15px !important;
+    padding-bottom: 200px !important;
+}
+
+/* 6. HOME PAGE - CARD SCALING */
+body.device-mobile .flex.flex-wrap.justify-center.gap-6 {
+    gap: 12px !important;
+    justify-content: flex-start !important;
+}
+
+body.device-mobile .min-w-\[220px\].h-64 {
+    min-width: calc(50% - 6px) !important;
+    /* 2 items per row */
+    height: 160px !important;
+    padding: 12px !important;
+}
+
+body.device-mobile .min-w-\[220px\] h3 {
+    font-size: 14px !important;
+}
+
+/* 7. HAMBURGER MENU */
+.animate-slide-left {
+    animation: slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* 8. REGISTER PAGE STEPS */
+body.device-mobile .flex.items-center.justify-between.mb-8 {
+    gap: 4px !important;
+}
+
+body.device-mobile .w-10.h-10.rounded-full.flex {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+}
+
+/* 9. BOTTOM NAVIGATION */
+body.device-mobile .bg-white\/95.backdrop-blur-xl.border-t.shadow-\[0_-8px_30px_-12px_rgba\(0,
+0,
+0,
+0.12\)\] {
+    height: 74px !important;
+    z-index: 5000 !important;
+    padding-bottom: env(safe-area-inset-bottom, 12px) !important;
+}
+
+body.device-mobile .bg-white\/95.backdrop-blur-xl a span {
+    font-size: 9px !important;
+}
+
+/* 10. VOICE INPUT COMPONENT */
+body.device-mobile .bg-blue-600.text-white.p-3.rounded-xl {
+    padding: 10px !important;
+    width: 44px !important;
+    height: 44px !important;
+}
+
+/* 11. RADIUS & SHADOWS */
+body.device-mobile .rounded-2xl {
+    border-radius: 12px !important;
+}
+
+body.device-mobile .rounded-3xl {
+    border-radius: 18px !important;
+}
+
 body.device-mobile .p-6 {
     padding: 16px !important;
 }
 
-/* Profile action buttons */
-body.device-mobile .flex.gap-3>button {
-    flex: 1 !important;
-    min-height: 48px !important;
-    font-size: 14px !important;
-}
-
-/* Camera modal in profile */
-body.device-mobile .fixed.inset-0.z-50 .max-w-md {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    height: 100dvh !important;
-    border-radius: 0 !important;
-}
-
-/* ---------------------------------------------------------------
-   11. MY ACTIVITY PAGE
-   --------------------------------------------------------------- */
-
-/* Activity header */
-body.device-mobile .bg-gradient-to-r.p-8 {
-    padding: 20px 16px !important;
-}
-
-body.device-mobile .bg-gradient-to-r .text-3xl {
-    font-size: 1.5rem !important;
-}
-
-/* Activity tabs */
-body.device-mobile .flex.overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    gap: 4px !important;
-}
-
-body.device-mobile .flex.overflow-x-auto>button {
-    flex-shrink: 0 !important;
-    scroll-snap-align: start;
-    padding: 8px 12px !important;
-    font-size: 11px !important;
-    white-space: nowrap !important;
-    min-height: 36px !important;
-    border-radius: 20px !important;
-}
-
-/* Stats cards in overview */
-body.device-mobile .grid.grid-cols-2.gap-4 {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-}
-
-body.device-mobile .grid.grid-cols-2>div {
-    padding: 14px 10px !important;
-    border-radius: 16px !important;
-}
-
-/* Large stat numbers */
-body.device-mobile .text-3xl.font-bold,
-body.device-mobile .text-4xl.font-bold {
-    font-size: 1.5rem !important;
-}
-
-/* Service/alert cards in activity */
-body.device-mobile .rounded-3xl.border {
-    border-radius: 16px !important;
+body.device-mobile .p-5 {
     padding: 14px !important;
 }
 
-/* Recipient expansion */
-body.device-mobile .bg-gray-50.rounded-2xl {
-    padding: 10px !important;
-    border-radius: 12px !important;
-}
-
-/* Badge grid */
-body.device-mobile .grid.grid-cols-3,
-body.device-mobile .flex.flex-wrap.justify-center {
-    gap: 8px !important;
-}
-
-/* Timeline items */
-body.device-mobile .border-l-2>div {
-    padding: 8px 12px !important;
-    margin-left: 16px !important;
-}
-
-/* ---------------------------------------------------------------
-   12. EVENTS PAGE
-   --------------------------------------------------------------- */
-
-/* Event tab switcher */
-body.device-mobile .flex.rounded-2xl.p-1 {
-    border-radius: 14px !important;
-}
-
-body.device-mobile .flex.rounded-2xl>button {
-    padding: 10px 16px !important;
-    font-size: 13px !important;
-    border-radius: 12px !important;
-    min-height: 44px !important;
-}
-
-/* Event cards */
-body.device-mobile .bg-white.rounded-3xl.shadow-sm {
-    border-radius: 16px !important;
-    overflow: hidden !important;
-}
-
-/* Event image */
-body.device-mobile .h-48,
-body.device-mobile .h-52 {
-    height: 180px !important;
-}
-
-/* Event details within card */
-body.device-mobile .p-5,
-body.device-mobile .p-4 {
-    padding: 14px !important;
-}
-
-/* RSVP button */
-body.device-mobile .rounded-xl.font-bold {
-    padding: 12px !important;
-    min-height: 48px !important;
-    font-size: 14px !important;
-}
-
-/* Create event form */
-body.device-mobile .max-w-lg.mx-auto {
-    max-width: 100% !important;
-    padding: 0 12px !important;
-}
-
-/* ---------------------------------------------------------------
-   13. EXPLORE CITY PAGE (MAP)
-   --------------------------------------------------------------- */
-
-/* Map container - full height */
-body.device-mobile .leaflet-container {
-    height: calc(100dvh - 140px) !important;
-    width: 100% !important;
-    touch-action: pan-x pan-y;
-}
-
-/* Town selector overlay */
-body.device-mobile .fixed.inset-0.bg-black\/50 .bg-white.rounded-t-3xl,
-body.device-mobile .fixed.inset-0 .bg-white.rounded-t-3xl {
-    width: 100% !important;
-    max-height: 80dvh !important;
-    border-radius: 20px 20px 0 0 !important;
-    padding: 16px !important;
-}
-
-/* Town search input */
-body.device-mobile .rounded-2xl input {
-    padding: 14px !important;
-    font-size: 16px !important;
-}
-
-/* Town list items */
-body.device-mobile .cursor-pointer.rounded-xl {
-    padding: 14px !important;
-    min-height: 48px !important;
-}
-
-/* Map controls */
-body.device-mobile .leaflet-control-zoom {
-    margin-right: 8px !important;
-    margin-bottom: 80px !important;
-}
-
-body.device-mobile .leaflet-control-zoom a {
-    width: 36px !important;
-    height: 36px !important;
-    line-height: 36px !important;
-    font-size: 18px !important;
-}
-
-/* Map legend */
-body.device-mobile .absolute.bottom-4.left-4,
-body.device-mobile .absolute.bottom-3.left-3 {
-    bottom: 80px !important;
-    left: 8px !important;
-    max-width: calc(100vw - 60px) !important;
-    font-size: 11px !important;
-}
-
-/* Navbar on Explore City */
-body.device-mobile .bg-white\/95.backdrop-blur-xl.sticky {
-    padding: 10px 12px !important;
-}
-
-body.device-mobile .bg-white\/95.backdrop-blur-xl.sticky h1 {
-    font-size: 18px !important;
-}
-
-/* Town dropdown */
-body.device-mobile .relative .bg-white.border.rounded-2xl {
-    width: calc(100vw - 24px) !important;
-    max-height: 60dvh !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 12px !important;
-}
-
-/* Map popup */
-body.device-mobile .leaflet-popup-content-wrapper {
-    border-radius: 14px !important;
-    padding: 8px !important;
-}
-
-body.device-mobile .leaflet-popup-content {
-    margin: 8px !important;
-    font-size: 13px !important;
-    max-width: 200px !important;
-}
-
-/* ---------------------------------------------------------------
-   14. NOTIFICATIONS PAGE
-   --------------------------------------------------------------- */
-
-body.device-mobile .from-indigo-50.via-purple-50 {
-    padding-bottom: 100px !important;
-}
-
-/* Notification header */
-body.device-mobile .bg-gradient-to-r .text-2xl {
-    font-size: 1.3rem !important;
-}
-
-/* Filter pills */
-body.device-mobile .flex.gap-2.overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
-    gap: 6px !important;
-}
-
-body.device-mobile .flex.gap-2.overflow-x-auto>button {
-    flex-shrink: 0 !important;
-    padding: 8px 14px !important;
-    font-size: 12px !important;
-    white-space: nowrap !important;
-}
-
-/* Notification cards */
-body.device-mobile .p-4.rounded-2xl.border {
-    padding: 12px !important;
-    border-radius: 14px !important;
-}
-
-body.device-mobile .p-4.rounded-2xl .line-clamp-2 {
-    font-size: 13px !important;
-}
-
-/* ---------------------------------------------------------------
-   15. EMERGENCY PAGE
-   --------------------------------------------------------------- */
-
-/* Emergency type selection */
-body.device-mobile .grid.grid-cols-2.sm\:grid-cols-3 {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-}
-
-body.device-mobile .grid.grid-cols-2.sm\:grid-cols-3>button,
-body.device-mobile .grid.grid-cols-2.sm\:grid-cols-3>div {
-    padding: 16px 10px !important;
-    border-radius: 14px !important;
-    min-height: 90px !important;
-}
-
-/* Emergency description */
-body.device-mobile .bg-white.rounded-3xl {
-    border-radius: 16px !important;
-    padding: 16px !important;
-}
-
-/* ---------------------------------------------------------------
-   16. COMPLAINTS PAGE
-   --------------------------------------------------------------- */
-
-/* Complaint cards */
-body.device-mobile .bg-white.p-4.rounded-2xl {
-    padding: 14px !important;
-    border-radius: 14px !important;
-}
-
-/* New complaint form */
-body.device-mobile .bg-white.p-6.rounded-3xl {
-    padding: 16px !important;
-    border-radius: 16px !important;
-}
-
-/* Complaint status tabs */
-body.device-mobile .flex.gap-2>button.rounded-full {
-    padding: 8px 14px !important;
-    font-size: 12px !important;
-    min-height: 36px !important;
-}
-
-/* ---------------------------------------------------------------
-   17. STATE USERS PAGE
-   --------------------------------------------------------------- */
-
-/* User cards grid */
-body.device-mobile .grid.sm\:grid-cols-2.lg\:grid-cols-3 {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-}
-
-/* User card */
-body.device-mobile .bg-white.rounded-3xl.shadow-sm.border {
-    padding: 14px !important;
-    border-radius: 16px !important;
-}
-
-/* User avatar */
-body.device-mobile .w-14.h-14 {
-    width: 48px !important;
-    height: 48px !important;
-}
-
-/* Back button */
-body.device-mobile button.p-2.bg-white\/10 {
-    min-width: 40px !important;
-    min-height: 40px !important;
-    padding: 10px !important;
-}
-
-/* ---------------------------------------------------------------
-   18. STUDENT DASHBOARD
-   --------------------------------------------------------------- */
-
-/* Student header */
-body.device-mobile .from-indigo-600.to-blue-700 {
-    padding: 20px 16px !important;
-    border-bottom-left-radius: 24px !important;
-    border-bottom-right-radius: 24px !important;
-}
-
-/* Student stats grid */
-body.device-mobile .grid.grid-cols-2 .p-5 {
-    padding: 14px !important;
-}
-
-/* Peer cards scroll */
-body.device-mobile .min-w-\[160px\] {
-    min-width: 140px !important;
-}
-
-/* Mentor list */
-body.device-mobile .bg-white.p-4.rounded-3xl.flex.items-center {
-    padding: 12px !important;
-    border-radius: 14px !important;
-    gap: 10px !important;
-}
-
-/* ---------------------------------------------------------------
-   19. ADMIN DASHBOARD
-   --------------------------------------------------------------- */
-body.device-mobile .grid.lg\:grid-cols-4,
-body.device-mobile .grid.lg\:grid-cols-3 {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-}
-
-/* ---------------------------------------------------------------
-   20. MODAL / OVERLAY UNIVERSAL STYLES
-   --------------------------------------------------------------- */
-
-/* All modals - make full-width on mobile */
-body.device-mobile .fixed.inset-0.flex.items-center.justify-center {
-    padding: 12px !important;
-    align-items: flex-end !important;
-}
-
-body.device-mobile .fixed.inset-0 .bg-white {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 90dvh !important;
-    overflow-y: auto !important;
-    border-radius: 20px 20px 0 0 !important;
-}
-
-/* Modal close button */
-body.device-mobile .fixed.inset-0 button.absolute.top-4.right-4,
-body.device-mobile .fixed.inset-0 button.absolute.top-3.right-3 {
-    top: 8px !important;
-    right: 8px !important;
-    min-width: 40px !important;
-    min-height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* ---------------------------------------------------------------
-   21. SCROLLBARS — HIDE ON MOBILE
-   --------------------------------------------------------------- */
-body.device-mobile ::-webkit-scrollbar {
-    display: none;
-}
-
-body.device-mobile * {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-/* ---------------------------------------------------------------
-   22. TYPOGRAPHY ADJUSTMENTS
-   --------------------------------------------------------------- */
+/* 12. TYPOGRAPHY SCALING */
 body.device-mobile h1 {
-    font-size: 1.5rem !important;
-    line-height: 1.3 !important;
+    font-size: 1.6rem !important;
 }
 
 body.device-mobile h2 {
-    font-size: 1.25rem !important;
-    line-height: 1.3 !important;
+    font-size: 1.3rem !important;
 }
 
 body.device-mobile h3 {
     font-size: 1.1rem !important;
-    line-height: 1.3 !important;
 }
 
 body.device-mobile p {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-}
-
-body.device-mobile .text-sm {
     font-size: 13px !important;
 }
 
-body.device-mobile .text-xs {
-    font-size: 11px !important;
+/* Scrollbar Hiding */
+body.device-mobile ::-webkit-scrollbar {
+    display: none;
 }
 
-body.device-mobile .text-\[10px\] {
-    font-size: 10px !important;
-}
-
-/* ---------------------------------------------------------------
-   23. VOICE INPUT COMPONENT
-   --------------------------------------------------------------- */
-body.device-mobile .flex.items-end.gap-2 {
-    gap: 8px !important;
-}
-
-body.device-mobile .flex.items-end.gap-2>button {
-    min-width: 48px !important;
-    min-height: 48px !important;
-    padding: 10px !important;
-    border-radius: 12px !important;
-    flex-shrink: 0 !important;
-}
-
-/* ---------------------------------------------------------------
-   24. CARDS & CONTAINERS — UNIVERSAL MOBILE ROUNDING
-   --------------------------------------------------------------- */
-body.device-mobile .rounded-3xl {
-    border-radius: 16px !important;
-}
-
-body.device-mobile .rounded-2xl {
-    border-radius: 14px !important;
-}
-
-/* ---------------------------------------------------------------
-   25. ANIMATIONS — REDUCE MOTION ON MOBILE FOR PERFORMANCE
-   --------------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-
-    body.device-mobile *,
-    body.device-mobile *::before,
-    body.device-mobile *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* ---------------------------------------------------------------
-   26. SAFE AREA & NOTCH SUPPORT
-   --------------------------------------------------------------- */
-@supports (padding-top: env(safe-area-inset-top)) {
-
-    body.device-mobile .bg-gradient-to-r.text-white.p-6,
-    body.device-mobile .bg-gradient-to-r.text-white.p-8 {
-        padding-top: calc(16px + env(safe-area-inset-top)) !important;
-    }
-}
-
-/* ---------------------------------------------------------------
-   27. HORIZONTAL OVERFLOW PREVENTION
-   --------------------------------------------------------------- */
-body.device-mobile .overflow-hidden {
-    overflow: hidden !important;
-}
-
-body.device-mobile .overflow-x-auto {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
-body.device-mobile .px-4,
-body.device-mobile .px-6,
-body.device-mobile .px-8 {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-}
-
-/* Container width fix */
-body.device-mobile .max-w-7xl,
-body.device-mobile .max-w-6xl,
-body.device-mobile .max-w-5xl {
-    max-width: 100% !important;
-}
-
-/* ---------------------------------------------------------------
-   28. LOADING STATES
-   --------------------------------------------------------------- */
-body.device-mobile .animate-spin {
-    animation: spin 1s linear infinite !important;
-}
-
-body.device-mobile .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
-}
-
-/* ---------------------------------------------------------------
-   29. IMAGE HANDLING
-   --------------------------------------------------------------- */
-body.device-mobile img {
-    max-width: 100% !important;
-    height: auto;
-}
-
-body.device-mobile .object-cover {
-    object-fit: cover !important;
-}
-
-/* Profile photos should keep aspect ratio */
-body.device-mobile img.rounded-full {
-    object-fit: cover !important;
-}
-
-/* ---------------------------------------------------------------
-   30. FIXED POSITION ELEMENTS ADJUSTMENT
-   --------------------------------------------------------------- */
-
-/* Ensure fixed headers don't overlap with content */
-body.device-mobile .sticky.top-0 {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 40 !important;
-}
-
-/* Toast / notification banners */
-body.device-mobile .fixed.top-4,
-body.device-mobile .fixed.top-6 {
-    top: 12px !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: auto !important;
+body.device-mobile {
+    scrollbar-width: none;
 }

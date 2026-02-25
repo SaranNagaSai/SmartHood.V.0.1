@@ -2,10 +2,13 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
+import HamburgerMenu from './HamburgerMenu';
 import useNotifications from '../../hooks/useNotifications';
+import { useDevice } from '../../context/DeviceContext';
 
 const Layout = ({ children }) => {
     const location = useLocation();
+    const { isMobile } = useDevice();
 
     // Hide layout on Entry pages
     const hideLayoutRoutes = ['/', '/login', '/register', '/language'];
@@ -19,20 +22,27 @@ const Layout = ({ children }) => {
     }
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className={`flex min-h-screen bg-gray-50 ${isMobile ? 'flex-col' : ''}`}>
             {/* Desktop Sidebar */}
-            <div className="hidden md:block w-64 fixed h-full z-30">
-                <Sidebar />
-            </div>
+            {!isMobile && (
+                <div className="hidden md:block w-64 fixed h-full z-30">
+                    <Sidebar />
+                </div>
+            )}
+
+            {/* Mobile Navigation */}
+            {isMobile && (
+                <>
+                    <HamburgerMenu />
+                    <div className="md:hidden fixed bottom-0 w-full z-30">
+                        <BottomNav />
+                    </div>
+                </>
+            )}
 
             {/* Main Content */}
-            <div className="flex-1 md:ml-64 pb-20 md:pb-0 mb-safe overflow-y-auto">
+            <div className={`flex-1 ${!isMobile ? 'md:ml-64' : 'pb-24 pt-4'} mb-safe overflow-y-auto w-full`}>
                 {children}
-            </div>
-
-            {/* Mobile Bottom Nav */}
-            <div className="md:hidden fixed bottom-0 w-full z-30">
-                <BottomNav />
             </div>
         </div>
     );

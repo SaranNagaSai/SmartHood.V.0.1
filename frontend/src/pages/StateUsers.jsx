@@ -156,77 +156,73 @@ const StateUsers = () => {
                                                 </div>
                                             )}
 
-                                            {/* Horizontal Scrollable Cards */}
-                                            <div className="overflow-x-auto pb-4 -mx-2 px-2 scrollbar-thin">
-                                                <div className="flex gap-5" style={{ minWidth: 'min-content' }}>
-                                                    {townUsers.map((u, uIdx) => (
-                                                        <div
-                                                            key={u._id || uIdx}
-                                                            className="bg-white rounded-[1.5rem] border border-slate-100 p-5 group hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500 flex flex-col gap-4 shadow-xl shadow-black/20 flex-shrink-0"
-                                                            style={{
-                                                                width: '280px',
-                                                                minWidth: '280px',
-                                                                animation: `fadeSlideIn 0.5s ease-out ${uIdx * 60}ms both`
-                                                            }}
-                                                        >
-                                                            <div className="flex gap-4">
-                                                                {/* Avatar */}
-                                                                <div className="relative">
-                                                                    <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-slate-100 bg-slate-50 p-0.5 group-hover:scale-110 transition-transform duration-500 shadow-sm">
-                                                                        {u.profilePhoto ? (
-                                                                            <img
-                                                                                src={getProfilePhotoUrl(u.profilePhoto)}
-                                                                                alt={u.name}
-                                                                                className="w-full h-full object-cover rounded-xl"
-                                                                            />
-                                                                        ) : (
-                                                                            <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-indigo-400 rounded-xl">
-                                                                                <User size={22} />
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow-lg"></div>
-                                                                </div>
-
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex justify-between items-start gap-1">
-                                                                        <h4 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{u.name}</h4>
-                                                                        <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100/50 whitespace-nowrap flex-shrink-0">
-                                                                            {u.uniqueId}
-                                                                        </span>
-                                                                    </div>
-
-                                                                    <div className="mt-1.5 space-y-1">
-                                                                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-600">
-                                                                            <Briefcase size={11} className="text-indigo-500 flex-shrink-0" />
-                                                                            <span className="truncate">{u.professionDetails?.jobRole || u.professionCategory}</span>
+                                            {/* Responsive Grid of Cards */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                                {townUsers.map((u, uIdx) => (
+                                                    <div
+                                                        key={u._id || uIdx}
+                                                        className="bg-white rounded-[1.5rem] border border-slate-100 p-5 group hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500 flex flex-col gap-4 shadow-xl shadow-black/20"
+                                                        style={{
+                                                            animation: `fadeSlideIn 0.5s ease-out ${uIdx * 60}ms both`
+                                                        }}
+                                                    >
+                                                        <div className="flex gap-4">
+                                                            {/* Avatar */}
+                                                            <div className="relative">
+                                                                <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-slate-100 bg-slate-50 p-0.5 group-hover:scale-110 transition-transform duration-500 shadow-sm">
+                                                                    {u.profilePhoto ? (
+                                                                        <img
+                                                                            src={getProfilePhotoUrl(u.profilePhoto)}
+                                                                            alt={u.name}
+                                                                            className="w-full h-full object-cover rounded-xl"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-indigo-400 rounded-xl">
+                                                                            <User size={22} />
                                                                         </div>
-                                                                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                                                                            <MapPin size={11} className="text-indigo-300 flex-shrink-0" />
-                                                                            <span className="truncate">{u.locality}</span>
-                                                                        </div>
-                                                                    </div>
+                                                                    )}
                                                                 </div>
+                                                                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow-lg"></div>
                                                             </div>
 
-                                                            {/* Card Action Area */}
-                                                            <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="p-1.5 bg-indigo-600 text-white rounded-lg shadow-md group-hover:bg-indigo-700 transition-colors">
-                                                                        <Phone size={12} />
-                                                                    </div>
-                                                                    <a href={`tel:${u.phone}`} className="text-[11px] font-black text-slate-800 hover:text-indigo-600 transition-colors">
-                                                                        {u.phone}
-                                                                    </a>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex justify-between items-start gap-1">
+                                                                    <h4 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{u.name}</h4>
+                                                                    <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100/50 whitespace-nowrap flex-shrink-0">
+                                                                        {u.uniqueId}
+                                                                    </span>
                                                                 </div>
-                                                                <div className="flex items-center gap-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100 shadow-sm">
-                                                                    <Star size={10} className="fill-amber-500" />
-                                                                    <span className="text-[9px] font-black">{u.impactScore || 0} IMP</span>
+
+                                                                <div className="mt-1.5 space-y-1">
+                                                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-600">
+                                                                        <Briefcase size={11} className="text-indigo-500 flex-shrink-0" />
+                                                                        <span className="truncate">{u.professionDetails?.jobRole || u.professionCategory}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+                                                                        <MapPin size={11} className="text-indigo-300 flex-shrink-0" />
+                                                                        <span className="truncate">{u.locality}</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    ))}
-                                                </div>
+
+                                                        {/* Card Action Area */}
+                                                        <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="p-1.5 bg-indigo-600 text-white rounded-lg shadow-md group-hover:bg-indigo-700 transition-colors">
+                                                                    <Phone size={12} />
+                                                                </div>
+                                                                <a href={`tel:${u.phone}`} className="text-[11px] font-black text-slate-800 hover:text-indigo-600 transition-colors">
+                                                                    {u.phone}
+                                                                </a>
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100 shadow-sm">
+                                                                <Star size={10} className="fill-amber-500" />
+                                                                <span className="text-[9px] font-black">{u.impactScore || 0} IMP</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     );
@@ -264,7 +260,7 @@ const StateUsers = () => {
                 .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
                 .scrollbar-thin { scrollbar-width: thin; scrollbar-color: rgba(99,102,241,0.3) rgba(255,255,255,0.03); }
             `}} />
-        </div>
+        </div >
     );
 };
 

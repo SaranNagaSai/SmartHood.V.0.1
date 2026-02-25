@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useDevice } from '../context/DeviceContext';
 import { ArrowLeft, Users, X, MapPin, Search, ChevronDown, Mic } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -359,6 +360,7 @@ const findTownInAllDistricts = (townName) => {
 
 const ExploreCity = () => {
     const { t } = useLanguage();
+    const { isMobile } = useDevice();
     const navigate = useNavigate();
 
     const [localities, setLocalities] = React.useState([]);
@@ -639,21 +641,24 @@ const ExploreCity = () => {
     return (
         <div className="h-screen w-full flex flex-col relative overflow-hidden bg-gray-50">
             {/* Navbar Overlay */}
-            <div className="absolute top-4 left-4 z-[1000] flex gap-3 items-start">
-                <button onClick={() => navigate('/home')} className="p-3 bg-white text-gray-700 rounded-full shadow-lg hover:bg-gray-50 transition">
-                    <ArrowLeft size={20} />
+            <div className={`absolute top-4 left-4 z-[1000] flex gap-3 items-start ${isMobile ? 'right-4 left-2 top-2' : ''}`}>
+                <button
+                    onClick={() => navigate('/home')}
+                    className={`p-3 bg-white text-gray-700 rounded-full shadow-lg hover:bg-gray-50 transition ${isMobile ? 'p-2' : ''}`}
+                >
+                    <ArrowLeft size={isMobile ? 18 : 20} />
                 </button>
 
-                <div className="relative">
+                <div className="relative flex-grow">
                     <button
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 hover:bg-gray-50 transition min-w-[200px] justify-between"
+                        className={`bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 hover:bg-gray-50 transition justify-between w-full ${isMobile ? 'px-3 py-1.5' : 'min-w-[200px]'}`}
                     >
-                        <div className="flex items-center gap-2">
-                            <MapPin size={18} className="text-primary" />
-                            <span className="font-bold text-gray-800 text-sm">{userTown || 'Select Town'}</span>
+                        <div className="flex items-center gap-2 overflow-hidden">
+                            <MapPin size={isMobile ? 16 : 18} className="text-primary flex-shrink-0" />
+                            <span className="font-bold text-gray-800 text-sm truncate">{userTown || 'Select Town'}</span>
                         </div>
-                        <ChevronDown size={16} className={`text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown size={14} className={`text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {isDropdownOpen && (
@@ -700,10 +705,10 @@ const ExploreCity = () => {
             {/* Town Selection Overlay (visible when no town selected) */}
             {!userTown && (
                 <div className="absolute inset-0 z-[900] bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center p-4">
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in-95 duration-300">
-                        <MapPin size={48} className="mx-auto text-primary mb-4" />
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Explore Your City</h2>
-                        <p className="text-gray-500 mb-6">Select your town to discover local communities and resources.</p>
+                    <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in-95 duration-300">
+                        <MapPin size={isMobile ? 36 : 48} className="mx-auto text-primary mb-3 md:mb-4" />
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">Explore Your City</h2>
+                        <p className="text-sm text-gray-500 mb-6 font-medium">Select your town to discover local communities and resources.</p>
 
                         <div className="relative text-left max-w-sm mx-auto">
                             <div className="flex gap-2">
