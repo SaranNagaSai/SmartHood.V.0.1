@@ -384,44 +384,17 @@ const ExploreCity = () => {
                 const token = localStorage.getItem('token');
                 const userData = JSON.parse(localStorage.getItem('user'));
 
-                // Read user's district from their registered data
+                // Read user's district (used ONLY for map bounds restriction)
                 const registeredDistrict = userData?.district || '';
                 setUserDistrict(registeredDistrict);
 
-                // Fetch Available Towns from server
+                // Fetch ALL Available Towns from server (no district filtering)
                 const filterRes = await fetch(`${API_URL}/localities/filters`);
                 const filterData = await filterRes.json();
 
-                if (filterData.towns && registeredDistrict) {
-                    // Get towns that belong to user's district from DISTRICT_DATA
-                    const dKey = registeredDistrict.trim().toLowerCase();
-                    const districtEntry = DISTRICT_DATA[dKey] ||
-                        DISTRICT_DATA[Object.keys(DISTRICT_DATA).find(k => k.includes(dKey) || dKey.includes(k))];
-
-                    if (districtEntry && districtEntry.towns) {
-                        const districtTownNames = Object.keys(districtEntry.towns).map(t => t.toLowerCase());
-
-                        // Filter server towns to only those in user's district
-                        const filteredTowns = filterData.towns.filter(town =>
-                            districtTownNames.some(dt =>
-                                dt === town.toLowerCase() || town.toLowerCase().includes(dt) || dt.includes(town.toLowerCase())
-                            )
-                        );
-
-                        // If filtered list is empty, show district towns from our data
-                        if (filteredTowns.length > 0) {
-                            setAvailableTowns(filteredTowns.sort((a, b) => a.localeCompare(b)));
-                        } else {
-                            // Fallback: show all known district towns
-                            const knownTowns = Object.keys(districtEntry.towns).sort((a, b) => a.localeCompare(b));
-                            setAvailableTowns(knownTowns);
-                        }
-                    } else {
-                        // If district not found in our data, show all towns
-                        setAvailableTowns(filterData.towns.sort((a, b) => a.localeCompare(b)));
-                    }
-                } else if (filterData.towns) {
-                    setAvailableTowns(filterData.towns.sort((a, b) => a.localeCompare(b)));
+                if (filterData.towns) {
+                    const sortedTowns = filterData.towns.sort((a, b) => a.localeCompare(b));
+                    setAvailableTowns(sortedTowns);
                 }
             } catch (err) {
                 console.error("[ExploreCity] Failed to fetch initial data", err);
@@ -541,7 +514,7 @@ const ExploreCity = () => {
             if (matchedTown) {
                 handleTownChange(matchedTown);
             } else {
-                alert(`Town "${transcript}" not found in ${userDistrict || 'your district'}. Please try again.`);
+                alert(`Town "${transcript}" not found. Please try again.`);
             }
         };
 
@@ -652,12 +625,7 @@ const ExploreCity = () => {
                     >
                         <div className="flex items-center gap-2">
                             <MapPin size={18} className="text-primary" />
-                            <div className="flex flex-col items-start">
-                                <span className="font-bold text-gray-800 text-sm">{userTown || 'Select Town'}</span>
-                                {userDistrict && (
-                                    <span className="text-[10px] text-gray-400 font-medium">{userDistrict} District</span>
-                                )}
-                            </div>
+                            <span className="font-bold text-gray-800 text-sm">{userTown || 'Select Town'}</span>
                         </div>
                         <ChevronDown size={16} className={`text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
@@ -665,11 +633,6 @@ const ExploreCity = () => {
                     {isDropdownOpen && (
                         <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-60 overflow-y-auto">
                             <div className="p-2 border-b">
-                                {userDistrict && (
-                                    <div className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md mb-2 text-center uppercase tracking-wider">
-                                        📍 {userDistrict} District
-                                    </div>
-                                )}
                                 <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
                                     <Search size={14} className="text-gray-400" />
                                     <input
@@ -714,13 +677,7 @@ const ExploreCity = () => {
                     <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in-95 duration-300">
                         <MapPin size={48} className="mx-auto text-primary mb-4" />
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">Explore Your City</h2>
-                        {userDistrict ? (
-                            <p className="text-gray-500 mb-6">
-                                Explore towns in <span className="font-bold text-blue-600">{userDistrict}</span> district. Select a town to discover local communities.
-                            </p>
-                        ) : (
-                            <p className="text-gray-500 mb-6">Select your town to discover local communities and resources.</p>
-                        )}
+                        <p className="text-gray-500 mb-6">Select your town to discover local communities and resources.</p>
 
                         <div className="relative text-left max-w-sm mx-auto">
                             <div className="flex gap-2">
@@ -752,11 +709,6 @@ const ExploreCity = () => {
                             {isDropdownOpen && (
                                 <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden max-h-60 overflow-y-auto z-50 animate-in fade-in zoom-in-95 duration-200">
                                     <div className="p-2 sticky top-0 bg-white border-b z-10">
-                                        {userDistrict && (
-                                            <div className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md mb-2 text-center uppercase tracking-wider">
-                                                📍 {userDistrict} District Towns
-                                            </div>
-                                        )}
                                         <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
                                             <Search size={14} className="text-gray-400" />
                                             <input
@@ -783,7 +735,7 @@ const ExploreCity = () => {
                                                 </button>
                                             ))
                                         ) : (
-                                            <div className="p-4 text-center text-xs text-gray-400">No towns found in {userDistrict || 'your'} district</div>
+                                            <div className="p-4 text-center text-xs text-gray-400">No towns found</div>
                                         )}
                                     </div>
                                 </div>
@@ -821,11 +773,7 @@ const ExploreCity = () => {
                         <span className="w-3 h-3 rounded bg-gradient-to-r from-blue-800 to-blue-500 border border-white shadow-sm"></span>
                         <span className="text-xs text-gray-600">Town Labels</span>
                     </div>
-                    {userDistrict && (
-                        <div className="mt-2 pt-2 border-t border-gray-100">
-                            <span className="text-[10px] font-bold text-blue-600">📍 {userDistrict} District</span>
-                        </div>
-                    )}
+
                 </div>
             )}
 
