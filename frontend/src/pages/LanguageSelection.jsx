@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDevice } from '../context/DeviceContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Monitor, Smartphone } from 'lucide-react';
 import smartHoodLogo from '../assets/images/Smart Hood Logo.png';
@@ -8,6 +9,7 @@ import smartHoodLogo from '../assets/images/Smart Hood Logo.png';
 const LanguageSelection = () => {
     const { t, setLanguage } = useLanguage();
     const { setDeviceType } = useDevice();
+    const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [selectedDevice, setSelectedDevice] = useState(sessionStorage.getItem('deviceType') || '');
 
@@ -18,7 +20,12 @@ const LanguageSelection = () => {
         }
         setLanguage(lang);
         setDeviceType(selectedDevice);
-        navigate('/register');
+
+        if (isAuthenticated) {
+            navigate('/home');
+        } else {
+            navigate('/register');
+        }
     };
 
     return (
