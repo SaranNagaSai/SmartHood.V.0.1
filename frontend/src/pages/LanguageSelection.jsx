@@ -44,34 +44,57 @@ const LanguageSelection = () => {
 
                 <div className="w-full bg-gray-900/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 md:p-8">
                     {/* Device Type Selection */}
-                    <div className="mb-6">
-                        <p className="text-white/80 text-xs font-bold uppercase tracking-wider mb-3 text-center">Select Device Type</p>
-                        <div className="grid grid-cols-2 gap-3">
+                    <div className="mb-10">
+                        <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-6 text-center">System Access Module</p>
+                        <div className="grid grid-cols-2 gap-5 px-1">
+                            {/* Mobile Hub Card */}
                             <button
                                 onClick={() => setSelectedDevice('mobile')}
-                                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 ${selectedDevice === 'mobile'
-                                    ? 'bg-white/20 border-white/60 shadow-lg shadow-white/10 scale-105'
-                                    : 'bg-white/5 border-white/15 hover:bg-white/10 hover:border-white/30'
+                                className={`group relative flex flex-col items-center gap-4 p-6 rounded-[2.5rem] border-2 transition-all duration-500 ${selectedDevice === 'mobile'
+                                    ? 'bg-blue-500/10 border-blue-400 shadow-[0_0_25px_rgba(59,130,246,0.3)] scale-105'
+                                    : 'bg-white/5 border-white/10 hover:border-white/20'
                                     }`}
                             >
-                                <Smartphone size={28} className={`${selectedDevice === 'mobile' ? 'text-white' : 'text-white/60'}`} />
-                                <span className={`text-sm font-bold ${selectedDevice === 'mobile' ? 'text-white' : 'text-white/60'}`}>Mobile</span>
                                 {selectedDevice === 'mobile' && (
-                                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                                    <div className="absolute inset-0 bg-blue-500/20 blur-2xl animate-pulse"></div>
                                 )}
+
+                                <div className={`relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 transform group-hover:scale-110 ${selectedDevice === 'mobile'
+                                    ? 'bg-gradient-to-br from-blue-400 to-indigo-600 shadow-[0_10px_20px_rgba(59,130,246,0.5)] rotate-3 scale-110 border border-white/30'
+                                    : 'bg-white/5 border border-white/10 group-hover:bg-white/10'
+                                    }`}>
+                                    <Smartphone size={32} className={`transition-all duration-500 ${selectedDevice === 'mobile' ? 'text-white' : 'text-blue-400/50 group-hover:text-blue-400'}`} />
+                                </div>
+
+                                <div className="relative z-10 text-center">
+                                    <span className={`block text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${selectedDevice === 'mobile' ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>Mobile Portal</span>
+                                    <div className={`mt-1.5 h-0.5 mx-auto transition-all duration-500 rounded-full ${selectedDevice === 'mobile' ? 'w-10 bg-blue-400' : 'w-0 bg-white/20 group-hover:w-4'}`}></div>
+                                </div>
                             </button>
+
+                            {/* Desktop Rig Card */}
                             <button
                                 onClick={() => setSelectedDevice('desktop')}
-                                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 ${selectedDevice === 'desktop'
-                                    ? 'bg-white/20 border-white/60 shadow-lg shadow-white/10 scale-105'
-                                    : 'bg-white/5 border-white/15 hover:bg-white/10 hover:border-white/30'
+                                className={`group relative flex flex-col items-center gap-4 p-6 rounded-[2.5rem] border-2 transition-all duration-500 ${selectedDevice === 'desktop'
+                                    ? 'bg-purple-500/10 border-purple-400 shadow-[0_0_25px_rgba(168,85,247,0.3)] scale-105'
+                                    : 'bg-white/5 border-white/10 hover:border-white/20'
                                     }`}
                             >
-                                <Monitor size={28} className={`${selectedDevice === 'desktop' ? 'text-white' : 'text-white/60'}`} />
-                                <span className={`text-sm font-bold ${selectedDevice === 'desktop' ? 'text-white' : 'text-white/60'}`}>Desktop</span>
                                 {selectedDevice === 'desktop' && (
-                                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                                    <div className="absolute inset-0 bg-purple-500/20 blur-2xl animate-pulse"></div>
                                 )}
+
+                                <div className={`relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 transform group-hover:scale-110 ${selectedDevice === 'desktop'
+                                    ? 'bg-gradient-to-br from-purple-400 to-pink-600 shadow-[0_10px_20px_rgba(168,85,247,0.5)] -rotate-3 scale-110 border border-white/30'
+                                    : 'bg-white/5 border border-white/10 group-hover:bg-white/10'
+                                    }`}>
+                                    <Monitor size={32} className={`transition-all duration-500 ${selectedDevice === 'desktop' ? 'text-white' : 'text-purple-400/50 group-hover:text-purple-400'}`} />
+                                </div>
+
+                                <div className="relative z-10 text-center">
+                                    <span className={`block text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${selectedDevice === 'desktop' ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>Desktop Rig</span>
+                                    <div className={`mt-1.5 h-0.5 mx-auto transition-all duration-500 rounded-full ${selectedDevice === 'desktop' ? 'w-10 bg-purple-400' : 'w-0 bg-white/20 group-hover:w-4'}`}></div>
+                                </div>
                             </button>
                         </div>
                     </div>
