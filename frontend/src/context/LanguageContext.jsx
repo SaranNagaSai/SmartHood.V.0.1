@@ -337,7 +337,8 @@ export const LanguageProvider = ({ children }) => {
             'business': 'Business',
             'student': 'Student',
             'homemaker': 'Homemaker',
-            'others_cat': 'Others'
+            'others_cat': 'Others',
+            'neighborhood_reach': 'Our Network'
         },
         'Telugu': {
             'welcome': 'స్వాగతం',
@@ -639,7 +640,8 @@ export const LanguageProvider = ({ children }) => {
             'business': 'వ్యాపారం',
             'student': 'విద్యార్థి',
             'homemaker': 'గృహిణి',
-            'others_cat': 'ఇతరులు'
+            'others_cat': 'ఇతరులు',
+            'neighborhood_reach': 'మన నెట్‌వర్క్'
         }
     };
 
