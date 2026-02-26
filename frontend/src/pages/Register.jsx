@@ -7,6 +7,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { API_URL } from '../utils/apiConfig';
 import { User, MapPin, Briefcase, Check, Camera, Upload, X } from 'lucide-react';
+import './Register.css';
 
 const Register = () => {
     const { t, language } = useLanguage();
@@ -253,15 +254,181 @@ const Register = () => {
     );
 
     return (
-        <div className="min-h-screen w-full bg-gradient-brand flex flex-col items-center justify-center p-4 relative">
-            <div className="w-full max-w-[600px] bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 animate-slide-up relative z-10">
-                <div className="bg-primary/5 p-6 md:p-8 text-center border-b border-primary/10">
-                    <h1 className="text-2xl md:text-3xl font-bold text-primary tracking-tight">{t('join_smarthood')}</h1>
-                    <p className="text-gray-500 text-xs md:text-sm mt-2">{t('community_connect')}</p>
+        <div className="min-h-screen w-full bg-gradient-brand flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Animated Background Particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(20)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute rounded-full bg-white/10"
+                        style={{
+                            width: `${Math.random() * 6 + 2}px`,
+                            height: `${Math.random() * 6 + 2}px`,
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animation: `floatParticle ${Math.random() * 8 + 6}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 5}s`
+                        }}
+                    />
+                ))}
+                {/* Large decorative blurred orbs */}
+                <div className="absolute -top-32 -left-32 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
+                <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="w-full max-w-[1100px] flex flex-col lg:flex-row bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 animate-slide-up relative z-10">
+                
+                {/* Left Side - Animated Community Illustration (Desktop Only) */}
+                <div className="hidden lg:flex lg:w-[420px] bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-10 flex-col justify-between relative overflow-hidden">
+                    {/* Animated network grid background */}
+                    <div className="absolute inset-0 opacity-10">
+                        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                        </svg>
+                    </div>
+
+                    {/* Floating animated connection lines */}
+                    <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="20%" y1="30%" x2="70%" y2="20%" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite"/>
+                        </line>
+                        <line x1="30%" y1="70%" x2="80%" y2="50%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" values="0;-20" dur="4s" repeatCount="indefinite"/>
+                        </line>
+                        <line x1="10%" y1="50%" x2="50%" y2="80%" stroke="rgba(255,255,255,0.12)" strokeWidth="1" strokeDasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" values="0;-20" dur="3.5s" repeatCount="indefinite"/>
+                        </line>
+                        <line x1="60%" y1="15%" x2="40%" y2="60%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" values="0;-20" dur="5s" repeatCount="indefinite"/>
+                        </line>
+                    </svg>
+
+                    {/* Content */}
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                                <span className="text-2xl">🏘️</span>
+                            </div>
+                            <div>
+                                <h2 className="text-white text-xl font-bold tracking-tight">SmartHood</h2>
+                                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">Community Network</p>
+                            </div>
+                        </div>
+                        <h3 className="text-white text-3xl font-bold leading-tight mb-4">Build Your<br/>Neighborhood<br/>Network</h3>
+                        <p className="text-white/70 text-sm leading-relaxed">Connect with professionals, neighbors, and services in your locality. Join the smart community revolution.</p>
+                    </div>
+
+                    {/* Animated Community Nodes */}
+                    <div className="relative z-10 flex-1 flex items-center justify-center my-8">
+                        <div className="relative w-full h-64">
+                            {/* Central hub */}
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg shadow-white/10" style={{ animation: 'pulseNode 3s ease-in-out infinite' }}>
+                                <span className="text-2xl">🏠</span>
+                            </div>
+                            
+                            {/* Orbiting nodes */}
+                            {[
+                                { emoji: '👨‍⚕️', label: 'Medical', angle: 0, radius: 90, duration: '12s' },
+                                { emoji: '👩‍💻', label: 'Software', angle: 60, radius: 95, duration: '14s' },
+                                { emoji: '👨‍🏫', label: 'Teaching', angle: 120, radius: 85, duration: '16s' },
+                                { emoji: '🔧', label: 'Plumbing', angle: 180, radius: 92, duration: '13s' },
+                                { emoji: '👩‍🍳', label: 'Business', angle: 240, radius: 88, duration: '15s' },
+                                { emoji: '🎓', label: 'Student', angle: 300, radius: 90, duration: '11s' },
+                            ].map((node, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute left-1/2 top-1/2"
+                                    style={{
+                                        animation: `orbitNode ${node.duration} linear infinite`,
+                                        animationDelay: `${-i * 2}s`,
+                                        transformOrigin: '0 0',
+                                    }}
+                                >
+                                    <div
+                                        className="flex flex-col items-center gap-1"
+                                        style={{
+                                            transform: `translate(-50%, -50%) translateX(${node.radius}px)`,
+                                        }}
+                                    >
+                                        <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-md hover:scale-125 transition-transform cursor-default" style={{ animation: `counterRotate ${node.duration} linear infinite`, animationDelay: `${-i * 2}s` }}>
+                                            <span className="text-lg">{node.emoji}</span>
+                                        </div>
+                                        <span className="text-[8px] font-bold text-white/50 uppercase tracking-wider whitespace-nowrap" style={{ animation: `counterRotate ${node.duration} linear infinite`, animationDelay: `${-i * 2}s` }}>{node.label}</span>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Pulse rings around center */}
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border border-white/10 rounded-full" style={{ animation: 'expandRing 3s ease-out infinite' }} />
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border border-white/10 rounded-full" style={{ animation: 'expandRing 3s ease-out infinite 1s' }} />
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border border-white/10 rounded-full" style={{ animation: 'expandRing 3s ease-out infinite 2s' }} />
+                        </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="relative z-10 grid grid-cols-3 gap-3">
+                        {[
+                            { value: '500+', label: 'Users' },
+                            { value: '50+', label: 'Localities' },
+                            { value: '10+', label: 'Services' },
+                        ].map((stat, i) => (
+                            <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/10">
+                                <p className="text-white text-lg font-bold">{stat.value}</p>
+                                <p className="text-white/50 text-[9px] font-bold uppercase tracking-wider">{stat.label}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                <div className="p-5 md:p-8">
-                    <Stepper current={step} />
+                {/* Mobile Animated Header (visible only on mobile) */}
+                <div className="lg:hidden bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-6 relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10">
+                        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="gridMobile" width="30" height="30" patternUnits="userSpaceOnUse">
+                                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#gridMobile)" />
+                        </svg>
+                    </div>
+                    {/* Floating nodes for mobile */}
+                    <div className="absolute top-3 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 4s ease-in-out infinite' }}>
+                        <span className="text-sm">👨‍⚕️</span>
+                    </div>
+                    <div className="absolute top-10 right-16 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 5s ease-in-out infinite 1s' }}>
+                        <span className="text-xs">👩‍💻</span>
+                    </div>
+                    <div className="absolute bottom-3 right-8 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 6s ease-in-out infinite 2s' }}>
+                        <span className="text-xs">🔧</span>
+                    </div>
+                    
+                    <div className="relative z-10 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
+                            <span className="text-xl">🏘️</span>
+                        </div>
+                        <div>
+                            <h2 className="text-white text-lg font-bold tracking-tight">{t('join_smarthood')}</h2>
+                            <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">{t('community_connect')}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Side - Registration Form */}
+                <div className="flex-1 flex flex-col">
+                    <div className="hidden lg:block bg-primary/5 p-6 md:p-8 text-center border-b border-primary/10">
+                        <h1 className="text-2xl md:text-3xl font-bold text-primary tracking-tight">{t('join_smarthood')}</h1>
+                        <p className="text-gray-500 text-xs md:text-sm mt-2">{t('community_connect')}</p>
+                    </div>
+
+                    <div className="p-5 md:p-8 flex-1">
+                        <Stepper current={step} />
 
                     <form onSubmit={(e) => e.preventDefault()} className="animate-fade-in">
                         {/* Step 1: Personal Details */}
@@ -675,8 +842,9 @@ const Register = () => {
                         </Link>
                     </p>
                 </div>
-            </div >
-        </div >
+                </div>
+            </div>
+        </div>
     );
 };
 
