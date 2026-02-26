@@ -269,7 +269,7 @@ const Register = () => {
     );
 
     return (
-        <div className="min-h-screen w-full bg-gradient-brand flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen w-full bg-gradient-brand flex items-center justify-center p-2 sm:p-4 relative overflow-hidden">
             {/* Animated Background Particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(20)].map((_, i) => (
@@ -292,7 +292,7 @@ const Register = () => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
             </div>
 
-            <div className="w-full max-w-[1100px] flex flex-col lg:flex-row bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 animate-slide-up relative z-10">
+            <div className="w-full max-w-[1100px] flex flex-col lg:flex-row bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 animate-slide-up relative z-10">
                 
                 {/* Left Side - Animated Community Illustration (Desktop Only) */}
                 <div className="hidden lg:flex lg:w-[420px] bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-10 flex-col justify-between relative overflow-hidden">
@@ -418,7 +418,7 @@ const Register = () => {
                 </div>
 
                 {/* Mobile Animated Header (visible only on mobile) */}
-                <div className="lg:hidden bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-6 relative overflow-hidden">
+                <div className="lg:hidden bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-5 relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10">
                         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                             <defs>
@@ -430,24 +430,41 @@ const Register = () => {
                         </svg>
                     </div>
                     {/* Floating nodes for mobile */}
-                    <div className="absolute top-3 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 4s ease-in-out infinite' }}>
+                    <div className="absolute top-2 right-3 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 4s ease-in-out infinite' }}>
                         <span className="text-sm">👨‍⚕️</span>
                     </div>
-                    <div className="absolute top-10 right-16 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 5s ease-in-out infinite 1s' }}>
+                    <div className="absolute top-8 right-14 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 5s ease-in-out infinite 1s' }}>
                         <span className="text-xs">👩‍💻</span>
                     </div>
-                    <div className="absolute bottom-3 right-8 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 6s ease-in-out infinite 2s' }}>
+                    <div className="absolute bottom-10 right-5 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 6s ease-in-out infinite 2s' }}>
                         <span className="text-xs">🔧</span>
                     </div>
+                    <div className="absolute top-4 left-[70%] w-6 h-6 bg-white/10 rounded-full flex items-center justify-center" style={{ animation: 'floatParticle 5.5s ease-in-out infinite 0.5s' }}>
+                        <span className="text-[10px]">🎓</span>
+                    </div>
                     
-                    <div className="relative z-10 flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
+                    <div className="relative z-10 flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center flex-shrink-0">
                             <span className="text-xl">🏘️</span>
                         </div>
-                        <div>
-                            <h2 className="text-white text-lg font-bold tracking-tight">{t('join_smarthood')}</h2>
-                            <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">{t('community_connect')}</p>
+                        <div className="min-w-0">
+                            <h2 className="text-white text-base font-bold tracking-tight truncate">{t('join_smarthood')}</h2>
+                            <p className="text-white/60 text-[9px] font-bold uppercase tracking-widest">{t('community_connect')}</p>
                         </div>
+                    </div>
+
+                    {/* Mobile Stats Row */}
+                    <div className="relative z-10 grid grid-cols-3 gap-2 mt-2">
+                        {[
+                            { value: publicStats.totalUsers, label: 'Users' },
+                            { value: publicStats.totalLocalities, label: 'Localities' },
+                            { value: publicStats.totalTowns, label: 'Towns' },
+                        ].map((stat, i) => (
+                            <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-2 text-center border border-white/10">
+                                <p className="text-white text-sm font-bold">{stat.value}+</p>
+                                <p className="text-white/50 text-[8px] font-bold uppercase tracking-wider">{stat.label}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
@@ -458,7 +475,7 @@ const Register = () => {
                         <p className="text-gray-500 text-xs md:text-sm mt-2">{t('community_connect')}</p>
                     </div>
 
-                    <div className="p-5 md:p-8 flex-1">
+                    <div className="p-4 sm:p-5 md:p-8 flex-1">
                         <Stepper current={step} />
 
                     <form onSubmit={(e) => e.preventDefault()} className="animate-fade-in">

@@ -65,7 +65,7 @@ const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', requir
         }
     };
 
-    const baseInputStyles = "w-full p-4 pr-12 border border-gray-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition font-medium text-gray-700 placeholder-gray-400";
+    const baseInputStyles = "w-full p-3 pr-10 border border-gray-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition font-medium text-gray-700 placeholder-gray-400 text-sm md:text-base";
     const combinedStyles = className ? `${baseInputStyles} ${className}` : baseInputStyles;
     const currentPlaceholder = isListening ? `${t('listening')} (${language || 'English'})...` : placeholder;
 
@@ -98,13 +98,13 @@ const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', requir
                     <button
                         type="button"
                         onClick={toggleListening}
-                        className={`absolute right-3 top-3 p-2 rounded-lg transition-all ${isListening
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all flex-shrink-0 ${isListening
                             ? 'bg-red-50 text-red-500 animate-pulse ring-2 ring-red-100'
                             : 'text-gray-400 hover:text-primary hover:bg-primary/5'
                             }`}
                         title="Voice Input"
                     >
-                        {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+                        {isListening ? <MicOff size={16} /> : <Mic size={16} />}
                     </button>
                 )}
             </div>

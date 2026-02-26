@@ -399,7 +399,7 @@ const ServiceDetail = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-gray-700 uppercase mb-2">{t('amount_paid')} ({t('others')})</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-4 text-gray-400">₹</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
                                         <input
                                             type="number"
                                             value={amount}

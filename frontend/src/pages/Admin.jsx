@@ -75,7 +75,7 @@ const Admin = () => {
                                     placeholder="Enter admin username"
                                     className="w-full p-4 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 outline-none transition"
                                 />
-                                <Lock className="absolute left-4 top-4 text-purple-300" size={20} />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-300" size={18} />
                             </div>
                         </div>
 
@@ -91,7 +91,7 @@ const Admin = () => {
                                     placeholder="admin@smarthood.com"
                                     className="w-full p-4 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 outline-none transition"
                                 />
-                                <Mail className="absolute left-4 top-4 text-purple-300" size={20} />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-300" size={18} />
                             </div>
                         </div>
 
