@@ -27,7 +27,7 @@ const createCountIcon = (count) => {
 };
 
 // Component to handle map centering, bounds restriction, and district labels
-const MapController = ({ localityPositions, townCenter, districtBounds, hasLocalities }) => {
+const MapController = ({ localityPositions, townCenter, districtBounds, hasLocalities, isMobile }) => {
     const map = useMap();
     const hasFlownToTown = React.useRef('');
 
@@ -48,44 +48,49 @@ const MapController = ({ localityPositions, townCenter, districtBounds, hasLocal
     React.useEffect(() => {
         if (townCenter && hasFlownToTown.current !== JSON.stringify(townCenter)) {
             hasFlownToTown.current = JSON.stringify(townCenter);
-            map.flyTo(townCenter, 13, {
-                duration: 2.0,
-                easeLinearity: 0.2
-            });
+            if (isMobile) {
+                map.setView(townCenter, 13);
+            } else {
+                map.flyTo(townCenter, 13, { duration: 2.0, easeLinearity: 0.2 });
+            }
         } else if (!townCenter && districtBounds) {
-            // No town selected — show the whole district
             hasFlownToTown.current = '';
             const bounds = L.latLngBounds(
                 [districtBounds.minLat, districtBounds.minLng],
                 [districtBounds.maxLat, districtBounds.maxLng]
             );
-            map.flyToBounds(bounds, {
-                padding: [40, 40],
-                maxZoom: 10,
-                duration: 2.0
-            });
+            if (isMobile) {
+                map.fitBounds(bounds, { padding: [20, 20], maxZoom: 10 });
+            } else {
+                map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 10, duration: 2.0 });
+            }
         }
-    }, [townCenter, districtBounds, map]);
+    }, [townCenter, districtBounds, map, isMobile]);
 
     // Step 2: After localities are loaded, fit the map to show ALL locality markers
     React.useEffect(() => {
         if (!hasLocalities || !localityPositions || localityPositions.length === 0) return;
 
+        const delay = isMobile ? 300 : 2200;
         const timer = setTimeout(() => {
             if (localityPositions.length === 1) {
-                map.flyTo(localityPositions[0], 15, { duration: 1.5 });
+                if (isMobile) {
+                    map.setView(localityPositions[0], 15);
+                } else {
+                    map.flyTo(localityPositions[0], 15, { duration: 1.5 });
+                }
             } else {
                 const bounds = L.latLngBounds(localityPositions);
-                map.flyToBounds(bounds, {
-                    padding: [80, 80],
-                    maxZoom: 16,
-                    duration: 1.5
-                });
+                if (isMobile) {
+                    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+                } else {
+                    map.flyToBounds(bounds, { padding: [80, 80], maxZoom: 16, duration: 1.5 });
+                }
             }
-        }, 2200);
+        }, delay);
 
         return () => clearTimeout(timer);
-    }, [localityPositions, hasLocalities, map]);
+    }, [localityPositions, hasLocalities, map, isMobile]);
 
     return null;
 };
@@ -140,6 +145,7 @@ const ExploreCity = () => {
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [searchTown, setSearchTown] = React.useState('');
     const [isListening, setIsListening] = React.useState(false);
+    const [isSelectorOpen, setIsSelectorOpen] = React.useState(false);
 
     const districtInfo = React.useMemo(() => {
         if (!userDistrict) return null;
@@ -200,6 +206,7 @@ const ExploreCity = () => {
     const handleTownChange = async (townName) => {
         setUserTown(townName);
         setIsDropdownOpen(false);
+        setIsSelectorOpen(false);
         setSearchTown('');
         setDynamicCoords({});
         requestedLocs.current = new Set();
@@ -281,64 +288,158 @@ const ExploreCity = () => {
 
     const currentTownCenter = React.useMemo(() => userTown ? townCenterCache[userTown.toLowerCase()] : null, [userTown, townCenterCache]);
 
+    // Filter towns for search
+    const filteredTowns = availableTowns.filter(t => 
+        t.toLowerCase().includes(searchTown.toLowerCase())
+    );
+
     return (
         <div className="h-screen w-full flex flex-col relative overflow-hidden bg-slate-50 font-sans">
-            {/* Minimalist Top Nav Overlay */}
-            <div className={`absolute top-4 left-4 z-[1000] flex gap-3 items-center ${isMobile ? 'left-2 top-3 pr-4' : ''}`}>
-                {!isMobile && (
+            {/* Desktop Top Nav Overlay */}
+            {!isMobile && (
+                <div className={`absolute top-4 left-4 z-[1000] flex gap-3 items-center`}>
                     <button onClick={() => navigate('/home')} className="p-3 bg-white/95 backdrop-blur-md text-slate-700 rounded-2xl shadow-xl hover:bg-white transition-all active:scale-90 border border-slate-100">
                         <ArrowLeft size={18} />
                     </button>
-                )}
 
-                <div className="relative flex-grow max-w-sm">
-                    <button
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className={`bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 hover:bg-white transition-all border border-slate-100 group ${isMobile ? 'px-4 py-2.5 w-full flex-grow' : 'min-w-[280px]'}`}
-                    >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg group-hover:rotate-12 transition-transform">
-                                <Compass size={18} />
+                    <div className="relative flex-grow max-w-sm">
+                        <button
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className={`bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 hover:bg-white transition-all border border-slate-100 group min-w-[280px]`}
+                        >
+                            <div className="flex items-center gap-3 overflow-hidden">
+                                <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg group-hover:rotate-12 transition-transform">
+                                    <Compass size={18} />
+                                </div>
+                                <span className="font-black text-slate-800 text-[11px] uppercase tracking-[0.2em] truncate">{userTown || 'Initialize Region'}</span>
                             </div>
-                            <span className="font-black text-slate-800 text-[11px] uppercase tracking-[0.2em] truncate">{userTown || 'Initialize Region'}</span>
-                        </div>
-                        <ChevronDown size={14} className={`text-slate-400 transition-transform duration-500 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                    </button>
+                            <ChevronDown size={14} className={`text-slate-400 transition-transform duration-500 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
 
-                    {isDropdownOpen && (
-                        <div className="absolute top-full left-0 mt-3 w-72 bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-[2000]">
-                            <div className="p-4 border-b border-slate-50">
-                                <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-2xl">
-                                    <Search size={16} className="text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="SEARCH TOWNS..."
-                                        className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-slate-700 placeholder:text-slate-300"
-                                        value={searchTown}
-                                        onChange={(e) => setSearchTown(e.target.value)}
-                                        autoFocus
-                                    />
+                        {isDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-3 w-72 bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-[2000]">
+                                <div className="p-4 border-b border-slate-50">
+                                    <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-2xl">
+                                        <Search size={16} className="text-slate-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="SEARCH TOWNS..."
+                                            className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-slate-700 placeholder:text-slate-300"
+                                            value={searchTown}
+                                            onChange={(e) => setSearchTown(e.target.value)}
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+                                <div className="max-h-64 overflow-y-auto no-scrollbar">
+                                    {filteredTowns.map((town, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleTownChange(town)}
+                                            className={`w-full text-left px-6 py-4 text-[11px] font-black uppercase tracking-[0.15em] hover:bg-blue-50 transition-all flex items-center justify-between group ${userTown === town ? 'bg-blue-50/50 text-primary' : 'text-slate-500'}`}
+                                        >
+                                            {town}
+                                            {userTown === town && <div className="w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/30 animate-pulse"></div>}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                            <div className="max-h-64 overflow-y-auto no-scrollbar">
-                                {availableTowns.filter(t => t.toLowerCase().includes(searchTown.toLowerCase())).map((town, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handleTownChange(town)}
-                                        className={`w-full text-left px-6 py-4 text-[11px] font-black uppercase tracking-[0.15em] hover:bg-blue-50 transition-all flex items-center justify-between group ${userTown === town ? 'bg-blue-50/50 text-primary' : 'text-slate-500'}`}
-                                    >
-                                        {town}
-                                        {userTown === town && <div className="w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/30 animate-pulse"></div>}
-                                    </button>
-                                ))}
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile Town Selected Pill */}
+            {isMobile && userTown && !isSelectorOpen && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-[340px]">
+                    <div className="flex gap-2 items-center">
+                        <button onClick={() => navigate('/home')} className="p-3 bg-white/95 backdrop-blur-md text-slate-700 rounded-2xl shadow-xl border border-slate-100 active:scale-95 transition-all">
+                            <ArrowLeft size={18} />
+                        </button>
+                        <button 
+                            onClick={() => setIsSelectorOpen(true)}
+                            className="flex-1 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 border border-slate-100 active:scale-95 transition-all"
+                        >
+                            <div className="flex items-center gap-2 overflow-hidden">
+                                <MapPin size={16} className="text-primary flex-shrink-0" />
+                                <span className="font-black text-slate-800 text-[10px] uppercase tracking-widest truncate">{userTown}</span>
+                                <span className="text-[8px] font-bold text-slate-400 uppercase">{townStateMap[userTown]?.state || ''}</span>
                             </div>
+                            <ChevronDown size={14} className="text-slate-300" />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile Full-Screen Selector */}
+            {isMobile && (!userTown || isSelectorOpen) && (
+                <div className="absolute inset-0 z-[2000] bg-white flex flex-col animate-in fade-in slide-in-from-bottom duration-500">
+                    <div className="p-6 pb-2">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">Select Town</h2>
+                            {userTown && (
+                                <button onClick={() => setIsSelectorOpen(false)} className="p-2 bg-slate-100 text-slate-500 rounded-full">
+                                    <X size={20} />
+                                </button>
+                            )}
+                        </div>
+                        
+                        <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-inner group focus-within:border-primary transition-all">
+                            <Search size={20} className="text-slate-400 group-focus-within:text-primary transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="ENTER TOWN NAME..."
+                                className="bg-transparent border-none outline-none text-xs font-black uppercase tracking-[0.1em] w-full text-slate-700 placeholder:text-slate-300"
+                                value={searchTown}
+                                onChange={(e) => setSearchTown(e.target.value)}
+                                autoFocus
+                            />
+                            <button 
+                                onClick={startListening}
+                                className={`p-2 rounded-xl transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-primary/10 text-primary'}`}
+                            >
+                                <Mic size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2 no-scrollbar">
+                        {filteredTowns.length > 0 ? (
+                            filteredTowns.map((town, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleTownChange(town)}
+                                    className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all ${userTown === town ? 'bg-primary/5 border-2 border-primary/20 shadow-lg' : 'bg-slate-50/50 border border-slate-100 active:scale-[0.98]'}`}
+                                >
+                                    <div className="text-left">
+                                        <p className={`font-black uppercase tracking-widest ${userTown === town ? 'text-primary text-sm' : 'text-slate-800 text-xs'}`}>{town}</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{townStateMap[town]?.state || 'Registered Node'}</p>
+                                    </div>
+                                    <div className={`p-2 rounded-xl ${userTown === town ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100 text-slate-300'}`}>
+                                        <Navigation2 size={16} className={userTown === town ? '' : 'rotate-45'} />
+                                    </div>
+                                </button>
+                            ))
+                        ) : (
+                            <div className="text-center py-20 flex flex-col items-center">
+                                <Search size={48} className="text-slate-200 mb-4" />
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No towns found matching "{searchTown}"</p>
+                            </div>
+                        )}
+                    </div>
+                    
+                    {!userTown && (
+                        <div className="p-6 border-t border-slate-50">
+                            <button onClick={() => navigate('/home')} className="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
+                                <ArrowLeft size={14} /> Back to Dashboard
+                            </button>
                         </div>
                     )}
                 </div>
-            </div>
+            )}
 
-            {/* Premium Landing Overlay (No Town Selected) */}
-            {!userTown && (
+            {/* Desktop Landing Overlay (No Town Selected) */}
+            {!isMobile && !userTown && (
                 <div className="absolute inset-0 z-[1100] bg-slate-900/40 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-700">
                     <div className="bg-white p-10 md:p-14 rounded-[3.5rem] shadow-2xl max-w-lg w-full relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full blur-3xl -mr-10 -mt-10"></div>
@@ -405,6 +506,7 @@ const ExploreCity = () => {
                         townCenter={currentTownCenter}
                         districtBounds={districtInfo?.bounds || null}
                         hasLocalities={localities.length > 0}
+                        isMobile={isMobile}
                     />
 
                     {userTown && localities.map((loc, idx) => {
