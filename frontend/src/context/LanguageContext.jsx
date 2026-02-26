@@ -562,7 +562,7 @@ export const LanguageProvider = ({ children }) => {
             'category': 'వర్గం',
             'community': 'కమ్యూనిటీ',
             'create_event': 'ఈవెంట్‌ను సృష్టించు',
-            'new_user_prompt': 'ఖాతా లేదా? ఇక్కడ నమోదు చేసుకోండి',
+            'new_user_prompt': 'కొత్త యూజర్ నమోదు',
             'loading_neighborhood': 'మీ ప్రాంత వివరాలు లోడ్ అవుతున్నాయి...',
             'live': 'లైవ్',
             'no_active_states': 'క్రియాశీల రాష్ట్రాలు కనుగొనబడలేదు.',
