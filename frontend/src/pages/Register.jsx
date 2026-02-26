@@ -24,10 +24,9 @@ const Register = () => {
     useEffect(() => {
         const fetchPublicStats = async () => {
             try {
-                const res = await fetch(`${API_URL}/localities/public-stats`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setPublicStats(data);
+                const res = await axios.get(`${API_URL}/localities/public-stats`);
+                if (res.data) {
+                    setPublicStats(res.data);
                 }
             } catch (err) {
                 console.error('Failed to fetch public stats', err);
