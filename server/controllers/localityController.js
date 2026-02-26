@@ -158,8 +158,31 @@ const geocodeLocality = async (req, res) => {
     }
 };
 
+// @desc    Get public stats (no auth required) for registration page
+// @route   GET /api/localities/public-stats
+// @access  Public
+const getPublicStats = async (req, res) => {
+    try {
+        const [totalUsers, totalLocalities, totalTowns] = await Promise.all([
+            User.countDocuments(),
+            User.distinct('locality').then(arr => arr.filter(Boolean).length),
+            User.distinct('town').then(arr => arr.filter(Boolean).length)
+        ]);
+
+        res.json({
+            totalUsers,
+            totalLocalities,
+            totalTowns
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getLocalities,
     getFilters,
-    geocodeLocality
+    geocodeLocality,
+    getPublicStats
 };

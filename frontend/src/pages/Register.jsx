@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import VoiceInput from '../components/common/VoiceInput';
@@ -19,6 +19,22 @@ const Register = () => {
     const [profilePhotoPreview, setProfilePhotoPreview] = useState(null);
     const [cameraMode, setCameraMode] = useState(false);
     const webcamRef = React.useRef(null);
+    const [publicStats, setPublicStats] = useState({ totalUsers: 0, totalLocalities: 0, totalTowns: 0 });
+
+    useEffect(() => {
+        const fetchPublicStats = async () => {
+            try {
+                const res = await fetch(`${API_URL}/localities/public-stats`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setPublicStats(data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch public stats', err);
+            }
+        };
+        fetchPublicStats();
+    }, []);
     const isTelugu = (text) => {
         if (!text) return true;
         // Telugu Unicode Range: 0C00-0C7F
@@ -328,41 +344,57 @@ const Register = () => {
                     <div className="relative z-10 flex-1 flex items-center justify-center my-8">
                         <div className="relative w-full h-64">
                             {/* Central hub */}
-                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg shadow-white/10" style={{ animation: 'pulseNode 3s ease-in-out infinite' }}>
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg shadow-white/10 z-20" style={{ animation: 'pulseNode 3s ease-in-out infinite' }}>
                                 <span className="text-2xl">🏠</span>
                             </div>
                             
-                            {/* Orbiting nodes */}
+                            {/* Fixed-position nodes around center */}
                             {[
-                                { emoji: '👨‍⚕️', label: 'Medical', angle: 0, radius: 90, duration: '12s' },
-                                { emoji: '👩‍💻', label: 'Software', angle: 60, radius: 95, duration: '14s' },
-                                { emoji: '👨‍🏫', label: 'Teaching', angle: 120, radius: 85, duration: '16s' },
-                                { emoji: '🔧', label: 'Plumbing', angle: 180, radius: 92, duration: '13s' },
-                                { emoji: '👩‍🍳', label: 'Business', angle: 240, radius: 88, duration: '15s' },
-                                { emoji: '🎓', label: 'Student', angle: 300, radius: 90, duration: '11s' },
-                            ].map((node, i) => (
-                                <div
-                                    key={i}
-                                    className="absolute left-1/2 top-1/2"
-                                    style={{
-                                        animation: `orbitNode ${node.duration} linear infinite`,
-                                        animationDelay: `${-i * 2}s`,
-                                        transformOrigin: '0 0',
-                                    }}
-                                >
+                                { emoji: '👨‍⚕️', label: 'Medical', angle: 0 },
+                                { emoji: '👩‍💻', label: 'Software', angle: 60 },
+                                { emoji: '👨‍🏫', label: 'Teaching', angle: 120 },
+                                { emoji: '🔧', label: 'Plumbing', angle: 180 },
+                                { emoji: '👩‍🍳', label: 'Business', angle: 240 },
+                                { emoji: '🎓', label: 'Student', angle: 300 },
+                            ].map((node, i) => {
+                                const radius = 100;
+                                const angleRad = (node.angle * Math.PI) / 180;
+                                const x = Math.cos(angleRad) * radius;
+                                const y = Math.sin(angleRad) * radius;
+                                return (
                                     <div
-                                        className="flex flex-col items-center gap-1"
+                                        key={i}
+                                        className="absolute flex flex-col items-center gap-1 z-10"
                                         style={{
-                                            transform: `translate(-50%, -50%) translateX(${node.radius}px)`,
+                                            left: `calc(50% + ${x}px)`,
+                                            top: `calc(50% + ${y}px)`,
+                                            transform: 'translate(-50%, -50%)',
+                                            animation: `bobNode ${3 + i * 0.5}s ease-in-out infinite`,
+                                            animationDelay: `${i * 0.4}s`,
                                         }}
                                     >
-                                        <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-md hover:scale-125 transition-transform cursor-default" style={{ animation: `counterRotate ${node.duration} linear infinite`, animationDelay: `${-i * 2}s` }}>
+                                        <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-md hover:scale-125 transition-transform cursor-default">
                                             <span className="text-lg">{node.emoji}</span>
                                         </div>
-                                        <span className="text-[8px] font-bold text-white/50 uppercase tracking-wider whitespace-nowrap" style={{ animation: `counterRotate ${node.duration} linear infinite`, animationDelay: `${-i * 2}s` }}>{node.label}</span>
+                                        <span className="text-[8px] font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">{node.label}</span>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
+
+                            {/* Connection lines from center to each node */}
+                            <svg className="absolute inset-0 w-full h-full z-0" xmlns="http://www.w3.org/2000/svg">
+                                {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+                                    const radius = 100;
+                                    const angleRad = (angle * Math.PI) / 180;
+                                    const x2 = 50 + (Math.cos(angleRad) * radius / 3.2);
+                                    const y2 = 50 + (Math.sin(angleRad) * radius / 2.56);
+                                    return (
+                                        <line key={i} x1="50%" y1="50%" x2={`${x2}%`} y2={`${y2}%`} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="4,4">
+                                            <animate attributeName="stroke-dashoffset" values="0;-16" dur={`${2 + i * 0.3}s`} repeatCount="indefinite"/>
+                                        </line>
+                                    );
+                                })}
+                            </svg>
 
                             {/* Pulse rings around center */}
                             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border border-white/10 rounded-full" style={{ animation: 'expandRing 3s ease-out infinite' }} />
@@ -371,15 +403,15 @@ const Register = () => {
                         </div>
                     </div>
 
-                    {/* Stats */}
+                    {/* Stats - Real Data */}
                     <div className="relative z-10 grid grid-cols-3 gap-3">
                         {[
-                            { value: '500+', label: 'Users' },
-                            { value: '50+', label: 'Localities' },
-                            { value: '10+', label: 'Services' },
+                            { value: publicStats.totalUsers, label: 'Users' },
+                            { value: publicStats.totalLocalities, label: 'Localities' },
+                            { value: publicStats.totalTowns, label: 'Towns' },
                         ].map((stat, i) => (
                             <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/10">
-                                <p className="text-white text-lg font-bold">{stat.value}</p>
+                                <p className="text-white text-lg font-bold">{stat.value}+</p>
                                 <p className="text-white/50 text-[9px] font-bold uppercase tracking-wider">{stat.label}</p>
                             </div>
                         ))}

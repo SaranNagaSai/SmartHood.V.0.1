@@ -37,6 +37,15 @@
     }
 }
 
+@keyframes bobNode {
+    0%, 100% {
+        transform: translate(-50%, -50%) translateY(0px);
+    }
+    50% {
+        transform: translate(-50%, -50%) translateY(-8px);
+    }
+}
+
 @keyframes pulseNode {
     0%, 100% {
         transform: translate(-50%, -50%) scale(1);
