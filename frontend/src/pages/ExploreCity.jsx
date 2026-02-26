@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDevice } from '../context/DeviceContext';
-import { ArrowLeft, Users, X, MapPin, Search, ChevronDown, Mic, Compass, Navigation2, Globe } from 'lucide-react';
+import { ArrowLeft, Users, X, MapPin, Search, ChevronDown, Mic, Compass, Navigation2, Globe, RefreshCw } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
