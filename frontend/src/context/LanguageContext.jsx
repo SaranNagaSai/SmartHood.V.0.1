@@ -338,7 +338,8 @@ export const LanguageProvider = ({ children }) => {
             'student': 'Student',
             'homemaker': 'Homemaker',
             'others_cat': 'Others',
-            'neighborhood_reach': 'Our Network'
+            'neighborhood_reach': 'Our Network',
+            'new_user_prompt': 'Register - New User'
         },
         'Telugu': {
             'welcome': 'స్వాగతం',
