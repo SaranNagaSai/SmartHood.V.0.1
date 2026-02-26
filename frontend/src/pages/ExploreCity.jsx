@@ -27,70 +27,44 @@ const createCountIcon = (count) => {
 };
 
 // Component to handle map centering, bounds restriction, and district labels
-const MapController = ({ localityPositions, townCenter, districtBounds, hasLocalities, isMobile }) => {
+// Component to handle map movements and focus
+const MapController = ({ townCenter, localityPositions }) => {
     const map = useMap();
-    const hasFlownToTown = React.useRef('');
+    const lastFlownTown = React.useRef(null);
 
-    // Set max bounds to restrict panning to the district
+    // Effect for flying to a town center
     React.useEffect(() => {
-        if (districtBounds) {
-            const bounds = L.latLngBounds(
-                [districtBounds.minLat, districtBounds.minLng],
-                [districtBounds.maxLat, districtBounds.maxLng]
-            );
-            map.setMaxBounds(bounds.pad(0.15)); // 15% padding
-            map.options.maxBoundsViscosity = 1.0;
-            map.setMinZoom(7);
+        if (townCenter) {
+            const townStr = JSON.stringify(townCenter);
+            if (lastFlownTown.current !== townStr) {
+                lastFlownTown.current = townStr;
+                map.flyTo(townCenter, 14, {
+                    duration: 1.5,
+                    easeLinearity: 0.25
+                });
+            }
+        } else {
+            // No town selected - Show India
+            lastFlownTown.current = null;
+            map.flyTo([20.5937, 78.9629], 5, {
+                duration: 1.5
+            });
         }
-    }, [districtBounds, map]);
+    }, [townCenter, map]);
 
-    // Step 1: When a town is first selected, fly to the town center
+    // Effect for fitting to show all locality markers
     React.useEffect(() => {
-        if (townCenter && hasFlownToTown.current !== JSON.stringify(townCenter)) {
-            hasFlownToTown.current = JSON.stringify(townCenter);
-            if (isMobile) {
-                map.setView(townCenter, 13);
-            } else {
-                map.flyTo(townCenter, 13, { duration: 2.0, easeLinearity: 0.2 });
-            }
-        } else if (!townCenter && districtBounds) {
-            hasFlownToTown.current = '';
-            const bounds = L.latLngBounds(
-                [districtBounds.minLat, districtBounds.minLng],
-                [districtBounds.maxLat, districtBounds.maxLng]
-            );
-            if (isMobile) {
-                map.fitBounds(bounds, { padding: [20, 20], maxZoom: 10 });
-            } else {
-                map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 10, duration: 2.0 });
-            }
+        if (localityPositions && localityPositions.length > 0 && townCenter) {
+            const bounds = L.latLngBounds(localityPositions);
+            const timer = setTimeout(() => {
+                map.fitBounds(bounds, {
+                    padding: [50, 50],
+                    maxZoom: 16
+                });
+            }, 1800);
+            return () => clearTimeout(timer);
         }
-    }, [townCenter, districtBounds, map, isMobile]);
-
-    // Step 2: After localities are loaded, fit the map to show ALL locality markers
-    React.useEffect(() => {
-        if (!hasLocalities || !localityPositions || localityPositions.length === 0) return;
-
-        const delay = isMobile ? 300 : 2200;
-        const timer = setTimeout(() => {
-            if (localityPositions.length === 1) {
-                if (isMobile) {
-                    map.setView(localityPositions[0], 15);
-                } else {
-                    map.flyTo(localityPositions[0], 15, { duration: 1.5 });
-                }
-            } else {
-                const bounds = L.latLngBounds(localityPositions);
-                if (isMobile) {
-                    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
-                } else {
-                    map.flyToBounds(bounds, { padding: [80, 80], maxZoom: 16, duration: 1.5 });
-                }
-            }
-        }, delay);
-
-        return () => clearTimeout(timer);
-    }, [localityPositions, hasLocalities, map, isMobile]);
+    }, [localityPositions, townCenter, map]);
 
     return null;
 };
@@ -494,8 +468,9 @@ const ExploreCity = () => {
             {/* Map Container */}
             <div className="flex-1 w-full h-full z-0">
                 <MapContainer
-                    center={userTown ? (currentTownCenter || [16.5, 79.5]) : [20.5937, 78.9629]}
-                    zoom={userTown ? 12 : 5}
+                    center={[20.5937, 78.9629]}
+                    zoom={5}
+                    minZoom={3}
                     style={{ height: '100%', width: '100%' }}
                     zoomControl={false}
                     className="leaflet-modern"
@@ -504,9 +479,6 @@ const ExploreCity = () => {
                     <MapController
                         localityPositions={localityPositions}
                         townCenter={currentTownCenter}
-                        districtBounds={districtInfo?.bounds || null}
-                        hasLocalities={localities.length > 0}
-                        isMobile={isMobile}
                     />
 
                     {userTown && localities.map((loc, idx) => {
