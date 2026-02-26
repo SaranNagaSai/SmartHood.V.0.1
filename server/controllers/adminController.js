@@ -317,10 +317,213 @@ const getUserStats = async (req, res) => {
     }
 };
 
+// @desc    Generate Excel for a user and email to all admins
+// @route   POST /api/admin/users/:id/export-excel
+// @access  Admin
+const exportUserExcel = async (req, res) => {
+    try {
+        const ExcelJS = require('exceljs');
+        const { sendEmail } = require('../services/emailService');
+
+        const userId = req.params.id;
+        const user = await User.findById(userId).select('-fcmToken');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Fetch user stats
+        const servicesOffered = await Service.countDocuments({ createdBy: userId, type: { $in: ['offer', 'OFFER'] } });
+        const servicesRequested = await Service.countDocuments({ createdBy: userId, type: { $in: ['request', 'REQUEST'] } });
+        const servicesCompleted = await Service.countDocuments({ createdBy: userId, status: { $in: ['completed', 'COMPLETED'] } });
+        const servicesActive = await Service.countDocuments({ createdBy: userId, status: { $in: ['active', 'OPEN'] } });
+
+        const earningResult = await Service.aggregate([
+            { $match: { completedBy: user._id, status: { $in: ['completed', 'COMPLETED'] } } },
+            { $group: { _id: null, total: { $sum: '$amountSpent' } } }
+        ]);
+        const spendingResult = await Service.aggregate([
+            { $match: { createdBy: user._id, status: { $in: ['completed', 'COMPLETED'] } } },
+            { $group: { _id: null, total: { $sum: '$amountSpent' } } }
+        ]);
+        const totalEarned = earningResult[0]?.total || 0;
+        const totalSpent = spendingResult[0]?.total || 0;
+
+        const totalAlerts = await Alert.countDocuments({ senderId: userId });
+        const interestedIn = await Service.countDocuments({ interestedProviders: userId });
+        const accountAgeDays = Math.floor((Date.now() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24));
+
+        // Create Excel workbook
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'SmartHood Admin';
+        workbook.created = new Date();
+
+        const sheet = workbook.addWorksheet('User Report', {
+            properties: { tabColor: { argb: '0E7490' } }
+        });
+
+        // Define columns
+        sheet.columns = [
+            { header: 'Field', key: 'field', width: 28 },
+            { header: 'Details', key: 'details', width: 45 },
+        ];
+
+        // Style header row
+        const headerRow = sheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFF' }, size: 12 };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0E7490' } };
+        headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
+        headerRow.height = 30;
+
+        // Add user data
+        const rows = [
+            ['📋 PERSONAL INFORMATION', ''],
+            ['Name', user.name || 'N/A'],
+            ['Unique ID', user.uniqueId || 'N/A'],
+            ['Phone', user.phone || 'N/A'],
+            ['Email', user.email || 'N/A'],
+            ['Age', user.age || 'N/A'],
+            ['Gender', user.gender || 'N/A'],
+            ['Blood Group', user.bloodGroup || 'N/A'],
+            ['', ''],
+            ['📍 LOCATION', ''],
+            ['Address', user.address || 'N/A'],
+            ['Locality', user.locality || 'N/A'],
+            ['Town', user.town || 'N/A'],
+            ['District', user.district || 'N/A'],
+            ['State', user.state || 'N/A'],
+            ['', ''],
+            ['💼 PROFESSION', ''],
+            ['Category', user.professionCategory || 'N/A'],
+            ['Job Role', user.professionDetails?.jobRole || 'N/A'],
+            ['Sector', user.professionDetails?.sector || 'N/A'],
+            ['Business Type', user.professionDetails?.businessType || 'N/A'],
+            ['Education Level', user.professionDetails?.educationLevel || 'N/A'],
+            ['Course', user.professionDetails?.course || 'N/A'],
+            ['Experience (Years)', user.experience || '0'],
+            ['', ''],
+            ['📊 SERVICE STATISTICS', ''],
+            ['Services Offered', servicesOffered.toString()],
+            ['Services Requested', servicesRequested.toString()],
+            ['Services Completed', servicesCompleted.toString()],
+            ['Services Active', servicesActive.toString()],
+            ['Showed Interest In', interestedIn.toString()],
+            ['', ''],
+            ['💰 FINANCIAL SUMMARY', ''],
+            ['Total Earned (₹)', `₹${totalEarned}`],
+            ['Total Spent (₹)', `₹${totalSpent}`],
+            ['Net Balance (₹)', `₹${totalEarned - totalSpent}`],
+            ['', ''],
+            ['🔔 ENGAGEMENT', ''],
+            ['Alerts Sent', totalAlerts.toString()],
+            ['Impact Score', (user.impactScore || 0).toString()],
+            ['Account Age (Days)', accountAgeDays.toString()],
+            ['Joined On', user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : 'N/A'],
+        ];
+
+        rows.forEach((row, idx) => {
+            const dataRow = sheet.addRow({ field: row[0], details: row[1] });
+            // Style section headers
+            if (row[0].includes('📋') || row[0].includes('📍') || row[0].includes('💼') || row[0].includes('📊') || row[0].includes('💰') || row[0].includes('🔔')) {
+                dataRow.font = { bold: true, size: 11, color: { argb: '0E7490' } };
+                dataRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E0F7FA' } };
+            }
+            dataRow.alignment = { vertical: 'middle' };
+        });
+
+        // Add borders
+        sheet.eachRow({ includeEmpty: false }, (row) => {
+            row.eachCell({ includeEmpty: false }, (cell) => {
+                cell.border = {
+                    top: { style: 'thin', color: { argb: 'E2E8F0' } },
+                    left: { style: 'thin', color: { argb: 'E2E8F0' } },
+                    bottom: { style: 'thin', color: { argb: 'E2E8F0' } },
+                    right: { style: 'thin', color: { argb: 'E2E8F0' } },
+                };
+            });
+        });
+
+        // Generate Excel buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        // Get all admin emails
+        const admins = await Admin.find({ isActive: true }).select('email username');
+        const adminEmails = admins.map(a => a.email).filter(Boolean);
+
+        if (adminEmails.length === 0) {
+            return res.status(400).json({ message: 'No admin emails found' });
+        }
+
+        // Create nodemailer transporter
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
+            port: parseInt(process.env.EMAIL_PORT) || 2525,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD
+            },
+            tls: { rejectUnauthorized: false },
+            connectionTimeout: 10000,
+            greetingTimeout: 5000,
+            socketTimeout: 20000
+        });
+
+        const fileName = `SmartHood_User_${user.uniqueId || user.name}_Report.xlsx`;
+
+        // Send email to all admins at once
+        const mailOptions = {
+            from: `"SmartHood Admin" <${process.env.EMAIL_FROM || 'smarthoodc03@gmail.com'}>`,
+            to: adminEmails.join(', '),
+            subject: `[SmartHood] User Report - ${user.name} (${user.uniqueId || 'N/A'})`,
+            html: `
+                <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #0E7490, #4338CA); padding: 30px; text-align: center; color: white;">
+                        <h1 style="margin: 0; font-size: 24px;">📊 User Report Generated</h1>
+                        <p style="margin: 10px 0 0; opacity: 0.9;">SmartHood Admin Panel</p>
+                    </div>
+                    <div style="padding: 30px;">
+                        <h2 style="color: #1e293b; margin-top: 0;">User: ${user.name}</h2>
+                        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                            <tr><td style="padding: 8px; color: #64748b;">Unique ID</td><td style="padding: 8px; font-weight: bold;">${user.uniqueId || 'N/A'}</td></tr>
+                            <tr style="background: #f8fafc;"><td style="padding: 8px; color: #64748b;">Phone</td><td style="padding: 8px; font-weight: bold;">${user.phone || 'N/A'}</td></tr>
+                            <tr><td style="padding: 8px; color: #64748b;">Locality</td><td style="padding: 8px; font-weight: bold;">${user.locality}, ${user.town}</td></tr>
+                            <tr style="background: #f8fafc;"><td style="padding: 8px; color: #64748b;">Profession</td><td style="padding: 8px; font-weight: bold;">${user.professionCategory}</td></tr>
+                            <tr><td style="padding: 8px; color: #64748b;">Impact Score</td><td style="padding: 8px; font-weight: bold;">${user.impactScore || 0}</td></tr>
+                        </table>
+                        <p style="color: #64748b; font-size: 14px;">📎 Full report is attached as an Excel file.</p>
+                    </div>
+                    <div style="padding: 20px; background: #f1f5f9; text-align: center; border-top: 1px solid #e2e8f0;">
+                        <p style="color: #64748b; margin: 0; font-size: 12px;">SmartHood Admin Report • Generated on ${new Date().toLocaleString('en-IN')}</p>
+                    </div>
+                </div>
+            `,
+            attachments: [{
+                filename: fileName,
+                content: buffer,
+                contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }]
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        console.log(`[Excel] Report for ${user.name} sent to ${adminEmails.join(', ')}`);
+
+        res.json({
+            success: true,
+            message: `Report generated and sent to ${adminEmails.length} admins`,
+            sentTo: adminEmails
+        });
+
+    } catch (error) {
+        console.error('Excel Export Error:', error);
+        res.status(500).json({ message: 'Failed to generate and send report', error: error.message });
+    }
+};
+
 module.exports = {
     adminLogin,
     getAnalytics,
     getAllUsers,
     createAdmin,
-    getUserStats
+    getUserStats,
+    exportUserExcel
 };
