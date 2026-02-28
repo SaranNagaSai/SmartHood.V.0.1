@@ -56,7 +56,7 @@ const HamburgerMenu = () => {
                     >
                         {/* Header */}
                         <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gradient-brand">
-                            <h2 className="text-xl font-bold text-white uppercase tracking-wider">SmartHood</h2>
+                            <h2 className="text-xl font-bold text-white uppercase tracking-wider">{t('smart_hood')}</h2>
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className="p-2 bg-white/20 rounded-full text-white hover:bg-white/30 transition"
@@ -93,7 +93,7 @@ const HamburgerMenu = () => {
                                 className="w-full flex items-center justify-center gap-3 py-3 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition shadow-sm"
                             >
                                 <LogOut size={18} />
-                                Logout
+                                {t('logout')}
                             </button>
                         </div>
                     </div>

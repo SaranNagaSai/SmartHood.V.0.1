@@ -326,9 +326,9 @@ const MyActivity = () => {
                                         {/* Expandable Recipient List */}
                                         {expandedServiceId === service._id && (
                                             <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
-                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Recipients ({recipients.length})</p>
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 {t('recipients')} ({recipients.length})</p>
                                                 {loadingRecipients ? (
-                                                    <p className="text-xs text-gray-400 text-center py-2">Loading...</p>
+                                                    <p className="text-xs text-gray-400 text-center py-2">{t('loading')}...</p>
                                                 ) : recipients.length > 0 ? (
                                                     <div className="space-y-2 max-h-60 overflow-y-auto">
                                                         {recipients.map(user => (
@@ -341,15 +341,15 @@ const MyActivity = () => {
                                                                     )}
                                                                 </div>
                                                                 <div className="min-w-0 flex-1">
-                                                                    <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
-                                                                    <p className="text-xs text-gray-400">{user.locality} • {user.professionCategory || 'N/A'}</p>
+                                                                    <p className="text-sm font-medium text-gray-800 truncate">{translateValue(user.name)}</p>
+                                                                    <p className="text-xs text-gray-400">{translateValue(user.locality)} • {translateValue(user.professionCategory || t('na'))}</p>
                                                                 </div>
                                                                 <span className="text-xs text-gray-300 flex-shrink-0">{user.uniqueId}</span>
                                                             </div>
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <p className="text-xs text-gray-400 text-center py-2">No recipients recorded yet</p>
+                                                    <p className="text-xs text-gray-400 text-center py-2">{t('no_recipients_yet')}</p>
                                                 )}
                                             </div>
                                         )}
@@ -369,7 +369,7 @@ const MyActivity = () => {
                 {/* Alerts Tab - With Expandable Recipient List */}
                 {activeTab === 'alerts' && (
                     <div className="space-y-4">
-                        <h3 className="font-bold text-gray-800 px-2">My Alerts</h3>
+                        <h3 className="font-bold text-gray-800 px-2">{t('my_alerts')}</h3>
                         {myAlerts.length > 0 ? (
                             <div className="space-y-3">
                                 {myAlerts.map(alert => (
@@ -392,26 +392,26 @@ const MyActivity = () => {
                                                                 ? 'bg-blue-100 text-blue-700'
                                                                 : 'bg-amber-100 text-amber-700'
                                                             }`}>
-                                                            {alert.category}
+                                                            {translateValue(alert.category)}
                                                         </span>
                                                         {alert.subType && (
-                                                            <span className="text-xs text-gray-400">{alert.subType}</span>
+                                                            <span className="text-xs text-gray-400">{translateValue(alert.subType)}</span>
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-700 line-clamp-2">{alert.description}</p>
+                                                    <p className="text-sm text-gray-700 line-clamp-2">{translateValue(alert.description)}</p>
                                                     <div className="flex items-center gap-2 mt-2">
                                                         <p className="text-xs text-gray-400">
-                                                            {new Date(alert.createdAt).toLocaleDateString('en-IN', {
+                                                            {new Date(alert.createdAt).toLocaleDateString(t('locale') || 'en-IN', {
                                                                 day: 'numeric', month: 'short', year: 'numeric',
                                                                 hour: '2-digit', minute: '2-digit'
                                                             })}
-                                                            {alert.locality && ` • ${alert.locality}`}
+                                                            {alert.locality && ` • ${translateValue(alert.locality)}`}
                                                         </p>
                                                         <button
                                                             onClick={() => fetchAlertRecipients(alert._id)}
                                                             className={`text-xs px-3 py-1 rounded-full font-medium transition ml-auto ${expandedAlertId === alert._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
                                                         >
-                                                            👥 {alert.sentTo?.length || 0} sent
+                                                            👥 {alert.sentTo?.length || 0} {t('sent')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -420,9 +420,9 @@ const MyActivity = () => {
                                         {/* Expandable Recipient List */}
                                         {expandedAlertId === alert._id && (
                                             <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
-                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Recipients ({alertRecipients.length})</p>
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 {t('recipients')} ({alertRecipients.length})</p>
                                                 {loadingRecipients ? (
-                                                    <p className="text-xs text-gray-400 text-center py-2">Loading...</p>
+                                                    <p className="text-xs text-gray-400 text-center py-2">{t('loading')}...</p>
                                                 ) : alertRecipients.length > 0 ? (
                                                     <div className="space-y-2 max-h-60 overflow-y-auto">
                                                         {alertRecipients.map(user => (
@@ -435,15 +435,15 @@ const MyActivity = () => {
                                                                     )}
                                                                 </div>
                                                                 <div className="min-w-0 flex-1">
-                                                                    <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
-                                                                    <p className="text-xs text-gray-400">{user.locality} • {user.professionCategory || 'N/A'}</p>
+                                                                    <p className="text-sm font-medium text-gray-800 truncate">{translateValue(user.name)}</p>
+                                                                    <p className="text-xs text-gray-400">{translateValue(user.locality)} • {translateValue(user.professionCategory) || t('na')}</p>
                                                                 </div>
                                                                 <span className="text-xs text-gray-300 flex-shrink-0">{user.uniqueId}</span>
                                                             </div>
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <p className="text-xs text-gray-400 text-center py-2">No recipients recorded yet</p>
+                                                    <p className="text-xs text-gray-400 text-center py-2">{t('no_recipients_yet')}</p>
                                                 )}
                                             </div>
                                         )}

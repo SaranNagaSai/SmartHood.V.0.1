@@ -210,7 +210,7 @@ const Profile = () => {
                             </button>
                         </div>
                         <div className="text-center sm:text-left">
-                            <h1 className="text-xl sm:text-2xl font-bold">{user.name}</h1>
+                            <h1 className="text-xl sm:text-2xl font-bold">{translateValue(user.name)}</h1>
                             <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-3 mt-2">
                                 <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] sm:text-sm font-mono">
                                     {user.uniqueId}
@@ -231,17 +231,17 @@ const Profile = () => {
                     <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
                         <Award className="mx-auto text-amber-500 mb-1" size={20} sm:size={24} />
                         <p className="text-lg sm:text-xl font-bold text-gray-800">{user.impactScore || 0}</p>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">Impact</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">{t('impact')}</p>
                     </div>
                     <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
                         <TrendingUp className="mx-auto text-green-500 mb-1" size={20} sm:size={24} />
                         <p className="text-lg sm:text-xl font-bold text-gray-800">{user.experience || 0}</p>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">Exp</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">{t('exp')}</p>
                     </div>
                     <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
                         <DollarSign className="mx-auto text-blue-500 mb-1" size={20} sm:size={24} />
                         <p className="text-lg sm:text-xl font-bold text-gray-800">₹{user.revenue || 0}</p>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">Rev</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">{t('rev')}</p>
                     </div>
                 </div>
             </div>
@@ -254,14 +254,14 @@ const Profile = () => {
                             onClick={() => { setEditing(false); setEditData(user); }}
                             className="flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50"
                         >
-                            <X size={16} /> Cancel
+                            <X size={16} /> {t('cancel')}
                         </button>
                         <button
                             onClick={handleSave}
                             disabled={saving}
                             className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600"
                         >
-                            <Save size={16} /> {saving ? 'Saving...' : 'Save'}
+                            <Save size={16} /> {saving ? t('saving') : t('save')}
                         </button>
                     </div>
                 ) : (
@@ -269,7 +269,7 @@ const Profile = () => {
                         onClick={() => setEditing(true)}
                         className="flex items-center gap-1 px-4 py-2 bg-[var(--col-primary)] text-white rounded-xl hover:opacity-90"
                     >
-                        <Edit3 size={16} /> Edit Profile
+                        <Edit3 size={16} /> {t('edit_profile')}
                     </button>
                 )}
             </div>
@@ -282,11 +282,11 @@ const Profile = () => {
                         <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                             <User size={18} className="text-white" />
                         </div>
-                        Personal Information
+                        {t('personal_info')}
                     </h3>
                     <div className="grid grid-cols-2 gap-6">
                         <div>
-                            <p className="text-xs text-gray-400 mb-1">Age</p>
+                            <p className="text-xs text-gray-400 mb-1">{t('age')}</p>
                             {editing ? (
                                 <VoiceInput
                                     value={editData.age || ''}
@@ -295,27 +295,27 @@ const Profile = () => {
                                     className="bg-gray-50 border-gray-200 rounded-lg py-1 px-2 text-sm"
                                 />
                             ) : (
-                                <p className="font-medium text-gray-700">{user.age} years</p>
+                                <p className="font-medium text-gray-700">{user.age} {t('years')}</p>
                             )}
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 mb-1">Gender</p>
+                            <p className="text-xs text-gray-400 mb-1">{t('gender')}</p>
                             {editing ? (
                                 <select
                                     value={editData.gender || 'Male'}
                                     onChange={(e) => setEditData({ ...editData, gender: e.target.value })}
                                     className="w-full bg-gray-50 border border-gray-200 rounded-lg py-1 px-2 text-sm outline-none"
                                 >
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Male">{t('male')}</option>
+                                    <option value="Female">{t('female')}</option>
+                                    <option value="Other">{t('other_gender')}</option>
                                 </select>
                             ) : (
-                                <p className="font-medium text-gray-700">{user.gender}</p>
+                                <p className="font-medium text-gray-700">{t(user.gender?.toLowerCase()) || user.gender}</p>
                             )}
                         </div>
                         <div className="col-span-2">
-                            <p className="text-xs text-gray-400 mb-1">Email</p>
+                            <p className="text-xs text-gray-400 mb-1">{t('email')}</p>
                             {editing ? (
                                 <VoiceInput
                                     value={editData.email || ''}
@@ -325,18 +325,18 @@ const Profile = () => {
                                 />
                             ) : (
                                 <p className="font-medium text-gray-700 flex items-center gap-1">
-                                    <Mail size={12} /> {user.email || 'Not provided'}
+                                    <Mail size={12} /> {user.email || t('not_provided')}
                                 </p>
                             )}
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 mb-1">Phone (Locked)</p>
+                            <p className="text-xs text-gray-400 mb-1">{t('phone')} ({t('locked')})</p>
                             <p className="font-medium text-gray-400 flex items-center gap-1">
                                 <Phone size={12} /> {user.phone}
                             </p>
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 mb-1">Blood Group</p>
+                            <p className="text-xs text-gray-400 mb-1">{t('blood_group')}</p>
                             {editing ? (
                                 <select
                                     value={editData.bloodGroup || 'A+'}
@@ -367,25 +367,25 @@ const Profile = () => {
                         <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
                             <MapPin size={18} className="text-white" />
                         </div>
-                        Location Details
+                        {t('location_details')}
                     </h3>
                     {editing ? (
                         <div className="space-y-3">
                             <VoiceInput
-                                label="Address"
+                                label={t('address')}
                                 value={editData.address || ''}
                                 onChange={(e) => setEditData({ ...editData, address: e.target.value })}
                                 className="bg-gray-50 border-gray-200 rounded-lg"
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <VoiceInput
-                                    label="Locality"
+                                    label={t('locality')}
                                     value={editData.locality || ''}
                                     onChange={(e) => setEditData({ ...editData, locality: e.target.value })}
                                     className="bg-gray-50 border-gray-200 rounded-lg"
                                 />
                                 <VoiceInput
-                                    label="Town"
+                                    label={t('town')}
                                     value={editData.town || ''}
                                     onChange={(e) => setEditData({ ...editData, town: e.target.value })}
                                     className="bg-gray-50 border-gray-200 rounded-lg"
@@ -393,13 +393,13 @@ const Profile = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <VoiceInput
-                                    label="District"
+                                    label={t('district')}
                                     value={editData.district || ''}
                                     onChange={(e) => setEditData({ ...editData, district: e.target.value })}
                                     className="bg-gray-50 border-gray-200 rounded-lg"
                                 />
                                 <VoiceInput
-                                    label="State"
+                                    label={t('state')}
                                     value={editData.state || ''}
                                     onChange={(e) => setEditData({ ...editData, state: e.target.value })}
                                     className="bg-gray-50 border-gray-200 rounded-lg"
@@ -408,12 +408,12 @@ const Profile = () => {
                         </div>
                     ) : (
                         <div className="space-y-2">
-                            <p className="text-gray-700">{user.address || 'No address'}</p>
+                            <p className="text-gray-700">{translateValue(user.address) || t('no_address')}</p>
                             <p className="text-sm text-gray-500">
-                                {user.locality}, {user.town}
+                                {translateValue(user.locality)}, {translateValue(user.town)}
                             </p>
                             <p className="text-sm text-gray-500">
-                                {user.district}, {user.state}
+                                {translateValue(user.district)}, {translateValue(user.state)}
                             </p>
                         </div>
                     )}
@@ -425,20 +425,20 @@ const Profile = () => {
                         <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
                             <Briefcase size={18} className="text-white" />
                         </div>
-                        Professional Details
+                        {t('professional_details')}
                     </h3>
                     <div className="space-y-3">
                         {editing ? (
                             <>
                                 <div>
-                                    <label className="text-xs text-gray-400 block mb-1">Category</label>
+                                    <label className="text-xs text-gray-400 block mb-1">{t('category')}</label>
                                     <select
                                         value={editData.professionCategory || 'Employed'}
                                         onChange={(e) => setEditData({ ...editData, professionCategory: e.target.value })}
                                         className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-2 text-sm outline-none"
                                     >
                                         {['Employed', 'Business', 'Student', 'Homemaker', 'Others'].map(c => (
-                                            <option key={c} value={c}>{c}</option>
+                                            <option key={c} value={c}>{t(c.toLowerCase()) || c}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -446,13 +446,13 @@ const Profile = () => {
                                 {editData.professionCategory === 'Employed' && (
                                     <>
                                         <VoiceInput
-                                            label="Job Role"
+                                            label={t('job_role')}
                                             value={editData.professionDetails?.jobRole || ''}
                                             onChange={(e) => setEditData({ ...editData, professionDetails: { ...editData.professionDetails, jobRole: e.target.value } })}
                                             className="bg-gray-50 border-gray-200 rounded-lg"
                                         />
                                         <VoiceInput
-                                            label="Sector"
+                                            label={t('sector')}
                                             value={editData.professionDetails?.sector || ''}
                                             onChange={(e) => setEditData({ ...editData, professionDetails: { ...editData.professionDetails, sector: e.target.value } })}
                                             className="bg-gray-50 border-gray-200 rounded-lg"
@@ -462,7 +462,7 @@ const Profile = () => {
 
                                 {editData.professionCategory === 'Business' && (
                                     <VoiceInput
-                                        label="Business Type"
+                                        label={t('business_type')}
                                         value={editData.professionDetails?.businessType || ''}
                                         onChange={(e) => setEditData({ ...editData, professionDetails: { ...editData.professionDetails, businessType: e.target.value } })}
                                         className="bg-gray-50 border-gray-200 rounded-lg"
@@ -472,21 +472,21 @@ const Profile = () => {
                                 {editData.professionCategory === 'Student' && (
                                     <>
                                         <VoiceInput
-                                            label="Course"
+                                            label={t('course')}
                                             value={editData.professionDetails?.course || ''}
                                             onChange={(e) => setEditData({ ...editData, professionDetails: { ...editData.professionDetails, course: e.target.value } })}
                                             className="bg-gray-50 border-gray-200 rounded-lg"
                                         />
                                         <div>
-                                            <label className="text-xs text-gray-400 block mb-1">Education Level</label>
+                                            <label className="text-xs text-gray-400 block mb-1">{t('education_level')}</label>
                                             <select
                                                 value={editData.professionDetails?.educationLevel || ''}
                                                 onChange={(e) => setEditData({ ...editData, professionDetails: { ...editData.professionDetails, educationLevel: e.target.value } })}
                                                 className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-2 text-sm outline-none"
                                             >
-                                                <option value="">Select Level</option>
+                                                <option value="">{t('select_level')}</option>
                                                 {['High School', 'Intermediate', 'Undergraduate', 'Postgraduate', 'PhD', 'Other'].map(l => (
-                                                    <option key={l} value={l}>{l}</option>
+                                                    <option key={l} value={l}>{t(l.toLowerCase().replace(' ', '_')) || l}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -494,7 +494,7 @@ const Profile = () => {
                                 )}
 
                                 <VoiceInput
-                                    label="Years of Experience"
+                                    label={t('yrs_exp')}
                                     value={editData.experience || 0}
                                     type="number"
                                     onChange={(e) => setEditData({ ...editData, experience: parseInt(e.target.value) || 0 })}
@@ -504,38 +504,38 @@ const Profile = () => {
                         ) : (
                             <>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-500">Category</span>
+                                    <span className="text-gray-500">{t('category')}</span>
                                     <span className="font-medium text-[var(--col-secondary)]">
-                                        {user.professionCategory}
+                                        {translateValue(user.professionCategory)}
                                     </span>
                                 </div>
                                 {user.professionDetails?.jobRole && (
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-500">Role</span>
-                                        <span className="font-medium">{user.professionDetails.jobRole}</span>
+                                        <span className="text-gray-500">{t('role')}</span>
+                                        <span className="font-medium">{translateValue(user.professionDetails.jobRole)}</span>
                                     </div>
                                 )}
                                 {user.professionDetails?.sector && (
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-500">Sector</span>
-                                        <span className="font-medium">{user.professionDetails.sector}</span>
+                                        <span className="text-gray-500">{t('sector')}</span>
+                                        <span className="font-medium">{translateValue(user.professionDetails.sector)}</span>
                                     </div>
                                 )}
                                 {user.professionDetails?.businessType && (
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-500">Business</span>
-                                        <span className="font-medium">{user.professionDetails.businessType}</span>
+                                        <span className="text-gray-500">{t('business')}</span>
+                                        <span className="font-medium">{translateValue(user.professionDetails.businessType)}</span>
                                     </div>
                                 )}
                                 {user.professionDetails?.educationLevel && (
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-500">Education</span>
-                                        <span className="font-medium">{user.professionDetails.educationLevel}</span>
+                                        <span className="text-gray-500">{t('education')}</span>
+                                        <span className="font-medium">{translateValue(user.professionDetails.educationLevel)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                                    <span className="text-gray-500">Experience</span>
-                                    <span className="font-medium">{user.experience} Years</span>
+                                    <span className="text-gray-500">{t('experience')}</span>
+                                    <span className="font-medium">{user.experience} {t('years')}</span>
                                 </div>
                             </>
                         )}
@@ -548,7 +548,7 @@ const Profile = () => {
                         <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
                             <User size={18} className="text-white" />
                         </div>
-                        People in My Locality <span className="text-sm font-normal text-gray-500 ml-2">({localityUsers.length})</span>
+                        {t('people_in_locality')} <span className="text-sm font-normal text-gray-500 ml-2">({localityUsers.length})</span>
                     </h3>
 
                     {loadingLocalityUsers ? (
@@ -557,7 +557,7 @@ const Profile = () => {
                         </div>
                     ) : localityUsers.length === 0 ? (
                         <div className="text-center py-8 text-gray-500 italic bg-gray-50 rounded-xl">
-                            No other registered users in {user?.locality} yet.
+                            {t('no_users_locality')}
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -606,7 +606,7 @@ const Profile = () => {
                 <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-scale-up">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="font-bold text-gray-800">Update Profile Photo</h3>
+                            <h3 className="font-bold text-gray-800">{t('update_photo')}</h3>
                             <button onClick={() => setPhotoModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition">
                                 <X size={20} />
                             </button>
@@ -643,7 +643,7 @@ const Profile = () => {
                                         className="w-full bg-red-500 text-white p-3 rounded-xl font-bold hover:bg-red-600 transition flex items-center justify-center gap-2"
                                     >
                                         <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                                        Capture
+                                        {t('capture')}
                                     </button>
                                 ) : (
                                     <>
@@ -652,11 +652,11 @@ const Profile = () => {
                                             className="flex-1 bg-blue-50 text-blue-600 p-3 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 transition flex items-center justify-center gap-2"
                                         >
                                             <Camera size={18} />
-                                            Camera
+                                            {t('camera')}
                                         </button>
                                         <label className="flex-1 bg-green-50 text-green-600 p-3 rounded-xl font-bold border border-green-100 hover:bg-green-100 transition cursor-pointer flex items-center justify-center gap-2">
                                             <Upload size={18} />
-                                            Upload
+                                            {t('upload')}
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -673,7 +673,7 @@ const Profile = () => {
                                 disabled={!tempPhoto || uploadingPhoto}
                                 className="w-full bg-[var(--col-primary)] text-white py-4 rounded-xl font-bold hover:brightness-110 transition shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
-                                {uploadingPhoto ? 'Uploading...' : 'Save New Photo'}
+                                {uploadingPhoto ? t('saving') : t('save_photo')}
                             </button>
                         </div>
                     </div>

@@ -47,7 +47,7 @@ const Login = () => {
                         {isAuthenticated ? (
                             <div className="text-center animate-fade-in">
                                 <div className="mb-6 p-4 bg-white/10 rounded-2xl border border-white/20">
-                                    <p className="text-white/60 text-xs uppercase tracking-widest mb-2 font-bold">{t('logged_in_as') || 'Authenticated As'}</p>
+                                    <p className="text-white/60 text-xs uppercase tracking-widest mb-2 font-bold">{t('logged_in_as')}</p>
                                     <h3 className="text-xl font-bold text-white">{user?.name}</h3>
                                     <p className="text-blue-300 text-[10px] mt-1 font-mono">{user?.uniqueId}</p>
                                 </div>
@@ -55,7 +55,7 @@ const Login = () => {
                                     onClick={() => navigate('/home')}
                                     className="w-full bg-primary text-white p-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2 group border border-white/10"
                                 >
-                                    <span>{t('continue_to_website') || 'Continue to Website'}</span>
+                                    <span>{t('continue_to_website')}</span>
                                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                                 </button>
                             </div>

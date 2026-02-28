@@ -205,7 +205,7 @@ const Alerts = () => {
                         {selectedCat?.emoji} {t('broadcast_alert')}
                     </h1>
                     {selectedCategory && (
-                        <p className="text-xs opacity-90 mt-1">Broadcasting {selectedCategory} Alert</p>
+                        <p className="text-xs opacity-90 mt-1">{t('broadcasting_alert_prefix')} {t(selectedCategory.toLowerCase())} {t('broadcasting_alert_suffix')}</p>
                     )}
                 </div>
                 {selectedCategory && <Zap size={24} className="animate-pulse" />}
@@ -261,7 +261,7 @@ const Alerts = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-red-600 uppercase tracking-wider">{t('emergency_type')}</label>
-                                <p className="text-xs text-red-400">Select the type of emergency</p>
+                                <p className="text-xs text-red-400">{t('select_emergency_type_desc')}</p>
                             </div>
                         </div>
                         <select
@@ -285,7 +285,7 @@ const Alerts = () => {
                                 <Droplet className="text-white" size={32} fill="currentColor" />
                             </div>
                             <label className="block text-lg font-bold text-red-600 uppercase tracking-widest">{t('select_blood_group')}</label>
-                            <p className="text-sm text-red-400 mt-1">Choose the required blood type</p>
+                            <p className="text-sm text-red-400 mt-1">{t('choose_blood_type_desc')}</p>
                         </div>
                         <div className="grid grid-cols-4 gap-4">
                             {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(bg => (
@@ -334,7 +334,7 @@ const Alerts = () => {
                                 <Paperclip size={20} />
                             </div>
                             <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                                {t('attachments')} (Optional)
+                                {t('attachments')} ({t('optional')})
                             </label>
                         </div>
                         <input

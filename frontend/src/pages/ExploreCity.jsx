@@ -386,7 +386,7 @@ const ExploreCity = () => {
                             <div className="flex items-center gap-2 overflow-hidden">
                                 <MapPin size={16} className="text-primary flex-shrink-0" />
                                 <span className="font-black text-slate-800 text-[10px] uppercase tracking-widest truncate">{translateValue(userTown)}</span>
-                                <span className="text-[8px] font-bold text-slate-400 uppercase">{townStateMap[userTown]?.state || ''}</span>
+                                <span className="text-[8px] font-bold text-slate-400 uppercase">{translateValue(townStateMap[userTown]?.state) || ''}</span>
                             </div>
                             <ChevronDown size={14} className="text-slate-300" />
                         </button>
@@ -436,7 +436,7 @@ const ExploreCity = () => {
                                 >
                                     <div className="text-left">
                                         <p className={`font-black uppercase tracking-widest ${userTown === town ? 'text-primary text-sm' : 'text-slate-800 text-xs'}`}>{translateValue(town)}</p>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{townStateMap[town]?.state || 'Registered Node'}</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{translateValue(townStateMap[town]?.state) || translateValue('Registered Node')}</p>
                                     </div>
                                     <div className={`p-2 rounded-xl ${userTown === town ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100 text-slate-300'}`}>
                                         <Navigation2 size={16} className={userTown === town ? '' : 'rotate-45'} />
@@ -446,7 +446,7 @@ const ExploreCity = () => {
                         ) : (
                             <div className="text-center py-20 flex flex-col items-center">
                                 <Search size={48} className="text-slate-200 mb-4" />
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No towns found matching "{searchTown}"</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('no_towns_found')} "{searchTown}"</p>
                             </div>
                         )}
                     </div>
@@ -500,11 +500,11 @@ const ExploreCity = () => {
                             </div>
 
                             <div className="mt-12 pt-8 border-t border-slate-50">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Trending Locations</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{t('trending_locations')}</p>
                                 <div className="flex flex-wrap justify-center gap-2">
                                     {availableTowns.slice(0, 5).map(town => (
                                         <button key={town} onClick={() => handleTownChange(town)} className="px-4 py-2 bg-slate-50 hover:bg-blue-50 hover:text-primary rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-slate-100">
-                                            {town}
+                                            {translateValue(town)}
                                         </button>
                                     ))}
                                 </div>
@@ -539,13 +539,13 @@ const ExploreCity = () => {
                                 <Marker position={pos} icon={createCountIcon(loc.userCount)} eventHandlers={{ click: () => fetchLocalityUsers(loc.name) }}>
                                     <Popup className="premium-popup">
                                         <div className="text-center p-2 min-w-[120px]">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Locality Node</p>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{t('locality_node')}</p>
                                             <h4 className="text-sm font-black text-slate-800 uppercase mb-3">{translateValue(loc.name)}</h4>
                                             <div className="bg-slate-50 p-2 rounded-xl mb-3">
                                                 <p className="text-2xl font-black text-primary leading-none">{loc.userCount}</p>
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Personnel</p>
+                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">{t('members')}</p>
                                             </div>
-                                            <button onClick={() => fetchLocalityUsers(loc.name)} className="w-full py-2 bg-gradient-brand text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-lg active:scale-95">Open Terminal</button>
+                                            <button onClick={() => fetchLocalityUsers(loc.name)} className="w-full py-2 bg-gradient-brand text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-lg active:scale-95">{t('show_members')}</button>
                                         </div>
                                     </Popup>
                                 </Marker>
@@ -569,7 +569,7 @@ const ExploreCity = () => {
 
                         <div className="p-8 pb-4 flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">Locality Analysis</p>
+                                <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">{t('locality_analysis')}</p>
                                 <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase">{translateValue(selectedLocality)}</h2>
                                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-1">
                                     {isSelectionMode ? `${selectedUserIds.size} ${t('selected_interlink')}` : `${localityUsers.length} ${t('neighbors_identified')}`}
@@ -581,7 +581,7 @@ const ExploreCity = () => {
                                         onClick={() => { setIsSelectionMode(false); setSelectedUserIds(new Set()); }}
                                         className="px-4 py-2 bg-slate-50 text-slate-400 font-black text-[9px] uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-all"
                                     >
-                                        Cancel
+                                        {t('cancel')}
                                     </button>
                                 )}
                                 <button onClick={() => { setSelectedLocality(null); setIsSelectionMode(false); setSelectedUserIds(new Set()); }} className="p-4 hover:bg-slate-50 rounded-[1.5rem] text-slate-400 transition-colors border border-transparent hover:border-slate-100">
@@ -594,7 +594,7 @@ const ExploreCity = () => {
                             {loadingUsers ? (
                                 <div className="flex flex-col items-center justify-center h-64 text-slate-300">
                                     <RefreshCw size={48} className="animate-spin opacity-20 mb-4" />
-                                    <p className="text-[10px] font-black uppercase tracking-widest">Scanning Network...</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest">{t('searching_members')}</p>
                                 </div>
                             ) : localityUsers.length > 0 ? (
                                 <div className="space-y-4">
@@ -628,9 +628,9 @@ const ExploreCity = () => {
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-lg">
                                                             <MapPin size={10} />
-                                                            <span className="text-[9px] font-black tracking-tighter">NODE-{user.uniqueId?.slice(-4)}</span>
+                                                            <span className="text-[9px] font-black tracking-tighter">{t('node')}-{user.uniqueId?.slice(-4)}</span>
                                                         </div>
-                                                        <span className="text-[10px] font-black text-emerald-500">+{user.impactScore} IMPACT</span>
+                                                        <span className="text-[10px] font-black text-emerald-500">+{user.impactScore} {t('impact_score')}</span>
                                                     </div>
                                                 </div>
                                                 {!isSelectionMode && <ChevronRight className="text-slate-200 group-hover:text-primary transition-colors translate-x-4 group-hover:translate-x-0 opacity-0 group-hover:opacity-100" size={20} />}
@@ -641,7 +641,7 @@ const ExploreCity = () => {
                             ) : (
                                 <div className="text-center py-20 bg-slate-50 rounded-[2.5rem] border-4 border-dashed border-slate-100">
                                     <Users size={48} className="mx-auto mb-4 opacity-10 text-slate-400" />
-                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">No Active Personnel Found</p>
+                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('no_members_found')}</p>
                                 </div>
                             )}
                         </div>
@@ -650,7 +650,7 @@ const ExploreCity = () => {
                             {interlinkSuccess ? (
                                 <div className="w-full py-5 bg-emerald-500 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl flex items-center justify-center gap-3 animate-in fade-in zoom-in duration-300">
                                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">✓</div>
-                                    Requests Broadcasted!
+                                    {t('requests_broadcasted')}
                                 </div>
                             ) : (
                                 <button

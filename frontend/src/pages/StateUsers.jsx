@@ -218,7 +218,7 @@ const StateUsers = () => {
                                                             </div>
                                                             <div className="flex items-center gap-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100 shadow-sm">
                                                                 <Star size={10} className="fill-amber-500" />
-                                                                <span className="text-[9px] font-black">{u.impactScore || 0} IMP</span>
+                                                                <span className="text-[9px] font-black">{u.impactScore || 0} {t('impact_score')}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -236,8 +236,8 @@ const StateUsers = () => {
                             <Users size={40} />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-xl font-bold text-white tracking-tight">{t('community_horizon', 'Community Horizon')}</h3>
-                            <p className="text-gray-500 text-sm max-w-xs">{t('no_members_found', 'No members found in')} {stateName} {t('yet')}.</p>
+                            <h3 className="text-xl font-bold text-white tracking-tight">{t('community_horizon')}</h3>
+                            <p className="text-gray-500 text-sm max-w-xs">{t('no_members_found')} {translateValue(stateName)} {t('yet')}.</p>
                         </div>
                     </div>
                 )}

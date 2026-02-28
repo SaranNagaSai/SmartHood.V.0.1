@@ -239,7 +239,7 @@ const Home = () => {
                                         {style.icon}
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="font-bold text-gray-800 text-xs md:text-sm truncate max-w-[100px]">{t(prof._id.toLowerCase()) || prof._id}</h3>
+                                        <h3 className="font-bold text-gray-800 text-xs md:text-sm truncate max-w-[100px]">{translateValue(prof._id)}</h3>
                                         <span className="text-[9px] md:text-[10px] font-bold text-gray-400 mt-0.5 md:mt-1 block">{prof.count} {t('pros_nearby')}</span>
                                     </div>
                                 </div>
@@ -288,7 +288,7 @@ const Home = () => {
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
                         <div className="bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] p-4 flex items-center justify-between">
                             <div>
-                                <h3 className="text-white font-bold text-lg">{t(selectedProfession?.toLowerCase()) || selectedProfession}</h3>
+                                <h3 className="text-white font-bold text-lg">{translateValue(selectedProfession)}</h3>
                                 <p className="text-white/70 text-xs">{t('professionals_locality')}</p>
                             </div>
                             <button onClick={closeModal} className="text-white/80 hover:text-white p-1">
@@ -314,17 +314,17 @@ const Home = () => {
                                                                 />
                                                             ) : (
                                                                 <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-500">
-                                                                    {u.name.charAt(0)}
+                                                                    {u.name?.charAt(0)}
                                                                 </div>
                                                             )}
-                                                            <h4 className="font-bold text-gray-800">{u.name}</h4>
+                                                            <h4 className="font-bold text-gray-800">{translateValue(u.name)}</h4>
                                                         </div>
                                                         <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                                                            <MapPin size={10} /> {u.locality}
+                                                            <MapPin size={10} /> {translateValue(u.locality)}
                                                         </p>
                                                         <p className="text-xs text-[var(--col-secondary)] mt-1">
                                                             <Briefcase size={10} className="inline mr-1" />
-                                                            {u.professionDetails?.jobRole || u.professionCategory || t('professional')}
+                                                            {translateValue(u.professionDetails?.jobRole || u.professionCategory || t('professional'))}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
