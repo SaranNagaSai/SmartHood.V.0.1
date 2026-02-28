@@ -81,11 +81,11 @@ const Sidebar = () => {
                         />
                         <div>
                             <h1 className="text-xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent tracking-tight">
-                                Smart Hood
+                                {t('smart_hood')}
                             </h1>
                             <p className="text-[10px] text-slate-400 flex items-center gap-1 font-medium">
                                 <Sparkles size={10} className="text-purple-400" />
-                                Community Platform
+                                {t('community_platform')}
                             </p>
                         </div>
                     </div>

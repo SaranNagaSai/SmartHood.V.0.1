@@ -7,7 +7,7 @@ import { ArrowLeft, Send, Users, UserCheck, Paperclip, X, Image, AlertCircle, Gl
 import { API_URL } from '../utils/apiConfig';
 
 const OfferService = () => {
-    const { t } = useLanguage();
+    const { t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     const [formData, setFormData] = useState({
@@ -290,7 +290,7 @@ const OfferService = () => {
                             {t('my_community_default')}
                         </label>
                         <div className="px-3 py-2 bg-blue-100 border border-blue-300 text-blue-800 rounded-lg text-sm font-bold shadow-sm inline-block">
-                            {JSON.parse(localStorage.getItem('user'))?.locality}
+                            {translateValue(JSON.parse(localStorage.getItem('user'))?.locality)}
                         </div>
                         <p className="text-[10px] text-blue-600 mt-1">
                             {t('broadcast_home_note')}
@@ -371,7 +371,7 @@ const OfferService = () => {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className={`text-xs font-bold truncate ${isSelected ? 'text-indigo-700' : 'text-gray-700'}`}>
-                                                                {loc.name}
+                                                                {translateValue(loc.name)}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -403,7 +403,7 @@ const OfferService = () => {
                             onClick={() => setFormData({ ...formData, broadcastGlobal: true, targetAudience: 'ALL' })}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all ${formData.broadcastGlobal ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500'}`}
                         >
-                            <Globe size={14} /> To All Users
+                            <Globe size={14} /> {t('to_all_users')}
                         </button>
                     </div>
 
@@ -514,7 +514,7 @@ const OfferService = () => {
                                             }
                                         }}
                                     >
-                                        {comm.communityName} ({comm.memberCount} {t('users_count_suffix')})
+                                        {translateValue(comm.communityName)} ({comm.memberCount} {t('users_count_suffix')})
                                     </div>
                                 ))}
                             </div>

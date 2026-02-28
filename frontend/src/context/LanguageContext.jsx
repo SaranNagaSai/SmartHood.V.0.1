@@ -339,7 +339,66 @@ export const LanguageProvider = ({ children }) => {
             'homemaker': 'Homemaker',
             'others_cat': 'Others',
             'neighborhood_reach': 'Our Network',
-            'new_user_prompt': 'Register - New User'
+            'new_user_prompt': 'Register - New User',
+            'merchant': 'Merchant',
+            'carpenter': 'Carpenter',
+            'plumber': 'Plumber',
+            'electrician': 'Electrician',
+            'to_all_users': 'To All Users',
+            'community_platform': 'Community Platform',
+            'smart_hood': 'Smart Hood',
+            'major_towns': 'Major Towns',
+            'members': 'Members',
+            'discovery_hub': 'Discovery Hub',
+            'initialize_region': 'Initialize Region',
+            'search_towns': 'SEARCH TOWNS...',
+            'sync_regional_capability': 'Synchronize Regional Capability',
+            'select_town': 'Select Town',
+            'district_horizon': 'District Horizon',
+            'searching_members': 'Searching Members',
+            'selected_interlink': 'Selected for Interlink',
+            'neighbors_identified': 'Neighbors Identified',
+            'establish_interlink': 'Establish Interlink',
+            'request_interlink': 'Request Interlink',
+            'generating_interlinks': 'Generating Interlinks...',
+
+            // Indian States
+            'Andaman and Nicobar Islands': 'Andaman and Nicobar Islands',
+            'Andhra Pradesh': 'Andhra Pradesh',
+            'Arunachal Pradesh': 'Arunachal Pradesh',
+            'Assam': 'Assam',
+            'Bihar': 'Bihar',
+            'Chandigarh': 'Chandigarh',
+            'Chhattisgarh': 'Chhattisgarh',
+            'Dadra and Nagar Haveli and Daman and Diu': 'Dadra and Nagar Haveli and Daman and Diu',
+            'Delhi': 'Delhi',
+            'Goa': 'Goa',
+            'Gujarat': 'Gujarat',
+            'Haryana': 'Haryana',
+            'Himachal Pradesh': 'Himachal Pradesh',
+            'Jammu and Kashmir': 'Jammu and Kashmir',
+            'Jharkhand': 'Jharkhand',
+            'Karnataka': 'Karnataka',
+            'Kerala': 'Kerala',
+            'Ladakh': 'Ladakh',
+            'Lakshadweep': 'Lakshadweep',
+            'Madhya Pradesh': 'Madhya Pradesh',
+            'Maharashtra': 'Maharashtra',
+            'Manipur': 'Manipur',
+            'Meghalaya': 'Meghalaya',
+            'Mizoram': 'Mizoram',
+            'Nagaland': 'Nagaland',
+            'Odisha': 'Odisha',
+            'Puducherry': 'Puducherry',
+            'Punjab': 'Punjab',
+            'Rajasthan': 'Rajasthan',
+            'Sikkim': 'Sikkim',
+            'Tamil Nadu': 'Tamil Nadu',
+            'Telangana': 'Telangana',
+            'Tripura': 'Tripura',
+            'Uttar Pradesh': 'Uttar Pradesh',
+            'Uttarakhand': 'Uttarakhand',
+            'West Bengal': 'West Bengal'
         },
         'Telugu': {
             'welcome': 'స్వాగతం',
@@ -615,6 +674,20 @@ export const LanguageProvider = ({ children }) => {
             'course_placeholder': 'ఉదా: కంప్యూటర్ సైన్స్, బి.కామ్',
             'description_placeholder': 'మరిన్ని వివరాలను తెలియజేయండి...',
             'districts': 'జిల్లాలు',
+            'major_towns': 'ముఖ్యమైన పట్టణాలు',
+            'members': 'సభ్యులు',
+            'discovery_hub': 'డిస్కవరీ హబ్',
+            'initialize_region': 'ప్రాంతాన్ని ప్రారంభించండి',
+            'search_towns': 'పట్టణాల కోసం వెతకండి...',
+            'sync_regional_capability': 'ప్రాంతీయ సామర్థ్యాన్ని సమన్వయం చేయండి',
+            'select_town': 'పట్టణాన్ని ఎంచుకోండి',
+            'district_horizon': 'జిల్లా పరిధి',
+            'searching_members': 'సభ్యుల కోసం వెతుకుతోంది',
+            'selected_interlink': 'ఇంటర్‌లింక్ కోసం ఎంపిక చేయబడ్డారు',
+            'neighbors_identified': 'పొరుగువారు గుర్తించబడ్డారు',
+            'establish_interlink': 'ఇంటర్‌లింక్ ఏర్పాటు చేయండి',
+            'request_interlink': 'ఇంటర్‌లింక్ కోరండి',
+            'generating_interlinks': 'ఇంటర్‌లింక్‌లను సృష్టిస్తోంది...',
             'towns': 'పట్టణాలు',
             'discovery_hub': 'డిస్కవరీ హబ్',
             'hub': 'హబ్',
@@ -642,7 +715,52 @@ export const LanguageProvider = ({ children }) => {
             'student': 'విద్యార్థి',
             'homemaker': 'గృహిణి',
             'others_cat': 'ఇతరులు',
-            'neighborhood_reach': 'మన నెట్‌వర్క్'
+            'neighborhood_reach': 'మన నెట్‌వర్క్',
+            'merchant': 'వ్యాపారి',
+            'carpenter': 'వడ్రంగి',
+            'plumber': 'ప్లంబర్',
+            'electrician': 'ఎలక్ట్రీషియన్',
+            'to_all_users': 'వినియోగదారులందరికీ',
+            'community_platform': 'కమ్యూనిటీ ప్లాట్‌ఫారమ్',
+            'smart_hood': 'స్మార్ట్ హుడ్',
+
+            // Indian States
+            'Andaman and Nicobar Islands': 'అండమాన్ నికోబార్ దీవులు',
+            'Andhra Pradesh': 'ఆంధ్రప్రదేశ్',
+            'Arunachal Pradesh': 'అరుణాచల్ ప్రదేశ్',
+            'Assam': 'అస్సాం',
+            'Bihar': 'బీహార్',
+            'Chandigarh': 'చండీగఢ్',
+            'Chhattisgarh': 'ఛత్తీస్‌గఢ్',
+            'Dadra and Nagar Haveli and Daman and Diu': 'దాద్రా నగర్ హవేలీ మరియు డామన్ డయ్యూ',
+            'Delhi': 'ఢిల్లీ',
+            'Goa': 'గోవా',
+            'Gujarat': 'గుజరాత్',
+            'Haryana': 'హర్యానా',
+            'Himachal Pradesh': 'హిమాచల్ ప్రదేశ్',
+            'Jammu and Kashmir': 'జమ్మూ కాశ్మీర్',
+            'Jharkhand': 'జార్ఖండ్',
+            'Karnataka': 'కర్ణాటక',
+            'Kerala': 'కేరళ',
+            'Ladakh': 'లడఖ్',
+            'Lakshadweep': 'లక్షద్వీప్',
+            'Madhya Pradesh': 'మధ్యప్రదేశ్',
+            'Maharashtra': 'మహారాష్ట్ర',
+            'Manipur': 'మణిపూర్',
+            'Meghalaya': 'మేఘాలయ',
+            'Mizoram': 'మిజోరం',
+            'Nagaland': 'నాగాలాండ్',
+            'Odisha': 'ఒడిశా',
+            'Puducherry': 'పుదుచ్చేరి',
+            'Punjab': 'పంజాబ్',
+            'Rajasthan': 'రాజస్థాన్',
+            'Sikkim': 'సిక్కిం',
+            'Tamil Nadu': 'తమిళనాడు',
+            'Telangana': 'తెలంగాణ',
+            'Tripura': 'త్రిపుర',
+            'Uttar Pradesh': 'ఉత్తర ప్రదేశ్',
+            'Uttarakhand': 'ఉత్తరాఖండ్',
+            'West Bengal': 'పశ్చిమ బెంగాల్'
         }
     };
 
@@ -651,8 +769,15 @@ export const LanguageProvider = ({ children }) => {
         return translations[language]?.[key] || key;
     };
 
+    // Helper to translate dynamic values (e.g., from DB) if a translation exists
+    const translateValue = (value) => {
+        if (!value || !language || language === 'English') return value;
+        // Check if value exists as a key in Telugu translations
+        return translations['Telugu']?.[value] || value;
+    };
+
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, translateValue }}>
             {children}
         </LanguageContext.Provider>
     );

@@ -100,7 +100,7 @@ const findTownInAllDistricts = (townName) => {
 };
 
 const ExploreCity = () => {
-    const { t } = useLanguage();
+    const { t, translateValue } = useLanguage();
     const { isMobile } = useDevice();
     const navigate = useNavigate();
 
@@ -334,7 +334,7 @@ const ExploreCity = () => {
                                 <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg group-hover:rotate-12 transition-transform">
                                     <Compass size={18} />
                                 </div>
-                                <span className="font-black text-slate-800 text-[11px] uppercase tracking-[0.2em] truncate">{userTown || 'Initialize Region'}</span>
+                                <span className="font-black text-slate-800 text-[11px] uppercase tracking-[0.2em] truncate">{translateValue(userTown) || t('initialize_region')}</span>
                             </div>
                             <ChevronDown size={14} className={`text-slate-400 transition-transform duration-500 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
@@ -361,7 +361,7 @@ const ExploreCity = () => {
                                             onClick={() => handleTownChange(town)}
                                             className={`w-full text-left px-6 py-4 text-[11px] font-black uppercase tracking-[0.15em] hover:bg-blue-50 transition-all flex items-center justify-between group ${userTown === town ? 'bg-blue-50/50 text-primary' : 'text-slate-500'}`}
                                         >
-                                            {town}
+                                            {translateValue(town)}
                                             {userTown === town && <div className="w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/30 animate-pulse"></div>}
                                         </button>
                                     ))}
@@ -385,7 +385,7 @@ const ExploreCity = () => {
                         >
                             <div className="flex items-center gap-2 overflow-hidden">
                                 <MapPin size={16} className="text-primary flex-shrink-0" />
-                                <span className="font-black text-slate-800 text-[10px] uppercase tracking-widest truncate">{userTown}</span>
+                                <span className="font-black text-slate-800 text-[10px] uppercase tracking-widest truncate">{translateValue(userTown)}</span>
                                 <span className="text-[8px] font-bold text-slate-400 uppercase">{townStateMap[userTown]?.state || ''}</span>
                             </div>
                             <ChevronDown size={14} className="text-slate-300" />
@@ -399,7 +399,7 @@ const ExploreCity = () => {
                 <div className="absolute inset-0 z-[2000] bg-white flex flex-col animate-in fade-in slide-in-from-bottom duration-500">
                     <div className="p-6 pb-2">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">Select Town</h2>
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">{t('select_town')}</h2>
                             {userTown && (
                                 <button onClick={() => setIsSelectorOpen(false)} className="p-2 bg-slate-100 text-slate-500 rounded-full">
                                     <X size={20} />
@@ -435,7 +435,7 @@ const ExploreCity = () => {
                                     className={`w-full flex items-center justify-between p-5 rounded-3xl transition-all ${userTown === town ? 'bg-primary/5 border-2 border-primary/20 shadow-lg' : 'bg-slate-50/50 border border-slate-100 active:scale-[0.98]'}`}
                                 >
                                     <div className="text-left">
-                                        <p className={`font-black uppercase tracking-widest ${userTown === town ? 'text-primary text-sm' : 'text-slate-800 text-xs'}`}>{town}</p>
+                                        <p className={`font-black uppercase tracking-widest ${userTown === town ? 'text-primary text-sm' : 'text-slate-800 text-xs'}`}>{translateValue(town)}</p>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{townStateMap[town]?.state || 'Registered Node'}</p>
                                     </div>
                                     <div className={`p-2 rounded-xl ${userTown === town ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100 text-slate-300'}`}>
@@ -472,7 +472,7 @@ const ExploreCity = () => {
                             <div className="w-20 h-20 bg-gradient-brand rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl rotate-3 group-hover:rotate-12 transition-transform duration-700">
                                 <Globe size={40} className="text-white animate-pulse" />
                             </div>
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-4 uppercase">Discovery Hub</h2>
+                            <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-4 uppercase">{t('discovery_hub')}</h2>
                             <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mb-10 opacity-70">Synchronize Regional Capability</p>
 
                             <div className="flex flex-col gap-4 max-w-sm mx-auto">
@@ -540,7 +540,7 @@ const ExploreCity = () => {
                                     <Popup className="premium-popup">
                                         <div className="text-center p-2 min-w-[120px]">
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Locality Node</p>
-                                            <h4 className="text-sm font-black text-slate-800 uppercase mb-3">{loc.name}</h4>
+                                            <h4 className="text-sm font-black text-slate-800 uppercase mb-3">{translateValue(loc.name)}</h4>
                                             <div className="bg-slate-50 p-2 rounded-xl mb-3">
                                                 <p className="text-2xl font-black text-primary leading-none">{loc.userCount}</p>
                                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Personnel</p>
@@ -570,9 +570,9 @@ const ExploreCity = () => {
                         <div className="p-8 pb-4 flex items-center justify-between">
                             <div>
                                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">Locality Analysis</p>
-                                <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase">{selectedLocality}</h2>
+                                <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase">{translateValue(selectedLocality)}</h2>
                                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-                                    {isSelectionMode ? `${selectedUserIds.size} Selected for Interlink` : `${localityUsers.length} Neighbors Identified`}
+                                    {isSelectionMode ? `${selectedUserIds.size} ${t('selected_interlink')}` : `${localityUsers.length} ${t('neighbors_identified')}`}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">
@@ -623,8 +623,8 @@ const ExploreCity = () => {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="font-black text-slate-800 uppercase tracking-tight truncate group-hover:text-primary transition-colors">{user.name}</h4>
-                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 mb-2">{user.professionCategory}</p>
+                                                    <h4 className="font-black text-slate-800 uppercase tracking-tight truncate group-hover:text-primary transition-colors">{translateValue(user.name)}</h4>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 mb-2">{translateValue(user.professionCategory)}</p>
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-lg">
                                                             <MapPin size={10} />
@@ -661,12 +661,12 @@ const ExploreCity = () => {
                                     {isSendingInterlink ? (
                                         <>
                                             <RefreshCw size={18} className="animate-spin" />
-                                            Generating Interlinks...
+                                            {t('generating_interlinks')}
                                         </>
                                     ) : (
                                         <>
                                             <PlusSquare size={18} />
-                                            {isSelectionMode ? `Establish Interlink (${selectedUserIds.size})` : 'Request Interlink'}
+                                            {isSelectionMode ? `${t('establish_interlink')} (${selectedUserIds.size})` : t('request_interlink')}
                                         </>
                                     )}
                                 </button>

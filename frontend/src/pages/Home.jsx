@@ -5,7 +5,7 @@ import { Map, Zap, MapPin, Shield, X, Briefcase, Award } from 'lucide-react';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const Home = () => {
-    const { t } = useLanguage();
+    const { t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [stats, setStats] = useState({ professions: [], states: [] });
@@ -126,14 +126,7 @@ const Home = () => {
                     <div className="flex-1 min-w-0">
                         <p className="opacity-80 text-[10px] md:text-sm font-medium tracking-wide uppercase truncate">{t('welcome_back_user')}</p>
                         <h1 className="text-xl md:text-2xl font-bold truncate flex items-center gap-2">
-                            {user.name}
-                            {user.profilePhoto && (
-                                <img
-                                    src={getProfilePhotoUrl(user.profilePhoto)}
-                                    alt=""
-                                    className="w-6 h-6 rounded-full object-cover border border-white/30"
-                                />
-                            )}
+                            {translateValue(user.name)}
                         </h1>
                         <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mt-1">
                             <span className="bg-white/20 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] md:text-xs font-mono tracking-wider flex items-center gap-1 whitespace-nowrap">
@@ -141,7 +134,7 @@ const Home = () => {
                                 {user.uniqueId}
                             </span>
                             <span className="bg-black/20 px-1.5 py-0.5 rounded text-[9px] md:text-xs flex items-center gap-1 whitespace-nowrap">
-                                <MapPin size={8} md:size={10} /> {t(user.locality) || user.locality}
+                                <MapPin size={8} md:size={10} /> {translateValue(user.locality)}
                             </span>
                         </div>
                     </div>
@@ -217,7 +210,7 @@ const Home = () => {
 
                                     <Map className="text-white opacity-50 relative z-10" size={24} />
                                     <div className="relative z-10 text-white">
-                                        <span className="block font-bold text-lg drop-shadow-md">{stateName}</span>
+                                        <span className="block font-bold text-lg drop-shadow-md">{translateValue(stateName)}</span>
                                         <span className="text-xs text-white/90 font-medium">{st.count} {t('active_users')}</span>
                                     </div>
                                 </div>

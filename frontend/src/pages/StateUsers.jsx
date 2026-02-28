@@ -7,7 +7,7 @@ import { API_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const StateUsers = () => {
     const { stateName } = useParams();
-    const { t } = useLanguage();
+    const { t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -92,7 +92,7 @@ const StateUsers = () => {
                     </button>
                     <div>
                         <h1 className="font-extrabold text-xl lg:text-2xl text-white tracking-tight flex items-center gap-2">
-                            {stateName} <span className="text-indigo-400 font-medium opacity-80">{t('discovery_hub', 'Discovery Hub')}</span>
+                            {translateValue(stateName)} <span className="text-indigo-400 font-medium opacity-80">{t('discovery_hub', 'Discovery Hub')}</span>
                         </h1>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                             <Users size={10} className="text-indigo-400" />
@@ -128,7 +128,7 @@ const StateUsers = () => {
                                         <Star size={24} className="relative z-10 fill-indigo-400/20" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">{district}</h2>
+                                        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">{translateValue(district)}</h2>
                                         <p className="text-[10px] font-bold text-indigo-400/60 uppercase tracking-widest">
                                             {Object.keys(towns).length} {t('major_towns', 'Major Towns')} &bull; {Object.values(towns).reduce((acc, arr) => acc + arr.length, 0)} {t('members', 'Members')}
                                         </p>
@@ -149,7 +149,7 @@ const StateUsers = () => {
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-px w-8 bg-indigo-500/30"></div>
                                                     <MapPin size={14} className="text-indigo-400" />
-                                                    <h3 className="font-bold text-indigo-300 uppercase text-xs tracking-[0.2em]">{town}</h3>
+                                                    <h3 className="font-bold text-indigo-300 uppercase text-xs tracking-[0.2em]">{translateValue(town)}</h3>
                                                     <span className="text-[9px] font-bold text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
                                                         {townUsers.length} {t('members', 'Members')}
                                                     </span>
@@ -187,7 +187,7 @@ const StateUsers = () => {
 
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex justify-between items-start gap-1">
-                                                                    <h4 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{u.name}</h4>
+                                                                    <h4 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{translateValue(u.name)}</h4>
                                                                     <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100/50 whitespace-nowrap flex-shrink-0">
                                                                         {u.uniqueId}
                                                                     </span>
@@ -196,11 +196,11 @@ const StateUsers = () => {
                                                                 <div className="mt-1.5 space-y-1">
                                                                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-600">
                                                                         <Briefcase size={11} className="text-indigo-500 flex-shrink-0" />
-                                                                        <span className="truncate">{u.professionDetails?.jobRole || u.professionCategory}</span>
+                                                                        <span className="truncate">{translateValue(u.professionDetails?.jobRole) || translateValue(u.professionCategory)}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
                                                                         <MapPin size={11} className="text-indigo-300 flex-shrink-0" />
-                                                                        <span className="truncate">{u.locality}</span>
+                                                                        <span className="truncate">{translateValue(u.locality)}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
