@@ -135,11 +135,12 @@ const createService = async (req, res) => {
         await service.save();
 
         // Generate rich HTML email
+        const isTelugu = user.language === 'Telugu';
         const emailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase());
 
         // SEND EMAILS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
-            console.log(`[Background] Starting email broadcast for Service ${service._id} to ${targetUsers.length} users`);
+            console.log(`[Background] Starting email broadcast for Service ${service._id} to ${targetUsers.length} users (Lang: ${user.language})`);
 
             let emailSuccessCount = 0;
             let emailFailCount = 0;
@@ -149,13 +150,25 @@ const createService = async (req, res) => {
 
             try {
                 for (const targetUser of targetUsers) {
+                    const subject = isTelugu
+                        ? `${type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన'}: ${title}`
+                        : `${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`;
+
+                    const notifTitle = isTelugu
+                        ? (type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన')
+                        : (type === 'offer' ? 'Service Offer' : 'Help Request');
+
+                    const notifBody = isTelugu
+                        ? `${user.name} పోస్ట్ చేశారు: ${title}`
+                        : `${user.name} posted: ${title}`;
+
                     // Send Email directly
                     if (targetUser.email) {
                         try {
                             const result = await sendEmail(
                                 targetUser.email,
-                                `${type === 'offer' ? 'Service Offer / కొత్త ఆఫర్' : 'Help Request / కొత్త సహాయం'}: ${title}`,
-                                `${user.name} posted: ${title}`,
+                                subject,
+                                notifBody,
                                 emailHtml
                             );
                             if (result.success) {
@@ -177,8 +190,8 @@ const createService = async (req, res) => {
                             await admin.messaging().send({
                                 token: targetUser.fcmToken,
                                 notification: {
-                                    title: `${type === 'offer' ? 'Service Offer / కొత్త ఆఫర్' : 'Help Request / కొత్త సహాయం'}`,
-                                    body: `${user.name}: ${title}`
+                                    title: notifTitle,
+                                    body: notifBody
                                 },
                                 data: { url: `/service/${service._id}`, type: 'service' }
                             });
@@ -193,8 +206,8 @@ const createService = async (req, res) => {
                         const Notification = require('../models/Notification');
                         await Notification.create({
                             userId: targetUser._id,
-                            title: `${type === 'offer' ? 'Service Offer / కొత్త ఆఫర్' : 'Help Request / కొత్త సహాయం'}: ${title}`,
-                            body: `${user.name}: ${title}`,
+                            title: subject,
+                            body: notifBody,
                             type: 'service',
                             link: `/service/${service._id}`,
                             delivered: true,
@@ -342,11 +355,14 @@ const expressInterest = async (req, res) => {
             service.interestedProviders.push(req.user._id);
 
             // Notify service creator
+            const creator = await User.findById(service.createdBy);
+            const isTelugu = req.user.language === 'Telugu';
+
             if (creator && creator.email) {
                 await sendEmail(
                     creator.email,
-                    `New Interest / కొత్త ఆసక్తి: ${service.title}`,
-                    `${req.user.name} is interested in your request.`,
+                    isTelugu ? `కొత్త ఆసక్తి: ${service.title}` : `New Interest: ${service.title}`,
+                    isTelugu ? `${req.user.name} మీ సహాయం కోరుతున్నారు.` : `${req.user.name} is interested in your request.`,
                     generateInterestEmailTemplate(service, req.user)
                 );
             }
@@ -354,12 +370,12 @@ const expressInterest = async (req, res) => {
             // Create DB Notification for Creator
             await createNotification(
                 service.createdBy,
-                `New Interest / కొత్త ఆసక్తి`,
-                `${req.user.name} is interested in: ${service.title}`,
+                isTelugu ? `కొత్త ఆసక్తి` : `New Interest`,
+                isTelugu ? `${req.user.name} దీనిపై ఆసక్తి చూపారు: ${service.title}` : `${req.user.name} is interested in: ${service.title}`,
                 'interest',
                 `/service/${service._id}`,
                 null,
-                true // Notification already sent via email above
+                true
             );
         }
 
@@ -422,13 +438,14 @@ const completeService = async (req, res) => {
         });
 
         // Notify provider
-        const amount = amountSpent || 0; // Define amount for clarity
+        const amount = amountSpent || 0;
+        const isTelugu = req.user.language === 'Telugu';
 
         if (provider.email) {
             await sendEmail(
                 provider.email,
-                `Service Completed / సేవ పూర్తయింది: ${service.title}`,
-                `Congratulations! Your service has been marked as completed.`,
+                isTelugu ? `సేవ పూర్తయింది: ${service.title}` : `Service Completed: ${service.title}`,
+                isTelugu ? `అభినందనలు! మీ సేవ విజయవంతంగా పూర్తయింది.` : `Congratulations! Your service has been marked as completed.`,
                 generateCompletionEmailTemplate(service, provider, amount)
             );
         }
@@ -436,12 +453,12 @@ const completeService = async (req, res) => {
         // Notification for Provider
         await createNotification(
             service.completedBy,
-            `Service Completed / సేవ పూర్తయింది`,
-            `Your service "${service.title}" has been completed. Revenue: ₹${amount}`,
+            isTelugu ? `సేవ పూర్తయింది` : `Service Completed`,
+            isTelugu ? `మీ సేవ "${service.title}" పూర్తయింది. ఆదాయం: ₹${amount}` : `Your service "${service.title}" has been completed. Revenue: ₹${amount}`,
             'completion',
             `/service/${service._id}`,
             null,
-            true // Email already sent
+            true
         );
 
         res.json({

@@ -67,12 +67,12 @@ const createAlert = async (req, res) => {
         await alert.save();
 
         // Generate rich HTML email with full details and sender info
+        const isTelugu = req.user.language === 'Telugu';
         const emailHtml = generateAlertEmailTemplate(alert, req.user);
 
         // SEND EMAILS IN BACKGROUND (Non-blocking)
-        // Use setImmediate to process emails after the response is sent
         setImmediate(async () => {
-            console.log(`[Background] Starting email broadcast for Alert ${alert._id} to ${targetUsers.length} users`);
+            console.log(`[Background] Starting email broadcast for Alert ${alert._id} to ${targetUsers.length} users (Lang: ${req.user.language})`);
 
             let emailSuccessCount = 0;
             let emailFailCount = 0;
@@ -83,15 +83,23 @@ const createAlert = async (req, res) => {
 
             try {
                 for (const user of targetUsers) {
-                    console.log(`[Alert Trace] Processing user: ${user.name} (${user._id}), email: ${user.email || 'MISSING'}`);
+                    const subject = isTelugu
+                        ? `హెచ్చరిక: ${category}`
+                        : `ALERT: ${category}`;
+
+                    const notifTitle = isTelugu
+                        ? `హెచ్చరిక: ${category}`
+                        : `ALERT: ${category}`;
+
+                    const notifBody = description.substring(0, 200);
 
                     // Send Email directly
                     if (user.email) {
                         try {
                             const result = await sendEmail(
                                 user.email,
-                                `ALERT / హెచ్చరిక: ${category} - ${subType || ''}`,
-                                description.substring(0, 200),
+                                subject,
+                                notifBody,
                                 emailHtml
                             );
                             if (result.success) {
@@ -116,8 +124,8 @@ const createAlert = async (req, res) => {
                             await admin.messaging().send({
                                 token: user.fcmToken,
                                 notification: {
-                                    title: `ALERT / హెచ్చరిక: ${category}`,
-                                    body: description.substring(0, 100)
+                                    title: notifTitle,
+                                    body: notifBody.substring(0, 100)
                                 },
                                 data: { url: '/alerts', type: 'ALERT' }
                             });
@@ -132,8 +140,8 @@ const createAlert = async (req, res) => {
                         const Notification = require('../models/Notification');
                         await Notification.create({
                             userId: user._id,
-                            title: `ALERT / హెచ్చరిక: ${category}`,
-                            body: description.substring(0, 200),
+                            title: subject,
+                            body: notifBody,
                             type: 'ALERT',
                             link: '/alerts',
                             delivered: true,

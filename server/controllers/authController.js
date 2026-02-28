@@ -96,7 +96,8 @@ const registerUser = async (req, res) => {
             state: (state || '').trim(),
             professionCategory,
             professionDetails,
-            experience: parseInt(experience) || 0
+            experience: parseInt(experience) || 0,
+            language: language || req.body.language || 'English'
         });
 
         if (user) {

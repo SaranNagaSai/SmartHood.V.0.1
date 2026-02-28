@@ -212,6 +212,7 @@ const updateProfile = async (req, res) => {
             user.professionCategory = professionCategory || user.professionCategory;
             user.professionDetails = professionDetails || user.professionDetails;
             user.experience = experience !== undefined ? experience : user.experience;
+            user.language = req.body.language || language || user.language;
 
             const updatedUser = await user.save();
             res.json(updatedUser);
