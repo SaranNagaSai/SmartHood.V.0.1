@@ -30,6 +30,7 @@ export const LanguageProvider = ({ children }) => {
 
     const translations = {
         'English': {
+            'smarthood': 'SmartHood',
             'welcome': 'Welcome',
             'login': 'Login',
             'register': 'Register',
@@ -272,7 +273,11 @@ export const LanguageProvider = ({ children }) => {
             'post_confirmation_msg': 'This will be posted to all users in your locality.',
             'select_profession_alert': 'Please select at least one profession when targeting specific professionals',
             'telugu_only_error': 'Registration failed. Please use Telugu script for specific fields.',
+            'login_failed': 'Invalid credentials. Please check your username and phone number.',
             'broadcast_started': 'Broadcast started',
+            'system_access_module': 'System Access Module',
+            'mobile_portal': 'Mobile Portal',
+            'desktop_rig': 'Desktop Rig',
             'to_all_users': 'To All Users',
             'global_broadcast_active': 'Global Broadcast Active',
             'global_broadcast_desc': 'This will reach every user on the platform.',
@@ -442,6 +447,7 @@ export const LanguageProvider = ({ children }) => {
             'West Bengal': 'West Bengal'
         },
         'Telugu': {
+            'smarthood': 'స్మార్ట్‌హుడ్',
             'welcome': 'స్వాగతం',
             'login': 'లాగిన్',
             'register': 'నమోదు',
@@ -474,12 +480,14 @@ export const LanguageProvider = ({ children }) => {
             'postgraduate': 'పీజీ (PG)',
             'phd': 'పీహెచ్‌డీ',
             'welcome_back_msg': 'మీ స్మార్ట్‌హుడ్‌కు తిరిగి స్వాగతం',
-            'name_label': 'పేరు లేదా ప్రత్యేక ఐడి',
+            'name_label': 'వినియోగదారు పేరు',
             'name_placeholder': 'మీ పేరు తెలియజేయండి',
             'phone_label': 'ఫోన్ నంబర్',
             'phone_placeholder': '10 అంకెల మొబైల్ నంబర్',
             'sign_in': 'సైన్ ఇన్',
-            'secure_login': 'సురక్షిత పాస్‌వర్డ్‌లెస్ లాగిన్',
+            'login_failed': 'వివరాలు సరైనవి కావు. దయచేసి పేరు మరియు ఫోన్ నంబర్‌ను సరిచూసుకోండి.',
+            'secure_login': 'సురక్షిత పాసవర్డ్‌లెస్ లాగిన్',
+            'new_user_prompt': 'ఖాతా లేదా? ఇక్కడ సృష్టించండి',
             'join_smarthood': 'స్మార్ట్‌హుడ్‌లో చేరండి',
             'community_connect': 'ఈరోజే మీ స్థానిక కమ్యూనిటీతో కనెక్ట్ అవ్వండి',
             'personal': 'వ్యక్తిగత',
@@ -717,7 +725,6 @@ export const LanguageProvider = ({ children }) => {
             'category': 'వర్గం',
             'community': 'కమ్యూనిటీ',
             'create_event': 'ఈవెంట్‌ను సృష్టించు',
-            'new_user_prompt': 'కొత్త యూజర్ నమోదు',
             'loading_neighborhood': 'మీ ప్రాంత వివరాలు లోడ్ అవుతున్నాయి...',
             'live': 'లైవ్',
             'no_active_states': 'క్రియాశీల రాష్ట్రాలు కనుగొనబడలేదు.',

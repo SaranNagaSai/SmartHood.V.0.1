@@ -35,14 +35,14 @@ const LanguageSelection = () => {
                 <div className="text-center mb-6">
                     <div className="flex flex-col items-center justify-center gap-3 mb-4">
                         <img src={smartHoodLogo} alt="SmartHood" className="w-28 h-28 md:w-40 md:h-40 object-contain drop-shadow-2xl" />
-                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight drop-shadow-md">SmartHood</h2>
+                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight drop-shadow-md">{t('smarthood') || 'SmartHood'}</h2>
                     </div>
                 </div>
 
                 <div className="w-full bg-gray-900/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 md:p-8">
                     {/* Device Type Selection */}
                     <div className="mb-10">
-                        <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-6 text-center">System Access Module</p>
+                        <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-6 text-center">{t('system_access_module')}</p>
                         <div className="grid grid-cols-2 gap-5 px-1">
                             {/* Mobile Hub Card */}
                             <button
@@ -64,7 +64,7 @@ const LanguageSelection = () => {
                                 </div>
 
                                 <div className="relative z-10 text-center">
-                                    <span className={`block text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${selectedDevice === 'mobile' ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>Mobile Portal</span>
+                                    <span className={`block text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${selectedDevice === 'mobile' ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>{t('mobile_portal')}</span>
                                     <div className={`mt-1.5 h-0.5 mx-auto transition-all duration-500 rounded-full ${selectedDevice === 'mobile' ? 'w-10 bg-blue-400' : 'w-0 bg-white/20 group-hover:w-4'}`}></div>
                                 </div>
                             </button>
@@ -89,7 +89,7 @@ const LanguageSelection = () => {
                                 </div>
 
                                 <div className="relative z-10 text-center">
-                                    <span className={`block text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${selectedDevice === 'desktop' ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>Desktop Rig</span>
+                                    <span className={`block text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${selectedDevice === 'desktop' ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>{t('desktop_rig')}</span>
                                     <div className={`mt-1.5 h-0.5 mx-auto transition-all duration-500 rounded-full ${selectedDevice === 'desktop' ? 'w-10 bg-purple-400' : 'w-0 bg-white/20 group-hover:w-4'}`}></div>
                                 </div>
                             </button>
