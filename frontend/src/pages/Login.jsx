@@ -9,7 +9,7 @@ import smartHoodLogo from '../assets/images/Smart Hood Logo.png';
 
 const Login = () => {
     const { t } = useLanguage();
-    const { login } = useAuth();
+    const { login, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ name: '', phone: '' });
 
@@ -44,33 +44,52 @@ const Login = () => {
                     </div>
 
                     <div className="space-y-6">
-                        <div className="space-y-4">
-                            <VoiceInput
-                                label={t('name_label')}
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                placeholder={t('name_placeholder')}
-                                className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
-                                labelClassName="text-white drop-shadow-sm"
-                            />
-                            <VoiceInput
-                                label={t('phone_label')}
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                placeholder={t('phone_placeholder')}
-                                type="tel"
-                                className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
-                                labelClassName="text-white drop-shadow-sm"
-                            />
-                        </div>
+                        {isAuthenticated ? (
+                            <div className="text-center animate-fade-in">
+                                <div className="mb-6 p-4 bg-white/10 rounded-2xl border border-white/20">
+                                    <p className="text-white/60 text-xs uppercase tracking-widest mb-2 font-bold">{t('logged_in_as') || 'Authenticated As'}</p>
+                                    <h3 className="text-xl font-bold text-white">{user?.name}</h3>
+                                    <p className="text-blue-300 text-[10px] mt-1 font-mono">{user?.uniqueId}</p>
+                                </div>
+                                <button
+                                    onClick={() => navigate('/home')}
+                                    className="w-full bg-primary text-white p-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2 group border border-white/10"
+                                >
+                                    <span>{t('continue_to_website') || 'Continue to Website'}</span>
+                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="space-y-4">
+                                    <VoiceInput
+                                        label={t('name_label')}
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder={t('name_placeholder')}
+                                        className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
+                                        labelClassName="text-white drop-shadow-sm"
+                                    />
+                                    <VoiceInput
+                                        label={t('phone_label')}
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder={t('phone_placeholder')}
+                                        type="tel"
+                                        className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
+                                        labelClassName="text-white drop-shadow-sm"
+                                    />
+                                </div>
 
-                        <button
-                            onClick={handleLogin}
-                            className="w-full bg-primary text-white p-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2 group border border-white/10"
-                        >
-                            <span>{t('sign_in')}</span>
-                            <span className="group-hover:translate-x-1 transition-transform">→</span>
-                        </button>
+                                <button
+                                    onClick={handleLogin}
+                                    className="w-full bg-primary text-white p-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2 group border border-white/10"
+                                >
+                                    <span>{t('sign_in')}</span>
+                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                </button>
+                            </>
+                        )}
 
                         <p className="text-center text-xs text-gray-300 mt-6 pt-4 border-t border-white/10 flex items-center justify-center gap-2">
                             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>

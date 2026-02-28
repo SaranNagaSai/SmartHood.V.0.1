@@ -21,11 +21,8 @@ const LanguageSelection = () => {
         setLanguage(lang);
         setDeviceType(selectedDevice);
 
-        if (isAuthenticated) {
-            navigate('/home');
-        } else {
-            navigate('/register');
-        }
+        // Always navigate to login page after selection to show the login/register gateway
+        navigate('/login');
     };
 
     return (
