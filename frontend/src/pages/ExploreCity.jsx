@@ -121,6 +121,12 @@ const ExploreCity = () => {
     const [isListening, setIsListening] = React.useState(false);
     const [isSelectorOpen, setIsSelectorOpen] = React.useState(false);
 
+    // Interlink Multi-Selection State
+    const [isSelectionMode, setIsSelectionMode] = React.useState(false);
+    const [selectedUserIds, setSelectedUserIds] = React.useState(new Set());
+    const [isSendingInterlink, setIsSendingInterlink] = React.useState(false);
+    const [interlinkSuccess, setInterlinkSuccess] = React.useState(false);
+
     const districtInfo = React.useMemo(() => {
         if (!userDistrict) return null;
         const key = userDistrict.trim().toLowerCase();
@@ -241,6 +247,49 @@ const ExploreCity = () => {
         setLoadingUsers(false);
     };
 
+    const handleSelectUser = (userId) => {
+        if (!isSelectionMode) return;
+        setSelectedUserIds(prev => {
+            const next = new Set(prev);
+            if (next.has(userId)) next.delete(userId);
+            else next.add(userId);
+            return next;
+        });
+    };
+
+    const handleEstablishInterlink = async () => {
+        if (selectedUserIds.size === 0) return alert("Please select neighbors to interlink with.");
+
+        setIsSendingInterlink(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/notifications/interlink`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ targetUserIds: Array.from(selectedUserIds) })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setInterlinkSuccess(true);
+                setTimeout(() => {
+                    setInterlinkSuccess(false);
+                    setIsSelectionMode(false);
+                    setSelectedUserIds(new Set());
+                }, 3000);
+            } else {
+                alert(data.message || "Failed to send interlink requests.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Connection error. Please try again.");
+        }
+        setIsSendingInterlink(false);
+    };
+
     const getCoordinates = React.useCallback((town, localityName) => {
         const key = town?.toLowerCase();
         let center = townCenterCache[key] || [16.5, 79.5];
@@ -263,7 +312,7 @@ const ExploreCity = () => {
     const currentTownCenter = React.useMemo(() => userTown ? townCenterCache[userTown.toLowerCase()] : null, [userTown, townCenterCache]);
 
     // Filter towns for search
-    const filteredTowns = availableTowns.filter(t => 
+    const filteredTowns = availableTowns.filter(t =>
         t.toLowerCase().includes(searchTown.toLowerCase())
     );
 
@@ -330,7 +379,7 @@ const ExploreCity = () => {
                         <button onClick={() => navigate('/home')} className="p-3 bg-white/95 backdrop-blur-md text-slate-700 rounded-2xl shadow-xl border border-slate-100 active:scale-95 transition-all">
                             <ArrowLeft size={18} />
                         </button>
-                        <button 
+                        <button
                             onClick={() => setIsSelectorOpen(true)}
                             className="flex-1 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 border border-slate-100 active:scale-95 transition-all"
                         >
@@ -357,7 +406,7 @@ const ExploreCity = () => {
                                 </button>
                             )}
                         </div>
-                        
+
                         <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-inner group focus-within:border-primary transition-all">
                             <Search size={20} className="text-slate-400 group-focus-within:text-primary transition-colors" />
                             <input
@@ -368,7 +417,7 @@ const ExploreCity = () => {
                                 onChange={(e) => setSearchTown(e.target.value)}
                                 autoFocus
                             />
-                            <button 
+                            <button
                                 onClick={startListening}
                                 className={`p-2 rounded-xl transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-primary/10 text-primary'}`}
                             >
@@ -401,7 +450,7 @@ const ExploreCity = () => {
                             </div>
                         )}
                     </div>
-                    
+
                     {!userTown && (
                         <div className="p-6 border-t border-slate-50">
                             <button onClick={() => navigate('/home')} className="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
@@ -522,11 +571,23 @@ const ExploreCity = () => {
                             <div>
                                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">Locality Analysis</p>
                                 <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase">{selectedLocality}</h2>
-                                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-1">{localityUsers.length} Neighbors Identified</p>
+                                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                                    {isSelectionMode ? `${selectedUserIds.size} Selected for Interlink` : `${localityUsers.length} Neighbors Identified`}
+                                </p>
                             </div>
-                            <button onClick={() => setSelectedLocality(null)} className="p-4 hover:bg-slate-50 rounded-[1.5rem] text-slate-400 transition-colors border border-transparent hover:border-slate-100">
-                                <X size={24} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {isSelectionMode && (
+                                    <button
+                                        onClick={() => { setIsSelectionMode(false); setSelectedUserIds(new Set()); }}
+                                        className="px-4 py-2 bg-slate-50 text-slate-400 font-black text-[9px] uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
+                                <button onClick={() => { setSelectedLocality(null); setIsSelectionMode(false); setSelectedUserIds(new Set()); }} className="p-4 hover:bg-slate-50 rounded-[1.5rem] text-slate-400 transition-colors border border-transparent hover:border-slate-100">
+                                    <X size={24} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar pt-4">
@@ -538,15 +599,26 @@ const ExploreCity = () => {
                             ) : localityUsers.length > 0 ? (
                                 <div className="space-y-4">
                                     {localityUsers.map((user) => (
-                                        <div key={user.uniqueId} className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100 hover:bg-white hover:shadow-2xl transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-2 h-full bg-slate-200 group-hover:bg-primary transition-colors"></div>
+                                        <div
+                                            key={user.uniqueId}
+                                            onClick={() => isSelectionMode ? handleSelectUser(user._id) : null}
+                                            className={`p-5 rounded-3xl border transition-all duration-300 group relative overflow-hidden ${isSelectionMode ? (selectedUserIds.has(user._id) ? 'bg-primary/5 border-primary shadow-xl scale-[1.02]' : 'bg-white border-slate-100 opacity-60') : 'bg-slate-50/50 border-slate-100 hover:bg-white hover:shadow-2xl cursor-pointer'}`}
+                                        >
+                                            <div className={`absolute top-0 right-0 w-2 h-full transition-colors ${selectedUserIds.has(user._id) ? 'bg-primary' : 'bg-slate-200 group-hover:bg-primary'}`}></div>
+
+                                            {isSelectionMode && (
+                                                <div className={`absolute top-4 right-6 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedUserIds.has(user._id) ? 'bg-primary border-primary scale-110' : 'border-slate-200'}`}>
+                                                    {selectedUserIds.has(user._id) && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                                                </div>
+                                            )}
+
                                             <div className="flex items-center gap-5">
                                                 <div className="w-16 h-16 bg-white rounded-2xl p-1 shadow-lg group-hover:rotate-6 transition-transform">
                                                     {user.profilePhoto ? (
                                                         <img src={getProfilePhotoUrl(user.profilePhoto)} alt="" className="w-full h-full rounded-xl object-cover" />
                                                     ) : (
                                                         <div className="w-full h-full bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center font-black text-xl">
-                                                            {user.name.charAt(0)}
+                                                            {user.name?.charAt(0)}
                                                         </div>
                                                     )}
                                                 </div>
@@ -556,12 +628,12 @@ const ExploreCity = () => {
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-lg">
                                                             <MapPin size={10} />
-                                                            <span className="text-[9px] font-black tracking-tighter">NODE-{user.uniqueId.slice(-4)}</span>
+                                                            <span className="text-[9px] font-black tracking-tighter">NODE-{user.uniqueId?.slice(-4)}</span>
                                                         </div>
                                                         <span className="text-[10px] font-black text-emerald-500">+{user.impactScore} IMPACT</span>
                                                     </div>
                                                 </div>
-                                                <ChevronRight className="text-slate-200 group-hover:text-primary transition-colors translate-x-4 group-hover:translate-x-0 opacity-0 group-hover:opacity-100" size={20} />
+                                                {!isSelectionMode && <ChevronRight className="text-slate-200 group-hover:text-primary transition-colors translate-x-4 group-hover:translate-x-0 opacity-0 group-hover:opacity-100" size={20} />}
                                             </div>
                                         </div>
                                     ))}
@@ -575,10 +647,30 @@ const ExploreCity = () => {
                         </div>
 
                         <div className="p-8 pt-4 border-t border-slate-50 bg-slate-50/20 backdrop-blur-md rounded-b-[3rem] sticky bottom-0">
-                            <button className="w-full py-5 bg-gradient-brand text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 flex items-center justify-center gap-3">
-                                <PlusSquare size={18} />
-                                Request Interlink
-                            </button>
+                            {interlinkSuccess ? (
+                                <div className="w-full py-5 bg-emerald-500 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl flex items-center justify-center gap-3 animate-in fade-in zoom-in duration-300">
+                                    <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">✓</div>
+                                    Requests Broadcasted!
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => isSelectionMode ? handleEstablishInterlink() : setIsSelectionMode(true)}
+                                    disabled={isSendingInterlink}
+                                    className={`w-full py-5 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 ${isSelectionMode ? (selectedUserIds.size > 0 ? 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-emerald-500/30' : 'bg-slate-300 cursor-not-allowed') : 'bg-gradient-brand shadow-primary/30 hover:shadow-primary/50'}`}
+                                >
+                                    {isSendingInterlink ? (
+                                        <>
+                                            <RefreshCw size={18} className="animate-spin" />
+                                            Generating Interlinks...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <PlusSquare size={18} />
+                                            {isSelectionMode ? `Establish Interlink (${selectedUserIds.size})` : 'Request Interlink'}
+                                        </>
+                                    )}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

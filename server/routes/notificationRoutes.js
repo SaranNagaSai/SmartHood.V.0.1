@@ -5,11 +5,13 @@ const {
     getNotifications,
     markAsRead,
     markAllAsRead,
-    getUnreadCount
+    getUnreadCount,
+    sendInterlinkRequest
 } = require('../controllers/notificationController');
 
 router.get('/', protect, getNotifications);
 router.get('/unread-count', protect, getUnreadCount);
+router.post('/interlink', protect, sendInterlinkRequest);
 router.put('/:id/read', protect, markAsRead);
 router.put('/read-all', protect, markAllAsRead);
 
