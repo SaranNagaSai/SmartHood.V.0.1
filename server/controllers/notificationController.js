@@ -56,60 +56,79 @@ const markAllAsRead = async (req, res) => {
     }
 };
 
-// @desc    Create notification (internal use)
-const createNotification = async (userId, title, body, type = 'system', link = null, emailHtml = null, skipEmail = false) => {
+const createNotification = async (userId, data, type = 'system', link = null, emailHtml = null, skipEmail = false) => {
     try {
-        console.log(`[Notification] creating for userId: ${userId}, title: ${title}`);
+        // Support both simple string or bilingual object
+        const { title, body, titleTe, bodyTe } = typeof data === 'string' ? { title: data, body: '' } : data;
+
+        console.log(`[Notification] Creating for userId: ${userId}, type: ${type}`);
         const user = await User.findById(userId);
         if (!user) {
             console.log(`[Notification] User NOT found: ${userId}`);
             return null;
         }
 
+        const isTelugu = user.language === 'Telugu';
+        const finalTitle = isTelugu && titleTe ? titleTe : title;
+        const finalBody = isTelugu && bodyTe ? bodyTe : body;
+
         const notification = await Notification.create({
             userId,
-            title,
-            body,
+            title: finalTitle,
+            body: finalBody,
             type,
             link
         });
 
-        // Send Email (unless skipEmail is true - caller already handled email)
+        let delivered = false;
+        let methods = [];
+
+        // 1. Send Email (Dual Channel)
         if (user.email && !skipEmail) {
-            const emailResult = await sendEmail(user.email, title, body, emailHtml);
-            if (emailResult.success) {
-                notification.deliveryMethod = 'email';
-                notification.delivered = true;
-                console.log(`[Notification] Email sent to ${user.email}`);
-            } else {
-                console.error(`[Notification] Email FAILED to ${user.email}:`, emailResult.reason);
+            try {
+                const emailResult = await sendEmail(user.email, finalTitle, finalBody, emailHtml);
+                if (emailResult.success) {
+                    delivered = true;
+                    methods.push('email');
+                    console.log(`[Notification] Email sent to ${user.email}`);
+                }
+            } catch (err) {
+                console.error(`[Notification] Email error for ${user.email}:`, err.message);
             }
         }
 
+        // 2. Send FCM Push (Dual Channel - WhatsApp style)
         if (user.fcmToken) {
             try {
                 await admin.messaging().send({
                     token: user.fcmToken,
-                    notification: { title, body },
-                    data: { url: link || '/home' }
+                    notification: {
+                        title: finalTitle,
+                        body: finalBody.length > 100 ? finalBody.substring(0, 97) + '...' : finalBody
+                    },
+                    data: {
+                        url: link || '/home',
+                        type: type,
+                        click_action: 'FLUTTER_NOTIFICATION_CLICK' // For mobile compatibility if needed
+                    }
                 });
-                notification.deliveryMethod = user.email && !skipEmail ? 'both' : 'fcm';
-                notification.delivered = true;
+                delivered = true;
+                methods.push('fcm');
+                console.log(`[Notification] FCM sent to ${user.name}`);
             } catch (fcmError) {
-                console.error(`FCM Error for ${user.name}:`, fcmError.message);
+                console.error(`[Notification] FCM error for ${user.name}:`, fcmError.message);
             }
         }
 
-        if (notification.delivered) {
-            console.log(`[Notification] Marked as delivered (Entry ID: ${notification._id})`);
+        if (delivered) {
+            notification.delivered = true;
+            notification.deliveryMethod = methods.join('+');
             await notification.save();
-        } else {
-            console.log(`[Notification] NOT delivered (No email/FCM)`);
         }
 
         return notification;
     } catch (error) {
-        console.error('Notification creation error:', error);
+        console.error('[Notification] Error:', error);
         return null;
     }
 };

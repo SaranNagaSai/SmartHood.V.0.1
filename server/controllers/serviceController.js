@@ -138,95 +138,32 @@ const createService = async (req, res) => {
         const isTelugu = user.language === 'Telugu';
         const emailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase());
 
-        // SEND EMAILS IN BACKGROUND (Non-blocking)
+        // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
-            console.log(`[Background] Starting email broadcast for Service ${service._id} to ${targetUsers.length} users (Lang: ${user.language})`);
+            console.log(`[Background] Starting dual-channel broadcast for Service ${service._id} to ${targetUsers.length} users`);
 
-            let emailSuccessCount = 0;
-            let emailFailCount = 0;
-            let fcmCount = 0;
-            const { sendEmail } = require('../services/emailService');
-            const admin = require('../config/firebase');
+            const { createNotification } = require('./notificationController');
 
-            try {
-                const { translateText } = require('../utils/translationUtility');
+            for (const targetUser of targetUsers) {
+                const recipientIsTelugu = targetUser.language === 'Telugu';
 
-                for (const targetUser of targetUsers) {
-                    const recipientIsTelugu = targetUser.language === 'Telugu';
-                    const targetLanguage = recipientIsTelugu ? 'Telugu' : 'English';
+                // Prepare bilingual content
+                const notificationData = {
+                    title: type === 'offer' ? 'New Service Offer' : 'New Help Request',
+                    titleTe: type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన',
+                    body: `${user.name} posted: ${title}`,
+                    bodyTe: `${user.name} పోస్ట్ చేశారు: ${title}`
+                };
 
-                    // Translate the core title if possible
-                    const translatedTitle = translateText(title, targetLanguage);
-
-                    const notifTitle = recipientIsTelugu
-                        ? (type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన')
-                        : (type === 'offer' ? 'Service Offer' : 'Help Request');
-
-                    const notifBody = recipientIsTelugu
-                        ? `${user.name} పోస్ట్ చేశారు: ${translatedTitle}`
-                        : `${user.name} posted: ${translatedTitle}`;
-
-                    const subject = `${notifTitle}: ${translatedTitle}`;
-
-                    // Send Email directly
-                    if (targetUser.email) {
-                        try {
-                            const result = await sendEmail(
-                                targetUser.email,
-                                subject,
-                                notifBody,
-                                emailHtml
-                            );
-                            if (result.success) {
-                                emailSuccessCount++;
-                                console.log(`[Service Email] SUCCESS to ${targetUser.email}`);
-                            } else {
-                                emailFailCount++;
-                                console.error(`[Service Email] FAILED to ${targetUser.email}: ${result.reason}`);
-                            }
-                        } catch (emailErr) {
-                            emailFailCount++;
-                            console.error(`[Service Email] ERROR to ${targetUser.email}: ${emailErr.message}`);
-                        }
-                    }
-
-                    // Send FCM push notification
-                    if (targetUser.fcmToken) {
-                        try {
-                            await admin.messaging().send({
-                                token: targetUser.fcmToken,
-                                notification: {
-                                    title: notifTitle,
-                                    body: notifBody
-                                },
-                                data: { url: `/service/${service._id}`, type: 'service' }
-                            });
-                            fcmCount++;
-                        } catch (fcmErr) {
-                            console.error(`[Service FCM] ERROR for ${targetUser.name}: ${fcmErr.message}`);
-                        }
-                    }
-
-                    // Also create a DB notification entry
-                    try {
-                        const Notification = require('../models/Notification');
-                        await Notification.create({
-                            userId: targetUser._id,
-                            title: subject,
-                            body: notifBody,
-                            type: 'service',
-                            link: `/service/${service._id}`,
-                            delivered: true,
-                            deliveryMethod: targetUser.email ? 'email' : (targetUser.fcmToken ? 'fcm' : 'none')
-                        });
-                    } catch (notifErr) {
-                        console.error(`[Service DB Notif] ERROR for ${targetUser.name}: ${notifErr.message}`);
-                    }
-                }
-                console.log(`[Background] Service Broadcast COMPLETE: ${emailSuccessCount} sent, ${emailFailCount} failed, ${fcmCount} FCM`);
-            } catch (bgError) {
-                console.error(`[Background] Service Broadcast CRASHED: ${bgError.message}`);
+                await createNotification(
+                    targetUser._id,
+                    notificationData,
+                    'service',
+                    `/service/${service._id}`,
+                    emailHtml
+                );
             }
+            console.log(`[Background] Service Broadcast COMPLETE for ${targetUsers.length} users.`);
         });
 
         res.status(201).json({
@@ -376,12 +313,15 @@ const expressInterest = async (req, res) => {
             // Create DB Notification for Creator
             await createNotification(
                 service.createdBy,
-                isTelugu ? `కొత్త ఆసక్తి` : `New Interest`,
-                isTelugu ? `${req.user.name} దీనిపై ఆసక్తి చూపారు: ${service.title}` : `${req.user.name} is interested in: ${service.title}`,
+                {
+                    title: 'New Interest',
+                    titleTe: 'కొత్త ఆసక్తి',
+                    body: `${req.user.name} is interested in: ${service.title}`,
+                    bodyTe: `${req.user.name} దీనిపై ఆసక్తి చూపారు: ${service.title}`
+                },
                 'interest',
                 `/service/${service._id}`,
-                null,
-                true
+                generateInterestEmailTemplate(service, req.user)
             );
         }
 
@@ -431,6 +371,7 @@ const completeService = async (req, res) => {
         service.completedByUniqueId = provider.uniqueId;
         service.completionDate = new Date();
         service.amountSpent = amountSpent || 0;
+        service.followUpComplete = true; // INSTANT TERMINATION - stop scheduler reminders
 
         await service.save();
 
@@ -465,12 +406,15 @@ const completeService = async (req, res) => {
         // Notification for Provider
         await createNotification(
             service.completedBy,
-            isTelugu ? `సేవ పూర్తయింది` : `Service Completed`,
-            isTelugu ? `మీ సేవ "${service.title}" పూర్తయింది. ఆదాయం: ₹${amount}` : `Your service "${service.title}" has been completed. Revenue: ₹${amount}`,
+            {
+                title: 'Service Completed',
+                titleTe: 'సేవ పూర్తయింది',
+                body: `Your service "${service.title}" has been completed. Revenue: ₹${amount}`,
+                bodyTe: `మీ సేవ "${service.title}" పూర్తయింది. ఆదాయం: ₹${amount}`
+            },
             'completion',
             `/service/${service._id}`,
-            null,
-            true
+            generateCompletionEmailTemplate(service, provider, amount)
         );
 
         res.json({

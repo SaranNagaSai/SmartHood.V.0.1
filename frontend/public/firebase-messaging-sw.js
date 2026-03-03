@@ -23,3 +23,26 @@ messaging.onBackgroundMessage((payload) => {
 
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    // Extract target URL from notification data
+    const targetUrl = event.notification.data?.url || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then((clientList) => {
+                // If a window is already open, focus it and navigate
+                for (const client of clientList) {
+                    if (client.url.includes(location.origin) && 'focus' in client) {
+                        return client.focus().then(() => client.navigate(targetUrl));
+                    }
+                }
+                // Otherwise open a new window
+                if (clients.openWindow) {
+                    return clients.openWindow(targetUrl);
+                }
+            })
+    );
+});

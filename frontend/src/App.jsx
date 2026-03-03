@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useLanguage } from './context/LanguageContext';
 import { useAuth } from './context/AuthContext';
@@ -25,6 +25,7 @@ import AdminUserStats from './pages/AdminUserStats';
 import Emergency from './pages/Emergency';
 import StudentDashboard from './pages/StudentDashboard';
 import Layout from './components/layout/Layout';
+import { requestForToken } from './utils/firebase';
 
 import Loader from './components/common/Loader';
 
@@ -54,6 +55,13 @@ const AuthGuard = ({ children }) => {
 
 function App() {
     const { language } = useLanguage();
+    const { isAuthenticated } = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            requestForToken();
+        }
+    }, [isAuthenticated]);
 
     return (
         <Layout>

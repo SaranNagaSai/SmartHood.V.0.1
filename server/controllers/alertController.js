@@ -70,99 +70,34 @@ const createAlert = async (req, res) => {
         const isTelugu = req.user.language === 'Telugu';
         const emailHtml = generateAlertEmailTemplate(alert, req.user);
 
-        // SEND EMAILS IN BACKGROUND (Non-blocking)
+        // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
-            console.log(`[Background] Starting email broadcast for Alert ${alert._id} to ${targetUsers.length} users (Lang: ${req.user.language})`);
+            console.log(`[Background] Starting dual-channel broadcast for Alert ${alert._id} to ${targetUsers.length} users`);
 
-            let emailSuccessCount = 0;
-            let emailFailCount = 0;
-            let emailSkipCount = 0;
-            let fcmCount = 0;
-            const { sendEmail } = require('../services/emailService');
-            const admin = require('../config/firebase');
+            const { createNotification } = require('./notificationController');
 
-            const { translateText } = require('../utils/translationUtility');
+            for (const user of targetUsers) {
+                // Prepare bilingual content for the notification
+                const notificationData = {
+                    title: `ALERT: ${category} (${subType})`,
+                    titleTe: `హెచ్చరిక: ${category} (${subType})`, // We can use translationUtility if needed, but categories are defined
+                    body: description,
+                    bodyTe: description // createNotification will handle translation if we pass just body, 
+                    // but for precision let's provide bilingual if possible.
+                };
 
-            try {
-                for (const user of targetUsers) {
-                    const recipientIsTelugu = user.language === 'Telugu';
-                    const targetLanguage = recipientIsTelugu ? 'Telugu' : 'English';
+                // For alerts, we use the generateAlertEmailTemplate
+                const emailHtml = generateAlertEmailTemplate(alert, req.user);
 
-                    // Translate category, subType and description
-                    const translatedCategory = translateText(category, targetLanguage);
-                    const translatedSubType = translateText(subType, targetLanguage);
-                    const translatedDescription = translateText(description, targetLanguage);
-
-                    const subject = recipientIsTelugu
-                        ? `హెచ్చరిక: ${translatedCategory} (${translatedSubType})`
-                        : `ALERT: ${translatedCategory} (${translatedSubType})`;
-
-                    const notifTitle = subject;
-                    const notifBody = translatedDescription.substring(0, 200);
-
-                    // Send Email directly
-                    if (user.email) {
-                        try {
-                            const result = await sendEmail(
-                                user.email,
-                                subject,
-                                notifBody,
-                                emailHtml
-                            );
-                            if (result.success) {
-                                emailSuccessCount++;
-                                console.log(`[Alert Email] SUCCESS to ${user.email}`);
-                            } else {
-                                emailFailCount++;
-                                console.error(`[Alert Email] FAILED to ${user.email}: ${result.reason}`);
-                            }
-                        } catch (emailErr) {
-                            emailFailCount++;
-                            console.error(`[Alert Email] ERROR to ${user.email}: ${emailErr.message}`);
-                        }
-                    } else {
-                        emailSkipCount++;
-                        console.log(`[Alert Email] SKIP user ${user.name} - No email provided.`);
-                    }
-
-                    // Send FCM push notification
-                    if (user.fcmToken) {
-                        try {
-                            await admin.messaging().send({
-                                token: user.fcmToken,
-                                notification: {
-                                    title: notifTitle,
-                                    body: notifBody.substring(0, 100)
-                                },
-                                data: { url: '/alerts', type: 'ALERT' }
-                            });
-                            fcmCount++;
-                        } catch (fcmErr) {
-                            console.error(`[Alert FCM] ERROR for ${user.name}: ${fcmErr.message}`);
-                        }
-                    }
-
-                    // Also create a DB notification entry
-                    try {
-                        const Notification = require('../models/Notification');
-                        await Notification.create({
-                            userId: user._id,
-                            title: subject,
-                            body: notifBody,
-                            type: 'ALERT',
-                            link: '/alerts',
-                            delivered: true,
-                            deliveryMethod: user.email ? 'email' : (user.fcmToken ? 'fcm' : 'none')
-                        });
-                    } catch (notifErr) {
-                        console.error(`[Alert DB Notif] ERROR for ${user.name}: ${notifErr.message}`);
-                    }
-                }
-
-                console.log(`[Background] Alert Broadcast COMPLETE: ${emailSuccessCount} sent, ${emailFailCount} failed, ${emailSkipCount} skipped (no email), ${fcmCount} FCM`);
-            } catch (bgError) {
-                console.error(`[Background] Alert Broadcast CRASHED: ${bgError.message}`);
+                await createNotification(
+                    user._id,
+                    notificationData,
+                    'ALERT',
+                    '/alerts',
+                    emailHtml
+                );
             }
+            console.log(`[Background] Alert Broadcast COMPLETE for ${targetUsers.length} users.`);
         });
 
         res.status(201).json({

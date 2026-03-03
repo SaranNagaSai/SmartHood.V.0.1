@@ -129,12 +129,16 @@ const registerUser = async (req, res) => {
                     });
             }
 
-            // Also add an IN-APP welcome notification (skipEmail=true since welcome email already sent above)
+            // Also add an IN-APP welcome notification
             const { createNotification } = require('./notificationController');
             await createNotification(
                 user._id,
-                'Welcome to SmartHood / స్మార్ట్ హుడ్ కు స్వాగతం!',
-                `Hi ${user.name}, welcome to the ${user.locality} community. / ${user.name} గారు, ${user.locality} కమ్యూనిటీలోకి మీకు స్వాగతం.`,
+                {
+                    title: 'Welcome to SmartHood!',
+                    titleTe: 'స్మార్ట్ హుడ్ కు స్వాగతం!',
+                    body: `Hi ${user.name}, welcome to the ${user.locality} community. We are glad to have you here!`,
+                    bodyTe: `${user.name} గారు, ${user.locality} కమ్యూనిటీలోకి మీకు స్వాగతం! మన కమ్యూనిటీలో చేరినందుకు సంతోషం.`
+                },
                 'system',
                 '/home',
                 null,
@@ -245,4 +249,26 @@ const generateToken = (id) => {
     });
 };
 
-module.exports = { registerUser, loginUser };
+// @desc    Update user FCM token
+// @route   POST /api/auth/update-fcm
+// @access  Private
+const updateFcmToken = async (req, res) => {
+    try {
+        const { fcmToken } = req.body;
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.fcmToken = fcmToken;
+        await user.save();
+
+        res.json({ message: 'FCM token updated successfully' });
+    } catch (error) {
+        console.error('Update FCM Error:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+module.exports = { registerUser, loginUser, updateFcmToken };

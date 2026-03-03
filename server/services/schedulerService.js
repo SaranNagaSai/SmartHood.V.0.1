@@ -117,26 +117,43 @@ class SchedulerService {
                 if (shouldNotify) {
                     console.log(`🔔 Sending Stage ${nextStage} notification for ${service._id} (Termination: ${isTermination})`);
 
-                    // 1. In-App Notification
+                    const notificationData = {
+                        title: isTermination ? 'Request Expired Today' : 'Service Status Check',
+                        titleTe: isTermination ? 'అభ్యర్థన గడువు ముగిసింది' : 'సర్వీస్ ఫాలో-అప్',
+                        body: message,
+                        bodyTe: message
+                    };
+
+                    // Define specific bilingual bodies for the stages
+                    if (service.followUpStage === 0) {
+                        notificationData.body = `It's been 30 mins since you requested "${service.title}". Have you found help yet?`;
+                        notificationData.bodyTe = `మీరు కోరిన "${service.title}" కి ఇంకా సహాయం అందలేదా?`;
+                    } else if (service.followUpStage === 1) {
+                        notificationData.body = `1 hour follow-up: Still looking for help with "${service.title}"? SmartHood is broadcasting to nearby pros.`;
+                        notificationData.bodyTe = `1 గంట గడిచింది: "${service.title}" కోసం ఇంకా చూస్తున్నారా? స్మార్ట్ హుడ్ చుట్టుపక్కల నిపుణులకు తెలియజేస్తోంది.`;
+                    } else if (service.followUpStage === 2) {
+                        notificationData.body = `2 hours update: Any luck with "${service.title}"? Don't forget to mark it complete if done!`;
+                        notificationData.bodyTe = `2 గంటల అప్‌డేట్: "${service.title}" కి ఎవరైనా స్పందించారా? ఒకవేళ పూర్తయితే దయచేసి మార్క్ చేయండి!`;
+                    } else if (isTermination) {
+                        notificationData.body = `Your request "${service.title}" was not fulfilled today. Please rise this query again tomorrow.`;
+                        notificationData.bodyTe = `మీ అభ్యర్థన "${service.title}" నేడు పూర్తి కాలేదు. రేపు మళ్లీ ప్రయత్నించండి.`;
+                    }
+
+                    // 1. Dual Channel Notification (In-App + Push + Email)
+                    // We pass custom emailHtml for termination to keep it red
+                    let customEmailHtml = null;
+                    if (isTermination) {
+                        const term = generateTerminationEmailTemplate(service, user);
+                        customEmailHtml = term.html;
+                    }
+
                     await createNotification(
                         user._id,
-                        isTermination
-                            ? (isTelugu ? 'అభ్యర్థన గడువు ముగిసింది' : 'Request Expired Today')
-                            : (isTelugu ? 'సర్వీస్ ఫాలో-అప్' : 'Service Status Check'),
-                        message,
+                        notificationData,
                         isTermination ? 'alert' : 'reminder',
-                        `/service/${service._id}`
+                        `/service/${service._id}?action=complete`,
+                        customEmailHtml
                     );
-
-                    // 2. Email Notification
-                    if (user.email) {
-                        if (isTermination) {
-                            const terminationData = generateTerminationEmailTemplate(service, user);
-                            await sendEmail(user.email, terminationData.subject, message, terminationData.html);
-                        } else {
-                            await sendFollowUpEmail(user.email, service.title, service._id, user.language);
-                        }
-                    }
 
                     // Update Service
                     service.followUpStage = nextStage;

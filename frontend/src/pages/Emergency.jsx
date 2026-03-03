@@ -25,12 +25,46 @@ const Emergency = () => {
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [matchingDonors, setMatchingDonors] = useState([]);
+    const [selectedDonors, setSelectedDonors] = useState([]);
+    const [fetchingDonors, setFetchingDonors] = useState(false);
 
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('user'));
         if (userData) setUser(userData);
         else navigate('/login');
     }, [navigate]);
+
+    useEffect(() => {
+        if (subType === 'Blood Donation' && bloodGroup) {
+            fetchMatchingDonors();
+        }
+    }, [subType, bloodGroup]);
+
+    const fetchMatchingDonors = async () => {
+        setFetchingDonors(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`${API_URL}/users/search`, {
+                params: { bloodGroup, town: user?.town },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // Filter out current user and ensure they have blood group
+            const filtered = res.data.filter(u => u._id !== user._id && u.bloodGroup === bloodGroup);
+            setMatchingDonors(filtered);
+            // By default select all
+            setSelectedDonors(filtered.map(u => u._id));
+        } catch (error) {
+            console.error('Failed to fetch donors:', error);
+        }
+        setFetchingDonors(false);
+    };
+
+    const toggleDonor = (id) => {
+        setSelectedDonors(prev =>
+            prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
+        );
+    };
 
     const emergencyTypes = [
         { id: 'Blood Donation', label: t('blood_donation'), icon: Droplet, color: 'bg-red-500' },
@@ -54,7 +88,8 @@ const Emergency = () => {
                 locality: user.locality,
                 town: user.town,
                 district: user.district,
-                state: user.state
+                state: user.state,
+                targetUserIds: subType === 'Blood Donation' ? selectedDonors : []
             };
 
             await axios.post(`${API_URL}/alerts`, alertData, {
@@ -144,6 +179,51 @@ const Emergency = () => {
                                             {bg}
                                         </button>
                                     ))}
+                                </div>
+
+                                {/* Donor Selection List */}
+                                <div className="mt-6 border-t border-red-50 pt-6">
+                                    <h3 className="text-sm font-bold text-gray-700 mb-4 flex justify-between items-center">
+                                        <span>{t('matching_donors')} ({matchingDonors.length})</span>
+                                        <button
+                                            onClick={() => setSelectedDonors(selectedDonors.length === matchingDonors.length ? [] : matchingDonors.map(u => u._id))}
+                                            className="text-red-600 text-xs hover:underline"
+                                        >
+                                            {selectedDonors.length === matchingDonors.length ? t('deselect_all') : t('select_all')}
+                                        </button>
+                                    </h3>
+
+                                    {fetchingDonors ? (
+                                        <div className="flex justify-center p-4"><Loader2 className="animate-spin text-red-500" /></div>
+                                    ) : matchingDonors.length > 0 ? (
+                                        <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                            {matchingDonors.map(donor => (
+                                                <div
+                                                    key={donor._id}
+                                                    onClick={() => toggleDonor(donor._id)}
+                                                    className={`p-3 rounded-2xl border flex items-center gap-3 cursor-pointer transition-all ${selectedDonors.includes(donor._id)
+                                                            ? 'bg-red-50 border-red-200 shadow-sm'
+                                                            : 'bg-gray-50 border-transparent opacity-70'
+                                                        }`}
+                                                >
+                                                    <div className="flex-1">
+                                                        <div className="font-bold text-sm text-gray-800">{donor.name}</div>
+                                                        <div className="text-[10px] text-gray-500 uppercase font-bold">{donor.locality}</div>
+                                                    </div>
+                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${selectedDonors.includes(donor._id)
+                                                            ? 'bg-red-600 border-red-600 text-white'
+                                                            : 'border-gray-300'
+                                                        }`}>
+                                                        {selectedDonors.includes(donor._id) && <CheckCircle2 size={16} />}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-4 text-gray-400 text-sm italic">
+                                            {t('no_matching_donors')}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
