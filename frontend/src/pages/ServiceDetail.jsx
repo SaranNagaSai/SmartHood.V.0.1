@@ -101,7 +101,7 @@ const ServiceDetail = () => {
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <span className="text-xs font-bold bg-white/20 backdrop-blur-md px-2 py-0.5 rounded uppercase tracking-wider">
-                            {service.type}
+                            {translateValue(service.type)}
                         </span>
                         {isCompleted && (
                             <span className="text-xs font-bold bg-white text-green-700 px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
@@ -109,7 +109,7 @@ const ServiceDetail = () => {
                             </span>
                         )}
                     </div>
-                    <h1 className="font-bold text-lg truncate mt-1">{service.title}</h1>
+                    <h1 className="font-bold text-lg truncate mt-1">{translateValue(service.title)}</h1>
                 </div>
             </div>
 
@@ -121,7 +121,7 @@ const ServiceDetail = () => {
                         <div>
                             <h3 className="font-bold text-green-800">{t('job_done')}</h3>
                             <p className="text-sm text-green-700 mt-1">
-                                {t('completed_by')} <span className="font-bold">{service.completedBy?.name || service.completedByUniqueId}</span> on {new Date(service.completionDate).toLocaleDateString()}.
+                                {t('completed_by')} <span className="font-bold">{translateValue(service.completedBy?.name) || service.completedByUniqueId}</span> on {new Date(service.completionDate).toLocaleDateString()}.
                             </p>
                             {service.amountSpent > 0 && (
                                 <p className="text-sm font-bold text-green-800 mt-2">
@@ -150,7 +150,7 @@ const ServiceDetail = () => {
                             </div>
                             <div>
                                 <p className="font-bold text-gray-800 flex items-center gap-2">
-                                    {service.createdBy?.name}
+                                    {translateValue(service.createdBy?.name)}
                                     {service.createdBy?.profilePhoto && (
                                         <img
                                             src={getProfilePhotoUrl(service.createdBy.profilePhoto)}
@@ -174,7 +174,7 @@ const ServiceDetail = () => {
                                 <Clock size={12} /> {new Date(service.createdAt).toLocaleDateString()}
                             </p>
                             <p className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-lg mt-1 inline-block">
-                                {service.locality}
+                                {translateValue(service.locality)}
                             </p>
                         </div>
                     </div>
@@ -184,7 +184,7 @@ const ServiceDetail = () => {
 
 
                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {service.description}
+                        {translateValue(service.description)}
                     </p>
 
                     {/* Attachments */}
@@ -265,9 +265,9 @@ const ServiceDetail = () => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-800">{provider.name}</p>
+                                                    <p className="font-bold text-gray-800">{translateValue(provider.name)}</p>
                                                     <p className="text-xs text-gray-500 font-mono">{provider.uniqueId}</p>
-                                                    <p className="text-xs text-blue-600 font-bold mt-0.5">{provider.professionCategory}</p>
+                                                    <p className="text-xs text-blue-600 font-bold mt-0.5">{translateValue(provider.professionCategory)}</p>
                                                 </div>
                                             </div>
                                             {/* Contact visible because interest matches */}
@@ -357,7 +357,7 @@ const ServiceDetail = () => {
                                                     viewer.name?.charAt(0).toUpperCase()
                                                 )}
                                             </div>
-                                            <span className="text-sm font-medium text-gray-700">{viewer.name}</span>
+                                            <span className="text-sm font-medium text-gray-700">{translateValue(viewer.name)}</span>
                                         </div>
                                     ))
                                 ) : (

@@ -149,18 +149,24 @@ const createService = async (req, res) => {
             const admin = require('../config/firebase');
 
             try {
-                for (const targetUser of targetUsers) {
-                    const subject = isTelugu
-                        ? `${type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన'}: ${title}`
-                        : `${type === 'offer' ? 'Service Offer' : 'Help Request'}: ${title}`;
+                const { translateText } = require('../utils/translationUtility');
 
-                    const notifTitle = isTelugu
+                for (const targetUser of targetUsers) {
+                    const recipientIsTelugu = targetUser.language === 'Telugu';
+                    const targetLanguage = recipientIsTelugu ? 'Telugu' : 'English';
+
+                    // Translate the core title if possible
+                    const translatedTitle = translateText(title, targetLanguage);
+
+                    const notifTitle = recipientIsTelugu
                         ? (type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన')
                         : (type === 'offer' ? 'Service Offer' : 'Help Request');
 
-                    const notifBody = isTelugu
-                        ? `${user.name} పోస్ట్ చేశారు: ${title}`
-                        : `${user.name} posted: ${title}`;
+                    const notifBody = recipientIsTelugu
+                        ? `${user.name} పోస్ట్ చేశారు: ${translatedTitle}`
+                        : `${user.name} posted: ${translatedTitle}`;
+
+                    const subject = `${notifTitle}: ${translatedTitle}`;
 
                     // Send Email directly
                     if (targetUser.email) {

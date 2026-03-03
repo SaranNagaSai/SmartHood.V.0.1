@@ -15,7 +15,7 @@ const LanguageSelection = () => {
 
     const handleSelect = (lang) => {
         if (!selectedDevice) {
-            alert('Please select your device type first');
+            alert(t('select_device_error', 'Please select your device type first'));
             return;
         }
         setLanguage(lang);
@@ -108,8 +108,8 @@ const LanguageSelection = () => {
                                 }`}
                             disabled={!selectedDevice}
                         >
-                            <h2 className="text-lg md:text-xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)]">English</h2>
-                            <p className="text-gray-500 text-xs mt-1">Continue in English</p>
+                            <h2 className="text-lg md:text-xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)]">{t('English')}</h2>
+                            <p className="text-gray-500 text-xs mt-1">{t('continue_in_english')}</p>
                         </button>
 
                         <button
@@ -118,23 +118,23 @@ const LanguageSelection = () => {
                                 }`}
                             disabled={!selectedDevice}
                         >
-                            <h2 className="text-lg md:text-xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)] font-telugu">తెలుగు</h2>
-                            <p className="text-gray-500 text-xs mt-1">తెలుగులో కొనసాగండి</p>
+                            <h2 className="text-lg md:text-xl font-bold text-[var(--col-primary)] group-hover:text-[var(--col-secondary)] font-telugu">{t('Telugu')}</h2>
+                            <p className="text-gray-500 text-xs mt-1">{t('continue_in_telugu')}</p>
                         </button>
                     </div>
 
                     <div className="mt-6 text-center animate-fade-in border-t border-white/10 pt-4" style={{ animationDelay: '0.4s' }}>
-                        <p className="text-gray-300 text-xs mb-3">Already part of the neighborhood?</p>
+                        <p className="text-gray-300 text-xs mb-3">{t('already_neighbor')}</p>
                         <button
                             onClick={() => navigate('/login')}
                             className="text-white font-bold bg-white/10 px-6 py-2.5 rounded-xl backdrop-blur-sm hover:bg-white/20 transition-all shadow-lg border border-white/10 w-full text-sm"
                         >
-                            Login to Account
+                            {t('login_to_account')}
                         </button>
                     </div>
                 </div>
 
-                <p className="text-white/60 text-xs mt-6 bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm border border-white/5">Select device & language • పరికరం & భాష ఎంచుకోండి</p>
+                <p className="text-white/60 text-xs mt-6 bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm border border-white/5">{t('select_device_language')}</p>
             </div>
         </div>
     );

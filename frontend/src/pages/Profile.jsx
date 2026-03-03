@@ -216,7 +216,7 @@ const Profile = () => {
                                     {user.uniqueId}
                                 </span>
                                 <span className="bg-red-500/80 px-3 py-1 rounded-full text-[10px] sm:text-sm flex items-center gap-1">
-                                    <Droplet size={10} sm:size={12} /> {user.bloodGroup}
+                                    <Droplet size={10} sm:size={12} /> {translateValue(user.bloodGroup)}
                                 </span>
                             </div>
                         </div>
@@ -354,7 +354,7 @@ const Profile = () => {
                                 </select>
                             ) : (
                                 <p className="font-medium text-gray-700 flex items-center gap-1">
-                                    <Droplet size={12} className="text-red-500" /> {user.bloodGroup}
+                                    <Droplet size={12} className="text-red-500" /> {translateValue(user.bloodGroup)}
                                 </p>
                             )}
                         </div>
@@ -576,11 +576,11 @@ const Profile = () => {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-gray-800 truncate">{u.name}</h4>
-                                            <p className="text-xs text-gray-500 mb-1">ID: {u.uniqueId}</p>
+                                            <h4 className="font-bold text-gray-800 truncate">{translateValue(u.name)}</h4>
+                                            <p className="text-xs text-gray-500 mb-1">{t('unique_id_label', 'ID')}: {u.uniqueId}</p>
                                             <div className="flex items-center gap-2 mt-2 flex-wrap">
                                                 <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full uppercase tracking-wide">
-                                                    {u.professionCategory}
+                                                    {translateValue(u.professionCategory)}
                                                 </span>
                                                 {u.impactScore > 0 && (
                                                     <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
@@ -590,7 +590,7 @@ const Profile = () => {
                                             </div>
                                             {u.professionDetails?.jobRole && (
                                                 <p className="text-xs text-gray-500 mt-2 truncate">
-                                                    {u.professionDetails.jobRole}
+                                                    {translateValue(u.professionDetails.jobRole)}
                                                 </p>
                                             )}
                                         </div>

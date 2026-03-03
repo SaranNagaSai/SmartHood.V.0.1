@@ -220,10 +220,7 @@ const Register = () => {
 
             const res = await axios.post(`${API_URL}/auth/register`, formDataToSend);
 
-            let successMsg = `Registration Successful! Your Unique ID: ${res.data.uniqueId}`;
-            if (formData.email) {
-                successMsg += `\n\nA confirmation is sent to: ${formData.email}`;
-            }
+            const successMsg = `${t('registration_success_prefix', 'Registration Successful!')} ${t('unique_id_label', 'Your Unique ID')}: ${res.data.uniqueId}${formData.email ? `\n\n${t('email_confirmation_msg', 'A confirmation is sent to')}: ${formData.email}` : ''}`;
             alert(successMsg);
             login(res.data, res.data.token);
             navigate('/home');
@@ -317,7 +314,7 @@ const Register = () => {
 
                     {/* Stats */}
                     <div className="relative z-10 grid grid-cols-3 gap-3">
-                        {[{ value: publicStats.totalUsers, label: 'Users' }, { value: publicStats.totalLocalities, label: 'Localities' }, { value: publicStats.totalTowns, label: 'Towns' }].map((stat, i) => (
+                        {[{ value: publicStats.totalUsers, label: t('active_users') }, { value: publicStats.totalLocalities, label: t('localities') }, { value: publicStats.totalTowns, label: t('towns') }].map((stat, i) => (
                             <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/10">
                                 <p className="text-white text-lg font-bold">{stat.value}+</p>
                                 <p className="text-white/50 text-[9px] font-bold uppercase tracking-wider">{stat.label}</p>
@@ -345,7 +342,7 @@ const Register = () => {
                         <p className="text-white/60 text-[11px] font-bold uppercase tracking-widest mb-6">{t('community_connect')}</p>
 
                         <div className="grid grid-cols-3 gap-3 w-full">
-                            {[{ value: publicStats.totalUsers, label: 'Users' }, { value: publicStats.totalLocalities, label: 'Localities' }, { value: publicStats.totalTowns, label: 'Towns' }].map((stat, i) => (
+                            {[{ value: publicStats.totalUsers, label: t('active_users') }, { value: publicStats.totalLocalities, label: t('localities') }, { value: publicStats.totalTowns, label: t('towns') }].map((stat, i) => (
                                 <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/10">
                                     <p className="text-white text-base font-bold">{stat.value}+</p>
                                     <p className="text-white/50 text-[8px] font-bold uppercase tracking-wider">{stat.label}</p>
@@ -424,16 +421,16 @@ const Register = () => {
                                                     onChange={handleChange}
                                                     className="w-full p-3 border border-red-100 rounded-xl bg-red-50 focus:ring-2 focus:ring-red-500 outline-none text-red-700 font-bold"
                                                 >
-                                                    {bloodGroups.map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                                                    {bloodGroups.map(bg => <option key={bg} value={bg}>{translateValue(bg)}</option>)}
                                                 </select>
                                             </div>
                                             <VoiceInput
                                                 name="email"
-                                                label={t('email') + " (Optional)"}
+                                                label={t('email') + ` (${t('optional')})`}
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                                 type="email"
-                                                placeholder="your@email.com"
+                                                placeholder={t('email_placeholder') || "your@email.com"}
                                                 className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
                                             />
                                         </div>
@@ -502,9 +499,9 @@ const Register = () => {
                                                 className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-primary outline-none transition-all"
                                                 required
                                             >
-                                                <option value="">-- {t('select_state') || "Select State"} --</option>
+                                                <option value="">-- {t('select_state')} --</option>
                                                 {indianStates.map(state => (
-                                                    <option key={state} value={state}>{state}</option>
+                                                    <option key={state} value={state}>{translateValue(state)}</option>
                                                 ))}
                                             </select>
                                         </div>

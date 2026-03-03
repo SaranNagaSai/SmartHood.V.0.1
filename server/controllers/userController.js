@@ -16,21 +16,22 @@ const getLocalityStats = async (req, res) => {
         // Aggregate Specific Job Titles in MY locality (or targeted localities)
         const { localities } = req.query;
 
-        // Base match: Always filter by the user's town to avoid cross-town collisions
-        // Use regex for case/whitespace safety on town
+        // Base match: Match against normalized names to bridge English/Telugu gap
+        const { normalizeToEnglish } = require('../utils/locationMap');
+        const normTown = normalizeToEnglish(currentUser.town);
+        const normLocality = normalizeToEnglish(currentUser.locality);
+
         let matchQuery = {
-            town: { $regex: new RegExp(`^\\s*${currentUser.town}\\s*$`, 'i') }
+            normalizedTown: { $regex: new RegExp(`^\\s*${normTown}\\s*$`, 'i') }
         };
 
         if (localities) {
             const localityList = localities.split(',');
-            // Use $or with regex for case-insensitive matching of each locality
             matchQuery.$or = localityList.map(loc => ({
-                locality: { $regex: new RegExp(`^\\s*${loc}\\s*$`, 'i') }
+                normalizedLocality: { $regex: new RegExp(`^\\s*${normalizeToEnglish(loc)}\\s*$`, 'i') }
             }));
         } else {
-            // Default to current user's locality
-            matchQuery.locality = { $regex: new RegExp(`^\\s*${currentUser.locality}\\s*$`, 'i') };
+            matchQuery.normalizedLocality = { $regex: new RegExp(`^\\s*${normLocality}\\s*$`, 'i') };
         }
 
         const professionStats = await User.aggregate([
@@ -107,18 +108,19 @@ const getUsersByLocality = async (req, res) => {
         const currentUser = req.user;
 
         // Use the provided town or fallback to user's town
-        const targetTown = town || currentUser.town;
+        const { normalizeToEnglish } = require('../utils/locationMap');
+        const targetTown = normalizeToEnglish(town || currentUser.town);
+        const targetLocality = normalizeToEnglish(locality);
 
         // Create case-insensitive regex for town and locality
-        // Match town ignoring whitespace and case
         const townRegex = new RegExp(`^\\s*${targetTown}\\s*$`, 'i');
-        const localityRegex = new RegExp(`^${locality}$`, 'i');
+        const localityRegex = new RegExp(`^${targetLocality}$`, 'i');
 
         const users = await User.find({
-            locality: { $regex: localityRegex },
-            town: { $regex: townRegex }
+            normalizedLocality: { $regex: localityRegex },
+            normalizedTown: { $regex: townRegex }
         })
-            .select('name uniqueId professionCategory professionDetails impactScore profilePhoto phone')
+            .select('name uniqueId professionCategory professionDetails language impactScore profilePhoto phone')
             .sort({ impactScore: -1 });
 
         res.json(users);
@@ -136,11 +138,13 @@ const getUsersByProfession = async (req, res) => {
         const { profession } = req.params;
         const currentUser = req.user;
 
-        // Create case-insensitive regex for locality to handle variations in casing
-        const localityRegex = new RegExp(`^\\s*${currentUser.locality.trim()}\\s*$`, 'i');
+        // Use normalized locality for cross-language matching
+        const { normalizeToEnglish } = require('../utils/locationMap');
+        const normLocality = normalizeToEnglish(currentUser.locality);
+        const localityRegex = new RegExp(`^\\s*${normLocality.trim()}\\s*$`, 'i');
 
         const users = await User.find({
-            locality: { $regex: localityRegex },
+            normalizedLocality: { $regex: localityRegex },
             $or: [
                 { 'professionDetails.jobRole': profession },
                 { 'professionDetails.businessType': profession },
@@ -149,7 +153,7 @@ const getUsersByProfession = async (req, res) => {
                 { professionCategory: profession } // For Homemaker or legacy
             ]
         })
-            .select('name uniqueId experience professionDetails professionCategory locality impactScore phone email profilePhoto')
+            .select('name uniqueId experience professionDetails professionCategory locality language impactScore phone email profilePhoto')
             .sort({ experience: -1 });
 
         res.json(users);
@@ -199,16 +203,26 @@ const updateProfile = async (req, res) => {
                 }
             }
 
-            // Update all editable fields
+            // Update geographic data
+            const { normalizeToEnglish } = require('../utils/locationMap');
+            if (locality) {
+                user.locality = locality.trim();
+                user.normalizedLocality = normalizeToEnglish(locality);
+            }
+            if (town) {
+                user.town = town.trim().charAt(0).toUpperCase() + town.trim().slice(1).toLowerCase();
+                user.normalizedTown = normalizeToEnglish(town);
+            }
+            if (district) {
+                user.district = district.trim();
+                user.normalizedDistrict = normalizeToEnglish(district);
+            }
             user.address = address || user.address;
-            user.locality = locality || user.locality;
-            user.town = town || user.town;
-            user.district = district || user.district;
             user.state = state || user.state;
             user.email = email !== undefined ? email : user.email;
             user.age = req.body.age || user.age;
             user.gender = req.body.gender || user.gender;
-            user.bloodGroup = bloodGroup || user.bloodGroup; // Allow blood group updates
+            user.bloodGroup = bloodGroup || user.bloodGroup;
             user.professionCategory = professionCategory || user.professionCategory;
             user.professionDetails = professionDetails || user.professionDetails;
             user.experience = experience !== undefined ? experience : user.experience;
@@ -414,13 +428,16 @@ const getUsersByState = async (req, res) => {
         if (stateName.toUpperCase() === 'AP') stateQuery = 'Andhra Pradesh';
         if (stateName.toUpperCase() === 'TS') stateQuery = 'Telangana';
 
-        // Use regex for flexible searching (e.g., "Andhra" matches "Andhra Pradesh")
+        // Use regex for flexible searching
+        const { normalizeToEnglish } = require('../utils/locationMap');
+        const normState = normalizeToEnglish(stateQuery);
+
         const query = {
-            state: { $regex: new RegExp(stateQuery, 'i') }
+            state: { $regex: new RegExp(normState, 'i') }
         };
 
         const users = await User.find(query)
-            .select('name uniqueId locality town district state professionCategory professionDetails profilePhoto phone impactScore')
+            .select('name uniqueId locality town district state professionCategory professionDetails profilePhoto phone language impactScore')
             .sort({ district: 1, town: 1, locality: 1 });
 
         console.log(`[User] State Discovery: Found ${users.length} users in ${stateName}`);

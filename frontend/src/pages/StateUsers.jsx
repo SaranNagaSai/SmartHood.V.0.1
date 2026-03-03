@@ -187,7 +187,18 @@ const StateUsers = () => {
 
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex justify-between items-start gap-1">
-                                                                    <h4 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{translateValue(u.name)}</h4>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <h4 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors tracking-tight uppercase">{translateValue(u.name)}</h4>
+                                                                        {/* Language Exposure Badge */}
+                                                                        {u.language && u.language !== (language || 'English') && (
+                                                                            <span className={`inline-block text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border mt-0.5 ${u.language === 'Telugu'
+                                                                                ? 'bg-orange-50 text-orange-600 border-orange-200'
+                                                                                : 'bg-blue-50 text-blue-600 border-blue-200'
+                                                                                }`}>
+                                                                                {u.language === 'Telugu' ? t('telugu_user') : t('english_user')}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
                                                                     <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100/50 whitespace-nowrap flex-shrink-0">
                                                                         {u.uniqueId}
                                                                     </span>

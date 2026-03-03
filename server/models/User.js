@@ -12,8 +12,11 @@ const userSchema = new mongoose.Schema({
     // Geographic Hierarchy
     address: { type: String },
     locality: { type: String, required: true },
+    normalizedLocality: { type: String }, // For cross-language matching (English base)
     town: { type: String, required: true },
+    normalizedTown: { type: String }, // For cross-language matching (English base)
     district: { type: String, required: true },
+    normalizedDistrict: { type: String }, // For cross-language matching (English base)
     state: { type: String, required: true },
 
     // Professional Info

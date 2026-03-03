@@ -346,7 +346,7 @@ const ExploreCity = () => {
                                         <Search size={16} className="text-slate-400" />
                                         <input
                                             type="text"
-                                            placeholder="SEARCH TOWNS..."
+                                            placeholder={t('search_towns', 'SEARCH TOWNS...')}
                                             className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-slate-700 placeholder:text-slate-300"
                                             value={searchTown}
                                             onChange={(e) => setSearchTown(e.target.value)}
@@ -411,7 +411,7 @@ const ExploreCity = () => {
                             <Search size={20} className="text-slate-400 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
-                                placeholder="ENTER TOWN NAME..."
+                                placeholder={t('enter_town_name', 'ENTER TOWN NAME...')}
                                 className="bg-transparent border-none outline-none text-xs font-black uppercase tracking-[0.1em] w-full text-slate-700 placeholder:text-slate-300"
                                 value={searchTown}
                                 onChange={(e) => setSearchTown(e.target.value)}
@@ -454,7 +454,7 @@ const ExploreCity = () => {
                     {!userTown && (
                         <div className="p-6 border-t border-slate-50">
                             <button onClick={() => navigate('/home')} className="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
-                                <ArrowLeft size={14} /> Back to Dashboard
+                                <ArrowLeft size={14} /> {t('back_dashboard', 'Back to Dashboard')}
                             </button>
                         </div>
                     )}
@@ -473,20 +473,20 @@ const ExploreCity = () => {
                                 <Globe size={40} className="text-white animate-pulse" />
                             </div>
                             <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-4 uppercase">{t('discovery_hub')}</h2>
-                            <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mb-10 opacity-70">Synchronize Regional Capability</p>
+                            <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mb-10 opacity-70">{t('sync_regional_capability', 'Synchronize Regional Capability')}</p>
 
                             <div className="flex flex-col gap-4 max-w-sm mx-auto">
                                 <button
                                     onClick={() => setIsDropdownOpen(true)}
                                     className="flex items-center justify-between bg-slate-50 px-8 py-5 rounded-3xl border border-slate-100 hover:bg-white hover:shadow-2xl hover:border-blue-200 transition-all duration-500 active:scale-95 group/btn shadow-inner"
                                 >
-                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest group-hover/btn:text-slate-800 transition-colors">Select Regional Node...</span>
+                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest group-hover/btn:text-slate-800 transition-colors">{t('select_regional_node', 'Select Regional Node...')}</span>
                                     <Navigation2 size={20} className="text-slate-300 group-hover/btn:text-primary transition-colors rotate-45" />
                                 </button>
 
                                 <div className="flex items-center gap-3">
                                     <div className="h-px flex-1 bg-slate-100"></div>
-                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Node Input</span>
+                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">{t('node_input', 'Node Input')}</span>
                                     <div className="h-px flex-1 bg-slate-100"></div>
                                 </div>
 
@@ -495,7 +495,7 @@ const ExploreCity = () => {
                                     className={`flex items-center justify-center gap-4 py-5 rounded-3xl font-black text-[11px] uppercase tracking-widest transition-all duration-500 shadow-xl ${isListening ? 'bg-rose-500 text-white animate-pulse scale-105' : 'bg-primary text-white hover:shadow-primary/20 hover:-translate-y-1'}`}
                                 >
                                     <Mic size={20} className={isListening ? 'animate-bounce' : ''} />
-                                    {isListening ? 'Intercepting Voice...' : 'Voice Command Initiation'}
+                                    {isListening ? t('intercepting_voice', 'Intercepting Voice...') : t('voice_initiation', 'Voice Command Initiation')}
                                 </button>
                             </div>
 

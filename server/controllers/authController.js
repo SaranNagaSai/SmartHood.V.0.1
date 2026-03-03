@@ -79,6 +79,12 @@ const registerUser = async (req, res) => {
             profilePhotoPath = req.file.path;
         }
 
+        // Normalize geographic data for cross-language matching
+        const { normalizeToEnglish } = require('../utils/locationMap');
+        const normLocality = normalizeToEnglish(locality);
+        const normTown = normalizeToEnglish(town);
+        const normDistrict = normalizeToEnglish(district);
+
         // Create user with normalized geographic data
         const user = await User.create({
             uniqueId,
@@ -91,8 +97,11 @@ const registerUser = async (req, res) => {
             bloodGroup,
             address: (address || '').trim(),
             locality: (locality || '').trim(),
+            normalizedLocality: normLocality,
             town: (town || '').trim().charAt(0).toUpperCase() + (town || '').trim().slice(1).toLowerCase(), // Normalize "Eluru"
+            normalizedTown: normTown,
             district: (district || '').trim(),
+            normalizedDistrict: normDistrict,
             state: (state || '').trim(),
             professionCategory,
             professionDetails,

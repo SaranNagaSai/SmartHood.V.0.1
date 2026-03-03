@@ -81,17 +81,24 @@ const createAlert = async (req, res) => {
             const { sendEmail } = require('../services/emailService');
             const admin = require('../config/firebase');
 
+            const { translateText } = require('../utils/translationUtility');
+
             try {
                 for (const user of targetUsers) {
-                    const subject = isTelugu
-                        ? `హెచ్చరిక: ${category}`
-                        : `ALERT: ${category}`;
+                    const recipientIsTelugu = user.language === 'Telugu';
+                    const targetLanguage = recipientIsTelugu ? 'Telugu' : 'English';
 
-                    const notifTitle = isTelugu
-                        ? `హెచ్చరిక: ${category}`
-                        : `ALERT: ${category}`;
+                    // Translate category, subType and description
+                    const translatedCategory = translateText(category, targetLanguage);
+                    const translatedSubType = translateText(subType, targetLanguage);
+                    const translatedDescription = translateText(description, targetLanguage);
 
-                    const notifBody = description.substring(0, 200);
+                    const subject = recipientIsTelugu
+                        ? `హెచ్చరిక: ${translatedCategory} (${translatedSubType})`
+                        : `ALERT: ${translatedCategory} (${translatedSubType})`;
+
+                    const notifTitle = subject;
+                    const notifBody = translatedDescription.substring(0, 200);
 
                     // Send Email directly
                     if (user.email) {

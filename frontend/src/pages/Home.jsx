@@ -74,19 +74,23 @@ const Home = () => {
 
     // Helper to get icon/color based on Pro category
     const getProStyle = (category) => {
+        const cat = (category || '').toLowerCase();
         const map = {
-            'Software': { icon: '💻', color: 'bg-blue-100 text-blue-700' },
-            'Medical': { icon: '⚕️', color: 'bg-red-100 text-red-700' },
-            'Teaching': { icon: '📚', color: 'bg-yellow-100 text-yellow-700' },
-            'Business': { icon: '💼', color: 'bg-purple-100 text-purple-700' },
-            'Plumbing': { icon: '🔧', color: 'bg-gray-100 text-gray-700' }
+            'software': { icon: '💻', color: 'bg-blue-100 text-blue-700' },
+            'medical': { icon: '⚕️', color: 'bg-red-100 text-red-700' },
+            'teaching': { icon: '📚', color: 'bg-yellow-100 text-yellow-700' },
+            'business': { icon: '💼', color: 'bg-purple-100 text-purple-700' },
+            'plumbing': { icon: '🔧', color: 'bg-gray-100 text-gray-700' },
+            'student': { icon: '🎓', color: 'bg-orange-100 text-orange-700' },
+            'employed': { icon: '🏢', color: 'bg-indigo-100 text-indigo-700' },
+            'homemaker': { icon: '🏠', color: 'bg-pink-100 text-pink-700' }
         };
-        return map[category] || { icon: '👷', color: 'bg-green-100 text-green-700' };
+        return map[cat] || { icon: '👷', color: 'bg-green-100 text-green-700' };
     };
 
     // Helper to get full state name
     const getStateName = (input) => {
-        if (!input) return 'Unknown';
+        if (!input) return t('unknown', 'Unknown');
         const code = input.toUpperCase().trim();
         const stateMap = {
             'AP': 'Andhra Pradesh',
@@ -104,7 +108,8 @@ const Home = () => {
             'PB': 'Punjab',
             'HR': 'Haryana'
         };
-        return stateMap[code] || input;
+        const name = stateMap[code] || input;
+        return translateValue(name);
     };
 
     return (
@@ -331,6 +336,17 @@ const Home = () => {
                                                         <span className="bg-[var(--col-primary)]/10 text-[var(--col-primary)] px-2 py-1 rounded-md text-xs font-mono font-bold">
                                                             {u.uniqueId}
                                                         </span>
+                                                        {/* Language Badge */}
+                                                        {u.language && u.language !== (language || 'English') && (
+                                                            <div className="mt-1 flex justify-end">
+                                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${u.language === 'Telugu'
+                                                                    ? 'bg-orange-50 text-orange-600 border-orange-200'
+                                                                    : 'bg-blue-50 text-blue-600 border-blue-200'
+                                                                    }`}>
+                                                                    {u.language === 'Telugu' ? t('telugu_user') : t('english_user')}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                         <div className="flex items-center gap-1 mt-2 text-xs text-amber-600">
                                                             <Award size={12} />
                                                             <span>{u.experience || 0} {t('yrs_exp')}</span>
