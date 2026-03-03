@@ -78,7 +78,7 @@ app.get('/', (req, res) => res.json({ status: 'ok', message: 'SmartHood API Runn
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 const schedulerService = require('./services/schedulerService');
 
