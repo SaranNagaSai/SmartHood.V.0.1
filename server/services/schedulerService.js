@@ -134,7 +134,7 @@ class SchedulerService {
                             const terminationData = generateTerminationEmailTemplate(service, user);
                             await sendEmail(user.email, terminationData.subject, message, terminationData.html);
                         } else {
-                            await sendFollowUpEmail(user.email, service.title, `${nextStage} Stages`, user.language);
+                            await sendFollowUpEmail(user.email, service.title, service._id, user.language);
                         }
                     }
 

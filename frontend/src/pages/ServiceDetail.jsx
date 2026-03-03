@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
@@ -10,9 +10,10 @@ import {
 } from 'lucide-react';
 
 const ServiceDetail = () => {
-    const { t } = useLanguage();
+    const { t, translateValue } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [service, setService] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
@@ -28,7 +29,13 @@ const ServiceDetail = () => {
         const user = JSON.parse(localStorage.getItem('user'));
         setCurrentUser(user);
         fetchService();
-    }, [id]);
+
+        // Check if we should auto-open the completion modal
+        const queryParams = new URLSearchParams(location.search);
+        if (queryParams.get('action') === 'complete') {
+            setShowCompleteModal(true);
+        }
+    }, [id, location.search]);
 
     const fetchService = async () => {
         try {
@@ -397,14 +404,16 @@ const ServiceDetail = () => {
 
                                 {/* Amount Input */}
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase mb-2">{t('amount_paid')} ({t('others')})</label>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase mb-2">
+                                        {t('amount_paid')} <span className="text-gray-400 normal-case italic">({t('optional')})</span>
+                                    </label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
                                         <input
                                             type="number"
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
-                                            placeholder="0"
+                                            placeholder={t('amount_spent_placeholder')}
                                             className="w-full p-3 pl-8 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 outline-none focus:ring-2 focus:ring-green-500"
                                         />
                                     </div>

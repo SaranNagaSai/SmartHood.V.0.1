@@ -221,12 +221,12 @@ const generateAlertEmailTemplate = (alert, sender) => {
     `;
 };
 
-const sendFollowUpEmail = async (userEmail, serviceName, daysAgo, lang = 'English') => {
+const sendFollowUpEmail = async (userEmail, serviceName, serviceId, lang = 'English') => {
     const isTelugu = lang === 'Telugu';
     const subject = isTelugu ? 'సర్వీస్ ఫాలో-అప్ రిమైండర్' : 'Service Follow-up Reminder';
     const text = isTelugu
-        ? `నమస్కారం! మీరు "${serviceName}" కోసం ${daysAgo} రోజుల క్రితం అభ్యర్థించారు. మీకు సహాయం అందిందా లేదా ఇంకా కావాలా అని తెలుసుకోవాలనుకుంటున్నాము.`
-        : `Hi! You requested "${serviceName}" ${daysAgo} days ago. We want to check if you still need assistance.`;
+        ? `నమస్కారం! మీరు "${serviceName}" కోసం అభ్యర్థించారు. మీకు సహాయం అందిందా లేదా ఇంకా కావాలా అని తెలుసుకోవాలనుకుంటున్నాము.`
+        : `Hi! You requested "${serviceName}". We want to check if you still need assistance.`;
 
     const html = `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
@@ -236,7 +236,7 @@ const sendFollowUpEmail = async (userEmail, serviceName, daysAgo, lang = 'Englis
             <div style="padding: 30px; text-align: center;">
                 <p>${text}</p>
                 <div style="margin-top: 30px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/services" 
+                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/${serviceId}?action=complete" 
                        style="background: #f59e0b; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                         ${isTelugu ? 'అప్‌డేట్ చేయండి' : 'Update Status'}
                     </a>
