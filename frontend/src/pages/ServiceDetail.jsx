@@ -29,13 +29,17 @@ const ServiceDetail = () => {
         const user = JSON.parse(localStorage.getItem('user'));
         setCurrentUser(user);
         fetchService();
+    }, [id]);
 
-        // Check if we should auto-open the completion modal
-        const queryParams = new URLSearchParams(location.search);
-        if (queryParams.get('action') === 'complete') {
-            setShowCompleteModal(true);
+    useEffect(() => {
+        // Auto-open logic: ONLY for requests
+        if (service && service.type === 'request') {
+            const queryParams = new URLSearchParams(location.search);
+            if (queryParams.get('action') === 'complete') {
+                setShowCompleteModal(true);
+            }
         }
-    }, [id, location.search]);
+    }, [service, location.search]);
 
     const fetchService = async () => {
         try {
@@ -376,7 +380,7 @@ const ServiceDetail = () => {
                 )}
 
                 {/* Completion Modal */}
-                {showCompleteModal && (
+                {showCompleteModal && service?.type === 'request' && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4">
                         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
                             <div className="bg-green-600 p-4 flex items-center justify-between text-white">

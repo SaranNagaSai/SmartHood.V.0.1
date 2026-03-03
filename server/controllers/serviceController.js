@@ -348,6 +348,10 @@ const completeService = async (req, res) => {
             return res.status(404).json({ message: 'Service not found' });
         }
 
+        if (service.type !== 'request') {
+            return res.status(400).json({ message: 'Completion form is only available for Help Requests' });
+        }
+
         if (service.createdBy.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Only the service creator can complete it' });
         }
