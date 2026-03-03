@@ -71,9 +71,9 @@ const Profile = () => {
             });
             const data = await res.json();
 
-            // Filter out current user based on uniqueId if available, or just skip if it's the same person
-            const currentUser = JSON.parse(localStorage.getItem('user'));
-            const filteredUsers = Array.isArray(data) ? data.filter(u => u.uniqueId !== currentUser.uniqueId) : [];
+            // Filter out current user
+            const currentUser = JSON.parse(localStorage.getItem('user')) || {};
+            const filteredUsers = Array.isArray(data) ? data.filter(u => u.uniqueId && u.uniqueId !== currentUser.uniqueId) : [];
             setLocalityUsers(filteredUsers);
         } catch (err) {
             console.error("Failed to fetch locality users", err);

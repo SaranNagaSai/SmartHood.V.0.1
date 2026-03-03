@@ -13,15 +13,23 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    const notificationTitle = payload.notification.title;
+    console.log('[firebase-messaging-sw.js] Received message ', payload);
+
+    // Support both notification and data payloads
+    const notificationTitle = payload.notification?.title || payload.data?.title || 'SmartHood Notification';
     const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/vite.svg',
-        data: payload.data
+        body: payload.notification?.body || payload.data?.body || '',
+        icon: '/logo.png',
+        badge: '/logo.png',
+        vibrate: [200, 100, 200],
+        requireInteraction: true,
+        data: {
+            ...payload.data,
+            receivedAt: Date.now()
+        }
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {

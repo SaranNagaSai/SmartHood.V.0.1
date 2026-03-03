@@ -24,6 +24,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUserStats from './pages/AdminUserStats';
 import Emergency from './pages/Emergency';
 import StudentDashboard from './pages/StudentDashboard';
+import AutoLogin from './pages/AutoLogin';
 import Layout from './components/layout/Layout';
 
 import Loader from './components/common/Loader';
@@ -73,6 +74,8 @@ function App() {
                         <Login />
                     </LanguageGuard>
                 } />
+
+                <Route path="/auto-login/:token" element={<AutoLogin />} />
 
                 {/* Main App Flow - Protected Routes */}
                 <Route path="/home" element={

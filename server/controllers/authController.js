@@ -249,4 +249,44 @@ const generateToken = (id) => {
     });
 };
 
-module.exports = { registerUser, loginUser };
+// @desc    Magic Login (Token-based auto-login)
+// @route   GET /api/auth/magic-login/:token
+// @access  Public
+const magicLogin = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Invalid magic token' });
+        }
+
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        // Return user data same as login
+        res.json({
+            _id: user._id,
+            uniqueId: user.uniqueId,
+            name: user.name,
+            phone: user.phone,
+            locality: user.locality,
+            town: user.town,
+            district: user.district,
+            state: user.state,
+            profilePhoto: user.profilePhoto,
+            token: generateToken(user._id) // Issue a fresh long-lived token
+        });
+
+    } catch (error) {
+        console.error('Magic Login Error:', error);
+        res.status(401).json({ message: 'Session expired or invalid token' });
+    }
+};
+
+module.exports = { registerUser, loginUser, magicLogin };
+

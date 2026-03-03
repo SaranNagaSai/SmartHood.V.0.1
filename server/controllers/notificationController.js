@@ -107,12 +107,27 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         title: finalTitle,
                         body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody
                     },
+                    webpush: {
+                        notification: {
+                            title: finalTitle,
+                            body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody,
+                            icon: '/logo.png',
+                            badge: '/logo.png',
+                            vibrate: [200, 100, 200],
+                            requireInteraction: true // Keeps the notification on screen until user interacts
+                        },
+                        fcmOptions: {
+                            link: link ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}${link}` : `${process.env.FRONTEND_URL || 'http://localhost:5173'}/home`
+                        }
+                    },
                     android: {
                         priority: 'high',
+                        ttl: 86400000, // 1 day
                         notification: {
                             sound: 'default',
                             priority: 'high',
-                            channelId: 'high_priority_alerts' // Common channel name to ensure visibility
+                            channelId: 'high_priority_alerts',
+                            clickAction: 'FLUTTER_NOTIFICATION_CLICK' // For mobile compatibility
                         }
                     },
                     apns: {
@@ -127,7 +142,8 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                     data: {
                         url: link || '/home',
                         type: type,
-                        click_action: 'FLUTTER_NOTIFICATION_CLICK'
+                        title: finalTitle,
+                        body: finalBody
                     }
                 });
                 delivered = true;

@@ -1103,7 +1103,7 @@ export const LanguageProvider = ({ children }) => {
             'Patimeeda;Gudivada': 'పాటిమీద; గుడివాడ',
             'Laborer': 'కార్మికుడు',
             'Technician': 'టెక్నీషియన్',
-            'Saran Naga Sai': 'శరణ్ నాగ సాయి',
+            'Thiriveedhi Saran Naga Sai': 'తిరువీధి శరణ్ నాగ సాయి',
             'Merchant': 'మర్చంట్',
             'Krishna': 'కృష్ణా',
             'continue_to_website': 'వెబ్‌సైట్‌కు కొనసాగండి',
@@ -1179,37 +1179,40 @@ export const LanguageProvider = ({ children }) => {
     };
 
     // Bidirectional Translator for dynamic values
-    const translateValue = (value) => {
-        if (!value || !language) return value;
+    const translateValue = (value, depth = 0) => {
+        if (!value || !language || depth > 2) return value;
+        if (typeof value !== 'string') return value;
+
+        const val = value.trim();
+        if (!val) return value;
 
         const targetDict = translations[language] || {};
-        const sourceDict = language === 'Telugu' ? translations['English'] : translations['Telugu'];
 
-        // 1. Direct match in current language dictionary (e.g., input is already key)
-        if (targetDict[value]) return targetDict[value];
+        // 1. Direct match in current language dictionary
+        if (targetDict[val]) return targetDict[val];
 
         // 2. Inverse match (input is the VALUE in the OTHER language)
-        // Find which EN key this TE value belongs to, or vice versa
-        const otherDictName = language === 'Telugu' ? 'English' : 'Telugu';
-        const otherDict = translations[otherDictName] || {};
-
-        // If I'm English, and input is a Telugu value, find its English key
-        for (const enKey in translations['Telugu']) {
-            if (translations['Telugu'][enKey] === value) return enKey;
+        for (const lang in translations) {
+            for (const key in translations[lang]) {
+                if (translations[lang][key] === val) {
+                    // We found the key for this value. Now return the current language version of this key.
+                    return targetDict[key] || key;
+                }
+            }
         }
 
-        // 3. Case-insensitive or trimmed match
-        const lowerVal = value.toString().toLowerCase().trim();
+        // 3. Case-insensitive match (Internal keys are often case-sensitive)
+        const lowerVal = val.toLowerCase();
         for (const key in targetDict) {
             if (key.toLowerCase() === lowerVal) return targetDict[key];
         }
 
-        // 4. Multi-word segmentation (Recursive)
-        if (value.includes(' ') || value.includes(',') || value.includes(';')) {
-            const parts = value.split(/([\s,;]+)/);
+        // 4. Multi-word segmentation (Recursive but limited)
+        if (val.includes(' ') || val.includes(',') || val.includes(';')) {
+            const parts = val.split(/([\s,;]+)/);
             return parts.map(p => {
                 if (/^[\s,;]+$/.test(p)) return p;
-                return translateValue(p);
+                return translateValue(p, depth + 1);
             }).join('');
         }
 

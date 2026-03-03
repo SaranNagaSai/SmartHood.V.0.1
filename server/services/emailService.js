@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
+
 
 // Persistent transporter instance
 let transporterInstance = null;
@@ -242,7 +244,7 @@ const generateFollowUpEmailTemplate = (service, user, message) => {
                         ${message}
                     </p>
                     <div style="margin-top: 10px;">
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/${service._id}?action=complete" 
+                        <a href="${user._id ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auto-login/${jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })}?redirect=${encodeURIComponent(`/service/${service._id}?action=complete`)}` : `${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/${service._id}?action=complete`}" 
                            style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 800; font-size: 16px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); transition: all 0.3s ease;">
                             ${isTelugu ? 'అప్‌డేట్ చేయండి' : 'Update Status'}
                         </a>
@@ -298,7 +300,7 @@ const generateTerminationEmailTemplate = (service, user) => {
                     <h3 style="color: #1e293b; margin-top: 0;">${service.title}</h3>
                     <p style="color: #64748b; line-height: 1.6;">${message}</p>
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/request-help" 
+                        <a href="${user._id ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auto-login/${jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })}?redirect=/service/request` : `${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/request`}" 
                            style="background: #1e293b; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                             ${isTelugu ? 'రేపు మళ్లీ పంపండి' : 'Try Again Tomorrow'}
                         </a>
