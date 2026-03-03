@@ -247,6 +247,40 @@ const sendFollowUpEmail = async (userEmail, serviceName, daysAgo, lang = 'Englis
     return sendEmail(userEmail, subject, text, html);
 };
 
+const generateTerminationEmailTemplate = (service, user) => {
+    const isTelugu = user.language === 'Telugu';
+    const actionColor = '#ef4444'; // Red for termination
+
+    const subject = isTelugu ? 'మీ సర్వీస్ అభ్యర్థన నేడు పూర్తి కాలేదు' : 'Your Service Request Not Fulfilled Today';
+    const message = isTelugu
+        ? `మీరు కోరిన "${service.title}" సర్వీస్ అభ్యర్థన నేడు పూర్తి కాలేదు. దీనిని మేము ప్రస్తుతానికి ముగిస్తున్నాము (Unsatisfied). ఒకవేళ మీకు ఇంకా సహాయం కావాలంటే రేపు మళ్లీ అదే అభ్యర్థనను పంపండి.`
+        : `Your request for "${service.title}" was not fulfilled today. We are marking this task as unsatisfied for now. Please raise this query again tomorrow if you still need help.`;
+
+    return {
+        subject,
+        html: `
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+                <div style="background: ${actionColor}; padding: 25px; text-align: center; color: white;">
+                    <h1 style="margin: 0; font-size: 24px;">${isTelugu ? 'సర్వీస్ అభ్యర్థన ముగింపు' : 'Task Termination'}</h1>
+                </div>
+                <div style="padding: 30px; text-align: center;">
+                    <div style="background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-weight: bold;">
+                        ${isTelugu ? 'పని పూర్తి కాలేదు' : 'Status: Unsatisfied'}
+                    </div>
+                    <h3 style="color: #1e293b; margin-top: 0;">${service.title}</h3>
+                    <p style="color: #64748b; line-height: 1.6;">${message}</p>
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/request-help" 
+                           style="background: #1e293b; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                            ${isTelugu ? 'రేపు మళ్లీ పంపండి' : 'Try Again Tomorrow'}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `
+    };
+};
+
 module.exports = {
     sendEmail,
     sendWelcomeEmail,
@@ -254,5 +288,6 @@ module.exports = {
     generateServiceEmailTemplate,
     generateInterestEmailTemplate,
     generateCompletionEmailTemplate,
-    generateAlertEmailTemplate
+    generateAlertEmailTemplate,
+    generateTerminationEmailTemplate
 };

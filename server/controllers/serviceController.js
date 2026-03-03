@@ -412,11 +412,17 @@ const completeService = async (req, res) => {
             return res.status(403).json({ message: 'Only the service creator can complete it' });
         }
 
-        // Find provider by unique ID
-        const provider = await User.findOne({ uniqueId: providerUniqueId.toUpperCase() });
+        // Find provider by unique ID OR Name
+        const searchTerm = providerUniqueId.trim();
+        const provider = await User.findOne({
+            $or: [
+                { uniqueId: searchTerm.toUpperCase() },
+                { name: { $regex: new RegExp(`^${searchTerm}$`, 'i') } }
+            ]
+        });
 
         if (!provider) {
-            return res.status(404).json({ message: 'Provider not found with this Unique ID' });
+            return res.status(404).json({ message: 'Provider not found with this ID or Name' });
         }
 
         // Update service

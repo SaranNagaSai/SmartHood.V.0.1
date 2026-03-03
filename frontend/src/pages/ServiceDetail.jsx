@@ -387,9 +387,9 @@ const ServiceDetail = () => {
                                     <div className="relative">
                                         <VoiceInput
                                             value={providerId}
-                                            onChange={(e) => setProviderId(e.target.value.toUpperCase())}
-                                            placeholder="e.g. ABC12"
-                                            className="font-mono text-center text-lg tracking-widest uppercase"
+                                            onChange={(e) => setProviderId(e.target.value)}
+                                            placeholder="e.g. ABC12 or John Doe"
+                                            className="text-center text-lg tracking-wide"
                                             required
                                         />
                                     </div>
