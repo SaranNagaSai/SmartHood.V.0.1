@@ -7,7 +7,7 @@ import { API_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const StateUsers = () => {
     const { stateName } = useParams();
-    const { t, translateValue } = useLanguage();
+    const { language, t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);

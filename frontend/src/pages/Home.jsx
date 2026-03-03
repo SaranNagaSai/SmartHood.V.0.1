@@ -5,7 +5,7 @@ import { Map, Zap, MapPin, Shield, X, Briefcase, Award } from 'lucide-react';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const Home = () => {
-    const { t, translateValue } = useLanguage();
+    const { language, t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [stats, setStats] = useState({ professions: [], states: [] });
