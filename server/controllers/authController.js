@@ -249,26 +249,4 @@ const generateToken = (id) => {
     });
 };
 
-// @desc    Update user FCM token
-// @route   POST /api/auth/update-fcm
-// @access  Private
-const updateFcmToken = async (req, res) => {
-    try {
-        const { fcmToken } = req.body;
-
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        user.fcmToken = fcmToken;
-        await user.save();
-
-        res.json({ message: 'FCM token updated successfully' });
-    } catch (error) {
-        console.error('Update FCM Error:', error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
-
-module.exports = { registerUser, loginUser, updateFcmToken };
+module.exports = { registerUser, loginUser };
