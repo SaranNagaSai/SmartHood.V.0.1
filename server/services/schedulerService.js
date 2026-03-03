@@ -1,7 +1,7 @@
 const Service = require('../models/Service');
 const User = require('../models/User');
 const { createNotification } = require('../controllers/notificationController');
-const { sendFollowUpEmail, generateTerminationEmailTemplate, sendEmail } = require('./emailService');
+const { sendFollowUpEmail, generateTerminationEmailTemplate, sendEmail, generateFollowUpEmailTemplate } = require('./emailService');
 
 /**
  * Advanced Scheduler Service
@@ -140,11 +140,14 @@ class SchedulerService {
                     }
 
                     // 1. Dual Channel Notification (In-App + Push + Email)
-                    // We pass custom emailHtml for termination to keep it red
                     let customEmailHtml = null;
                     if (isTermination) {
                         const term = generateTerminationEmailTemplate(service, user);
                         customEmailHtml = term.html;
+                    } else {
+                        // All non-termination follow-up stages get the premium template with "Update Status" button
+                        const followUp = generateFollowUpEmailTemplate(service, user, isTelugu ? notificationData.bodyTe : notificationData.body);
+                        customEmailHtml = followUp.html;
                     }
 
                     await createNotification(

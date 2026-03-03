@@ -100,16 +100,34 @@ const createNotification = async (userId, data, type = 'system', link = null, em
         // 2. Send FCM Push (Dual Channel - WhatsApp style)
         if (user.fcmToken) {
             try {
+                // Dual channel delivery - ensuring high priority for immediate visibility
                 await admin.messaging().send({
                     token: user.fcmToken,
                     notification: {
                         title: finalTitle,
-                        body: finalBody.length > 100 ? finalBody.substring(0, 97) + '...' : finalBody
+                        body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody
+                    },
+                    android: {
+                        priority: 'high',
+                        notification: {
+                            sound: 'default',
+                            priority: 'high',
+                            channelId: 'high_priority_alerts' // Common channel name to ensure visibility
+                        }
+                    },
+                    apns: {
+                        payload: {
+                            aps: {
+                                sound: 'default',
+                                badge: 1,
+                                'content-available': 1
+                            }
+                        }
                     },
                     data: {
                         url: link || '/home',
                         type: type,
-                        click_action: 'FLUTTER_NOTIFICATION_CLICK' // For mobile compatibility if needed
+                        click_action: 'FLUTTER_NOTIFICATION_CLICK'
                     }
                 });
                 delivered = true;

@@ -221,30 +221,58 @@ const generateAlertEmailTemplate = (alert, sender) => {
     `;
 };
 
-const sendFollowUpEmail = async (userEmail, serviceName, serviceId, lang = 'English') => {
-    const isTelugu = lang === 'Telugu';
+const generateFollowUpEmailTemplate = (service, user, message) => {
+    const isTelugu = user.language === 'Telugu';
     const subject = isTelugu ? 'సర్వీస్ ఫాలో-అప్ రిమైండర్' : 'Service Follow-up Reminder';
-    const text = isTelugu
-        ? `నమస్కారం! మీరు "${serviceName}" కోసం అభ్యర్థించారు. మీకు సహాయం అందిందా లేదా ఇంకా కావాలా అని తెలుసుకోవాలనుకుంటున్నాము.`
-        : `Hi! You requested "${serviceName}". We want to check if you still need assistance.`;
 
-    const html = `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
-            <div style="background: #f59e0b; padding: 25px; text-align: center; color: white;">
-                <h1 style="margin: 0; font-size: 24px;">${isTelugu ? 'సర్వీస్ ఫాలో-అప్' : 'Service Follow-up'}</h1>
-            </div>
-            <div style="padding: 30px; text-align: center;">
-                <p>${text}</p>
-                <div style="margin-top: 30px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/${serviceId}?action=complete" 
-                       style="background: #f59e0b; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                        ${isTelugu ? 'అప్‌డేట్ చేయండి' : 'Update Status'}
-                    </a>
+    return {
+        subject,
+        html: `
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+                <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 35px 25px; text-align: center; color: white;">
+                    <h1 style="margin: 0; font-size: 28px; letter-spacing: 1px;">Smart Hood</h1>
+                    <p style="margin: 5px 0 0; opacity: 0.9; font-weight: 500;">${isTelugu ? 'మన పరిసర వేదిక' : 'Your Neighborhood Platform'}</p>
+                </div>
+                <div style="padding: 40px 30px; text-align: center;">
+                    <div style="background: #f0f9ff; color: #1e3a8a; padding: 12px 20px; border-radius: 50px; display: inline-block; font-size: 14px; font-weight: 700; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;">
+                        ${isTelugu ? 'సర్వీస్ ఫాలో-అప్' : 'Service follow-up'}
+                    </div>
+                    <h3 style="color: #1e293b; font-size: 20px; margin-bottom: 15px;">${service.title}</h3>
+                    <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                        ${message}
+                    </p>
+                    <div style="margin-top: 10px;">
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/${service._id}?action=complete" 
+                           style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 800; font-size: 16px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); transition: all 0.3s ease;">
+                            ${isTelugu ? 'అప్‌డేట్ చేయండి' : 'Update Status'}
+                        </a>
+                    </div>
+                </div>
+                <div style="padding: 25px; background: #f8fafc; text-align: center; border-top: 1px solid #f1f5f9;">
+                    <p style="color: #64748b; margin: 0; font-size: 12px;">
+                        ${isTelugu
+                ? 'మీకు ఈమెయిల్ మీ పరిసరాల వేదిక అయిన స్మార్ట్ హుడ్ నుండి పంపబడినది.'
+                : 'The email you received was sent from SmartHood, your neighborhood platform.'}
+                    </p>
+                    <p style="color: #94a3b8; margin: 10px 0 0; font-size: 12px;">
+                        © ${new Date().getFullYear()} SmartHood. All rights reserved.
+                    </p>
                 </div>
             </div>
-        </div>
-    `;
-    return sendEmail(userEmail, subject, text, html);
+        `
+    };
+};
+
+const sendFollowUpEmail = async (userEmail, serviceName, serviceId, lang = 'English') => {
+    const service = { title: serviceName, _id: serviceId };
+    const user = { language: lang };
+    const isTelugu = lang === 'Telugu';
+    const message = isTelugu
+        ? `మీరు కోరిన "${serviceName}" కి ఇంకా సహాయం అందలేదా?`
+        : `Still haven't received the help you requested for "${serviceName}"?`;
+
+    const { subject, html } = generateFollowUpEmailTemplate(service, user, message);
+    return sendEmail(userEmail, subject, message, html);
 };
 
 const generateTerminationEmailTemplate = (service, user) => {
@@ -289,5 +317,6 @@ module.exports = {
     generateInterestEmailTemplate,
     generateCompletionEmailTemplate,
     generateAlertEmailTemplate,
-    generateTerminationEmailTemplate
+    generateTerminationEmailTemplate,
+    generateFollowUpEmailTemplate
 };
