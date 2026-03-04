@@ -128,24 +128,86 @@ const generateServiceEmailTemplate = (service, creator, type) => {
         ? (isOffer ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన')
         : (isOffer ? 'New Service Offer' : 'New Help Request');
 
+    // Get profession display
+    let professionStr = creator.professionCategory || '';
+    if (creator.professionCategory === 'Employed') professionStr = creator.professionDetails?.jobRole || 'Employed';
+    else if (creator.professionCategory === 'Business') professionStr = creator.professionDetails?.businessType || 'Business';
+    else if (creator.professionCategory === 'Student') professionStr = creator.professionDetails?.course || 'Student';
+
+    // Profile photo - use Cloudinary URL directly or generate initial
+    const hasPhoto = creator.profilePhoto && creator.profilePhoto.startsWith('http');
+    const photoUrl = hasPhoto ? creator.profilePhoto.replace('http:', 'https:') : null;
+    const initial = (creator.name || 'U').charAt(0).toUpperCase();
+
     return `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
-            <div style="background: ${actionColor}; padding: 25px; text-align: center; color: white;">
-                <h2>${title}</h2>
-                <p>${isTelugu ? `ప్రాంతం: ${service.locality}` : `Locality: ${service.locality}`}</p>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+            <!-- Header -->
+            <div style="background: ${actionColor}; padding: 28px 25px; text-align: center; color: white;">
+                <h2 style="margin: 0 0 6px; font-size: 22px; font-weight: 800;">${title}</h2>
+                <p style="margin: 0; opacity: 0.9; font-size: 14px;">${isTelugu ? `ప్రాంతం: ${service.locality}` : `Locality: ${service.locality}`}</p>
             </div>
+
             <div style="padding: 30px;">
-                <h3 style="color: #1e293b;">${service.title}</h3>
-                <div style="background: #f8fafc; padding: 15px; border-left: 4px solid ${actionColor};">
-                    <p style="margin: 0;">${service.description}</p>
+                <!-- Service Title & Description -->
+                <h3 style="color: #1e293b; margin: 0 0 15px; font-size: 18px; font-weight: 700;">${service.title}</h3>
+                <div style="background: #f8fafc; padding: 16px; border-left: 4px solid ${actionColor}; border-radius: 0 8px 8px 0; margin-bottom: 25px;">
+                    <p style="margin: 0; color: #475569; line-height: 1.6; font-size: 14px;">${service.description}</p>
                 </div>
-                <div style="margin-top: 20px; padding: 15px; border: 1px solid #eee;">
-                    <strong>${isTelugu ? 'పంపినవారు:' : 'Sender:'}</strong> ${creator.name}<br>
-                    <strong>${isTelugu ? 'ఫోన్:' : 'Phone:'}</strong> ${creator.phone}
+
+                <!-- Sender Profile Card -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: center;">
+                    <p style="margin: 0 0 15px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; color: #94a3b8;">
+                        ${isTelugu ? 'పంపినవారి వివరాలు' : 'Sender Details'}
+                    </p>
+
+                    <!-- Profile Photo or Initial -->
+                    ${photoUrl ? `
+                        <div style="margin: 0 auto 12px; width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid ${actionColor}; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <img src="${photoUrl}" alt="${creator.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                    ` : `
+                        <div style="margin: 0 auto 12px; width: 80px; height: 80px; border-radius: 50%; background: ${actionColor}; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <span style="color: white; font-size: 32px; font-weight: 800; line-height: 80px;">${initial}</span>
+                        </div>
+                    `}
+
+                    <!-- Name -->
+                    <h3 style="margin: 0 0 4px; color: #1e293b; font-size: 18px; font-weight: 800;">${creator.name}</h3>
+
+                    <!-- Profession Badge -->
+                    ${professionStr ? `
+                        <div style="margin: 6px auto 14px;">
+                            <span style="background: ${actionColor}15; color: ${actionColor}; padding: 4px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid ${actionColor}30;">
+                                ${professionStr}
+                            </span>
+                        </div>
+                    ` : ''}
+
+                    <!-- Contact Info -->
+                    <table style="width: 100%; max-width: 280px; margin: 0 auto; border-collapse: separate; border-spacing: 0 8px;">
+                        <tr>
+                            <td style="text-align: left; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; padding: 4px 0;">📞 ${isTelugu ? 'ఫోన్' : 'Phone'}</td>
+                            <td style="text-align: right; color: #1e293b; font-size: 15px; font-weight: 700; padding: 4px 0;">
+                                <a href="tel:${creator.phone}" style="color: #1e293b; text-decoration: none;">${creator.phone}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; padding: 4px 0;">📍 ${isTelugu ? 'ప్రాంతం' : 'Locality'}</td>
+                            <td style="text-align: right; color: #1e293b; font-size: 14px; font-weight: 600; padding: 4px 0;">${creator.locality || service.locality}</td>
+                        </tr>
+                        ${creator.experience ? `
+                        <tr>
+                            <td style="text-align: left; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; padding: 4px 0;">⭐ ${isTelugu ? 'అనుభవం' : 'Experience'}</td>
+                            <td style="text-align: right; color: #1e293b; font-size: 14px; font-weight: 600; padding: 4px 0;">${creator.experience} ${isTelugu ? 'సంవత్సరాలు' : 'Years'}</td>
+                        </tr>
+                        ` : ''}
+                    </table>
                 </div>
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/service/${service._id}" style="background: ${actionColor}; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px;">${isTelugu ? 'వివరాలు' : 'Details'}</a>
-                </div>
+
+                <!-- Footer -->
+                <p style="text-align: center; color: #94a3b8; font-size: 11px; margin-top: 25px;">
+                    ${isTelugu ? 'SmartHood కమ్యూనిటీ నెట్‌వర్క్ ద్వారా పంపబడింది' : 'Sent via SmartHood Community Network'}
+                </p>
             </div>
         </div>
     `;
