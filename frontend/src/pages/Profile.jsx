@@ -8,10 +8,12 @@ import {
 import Webcam from 'react-webcam';
 import VoiceInput from '../components/common/VoiceInput';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
+import useNotifications from '../hooks/useNotifications';
 
 const Profile = () => {
     const { language, t, translateValue } = useLanguage();
     const navigate = useNavigate();
+    const { syncFcmToken } = useNotifications(true);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
@@ -599,6 +601,35 @@ const Profile = () => {
                             ))}
                         </div>
                     )}
+                </div>
+
+                {/* Notification Settings */}
+                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 transition-all duration-300">
+                    <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-6">
+                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+                            <TrendingUp size={18} className="text-white" />
+                        </div>
+                        {t('notification_settings', 'Notification Settings')}
+                    </h3>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                            <div className="flex-1">
+                                <h4 className="font-bold text-indigo-900 text-sm">{t('push_notifications', 'Push Notifications')}</h4>
+                                <p className="text-xs text-indigo-700 mt-1">
+                                    {t('push_desc', 'Get instant alerts for help requests and work updates.')}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => syncFcmToken(true)}
+                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md hover:bg-indigo-700 transition active:scale-95"
+                            >
+                                {t('enable', 'Enable')}
+                            </button>
+                        </div>
+                        <p className="text-[10px] text-gray-400 italic text-center px-4">
+                            {t('notification_platform_note', 'Note: Notifications work best when you add SmartHood to your Home Screen (PWA).')}
+                        </p>
+                    </div>
                 </div>
             </div>
             {/* Photo Upload Modal */}

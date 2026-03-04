@@ -29,6 +29,8 @@ import Layout from './components/layout/Layout';
 
 import Loader from './components/common/Loader';
 
+import useNotifications from './hooks/useNotifications';
+
 // Guard to ensure language is selected
 const LanguageGuard = ({ children }) => {
     const { language } = useLanguage();
@@ -56,6 +58,9 @@ const AuthGuard = ({ children }) => {
 function App() {
     const { language } = useLanguage();
     const { isAuthenticated } = useAuth();
+
+    // Initialize push notifications
+    useNotifications(isAuthenticated);
 
     return (
         <Layout>
