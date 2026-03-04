@@ -32,8 +32,10 @@ const createComplaint = async (req, res) => {
         // Notify user
         await createNotification(
             req.user._id,
-            'Complaint Submitted',
-            `Your complaint "${subject}" has been submitted. Ticket: ${complaint.ticketId}`,
+            {
+                title: 'Complaint Submitted',
+                body: `Your complaint "${subject}" has been submitted. Ticket: ${complaint.ticketId}`
+            },
             'system'
         );
 
@@ -89,8 +91,10 @@ const updateComplaintStatus = async (req, res) => {
         // Notify user of status update
         await createNotification(
             complaint.userId,
-            'Complaint Status Updated',
-            `Your complaint "${complaint.subject}" is now ${status}`,
+            {
+                title: 'Complaint Status Updated',
+                body: `Your complaint "${complaint.subject}" is now ${status}`
+            },
             'system'
         );
 

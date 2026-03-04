@@ -3,7 +3,7 @@ const admin = require('../config/firebase');
 
 // Helper to send individual notification (already handled by createNotification now)
 const sendNotification = async (user, title, body, type, link) => {
-    return await createNotification(user._id, title, body, type, link);
+    return await createNotification(user._id, { title, body }, type, link);
 };
 
 const sendBrowserNotification = async (user, title, body, data = {}) => {
@@ -41,7 +41,7 @@ const routeNotifications = async (users, notification) => {
         const emailHtml = notification.emailHtml || null;
 
         // createNotification handles both DB entry and simultaneous delivery (Email/FCM)
-        await createNotification(user._id, title, body, type, link, emailHtml);
+        await createNotification(user._id, { title, body }, type, link, emailHtml);
     });
 
     await Promise.all(promises);

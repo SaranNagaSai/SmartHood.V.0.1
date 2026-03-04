@@ -274,8 +274,7 @@ Looking forward to connecting!`;
             // Already includes saving to DB inside createNotification
             return createNotification(
                 targetId,
-                title,
-                bodyContent,
+                { title, body: bodyContent },
                 'interlink',
                 '/profile',
                 emailHtml
