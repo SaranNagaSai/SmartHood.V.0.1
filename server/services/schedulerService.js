@@ -22,9 +22,9 @@ const { sendFollowUpEmail, generateTerminationEmailTemplate, sendEmail, generate
 // Absolute cumulative thresholds in minutes from service creation
 const STAGE_THRESHOLDS = {
     1: 30,       // Stage 0→1: 30 minutes
-    2: 90,       // Stage 1→2: 1.5 hours (30 + 60)
-    3: 150,      // Stage 2→3: 2.5 hours (30 + 60 + 60)
-    4: 210       // Stage 3→4: 3.5 hours (30 + 60 + 60 + 60) → TERMINATION
+    2: 60,       // Stage 1→2: 60 minutes (30 + 30)
+    3: 90,       // Stage 2→3: 90 minutes (30 + 30 + 30)
+    4: 120       // Stage 3→4: 120 minutes (30 + 30 + 30 + 30) → TERMINATION
 };
 
 class SchedulerService {
