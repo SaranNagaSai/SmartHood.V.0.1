@@ -141,53 +141,66 @@ const createService = async (req, res) => {
 
         // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
-            console.log(`[Background] Starting dual-channel broadcast for Service ${service._id} to ${targetUsers.length} users`);
+            try {
+                const totalTargets = targetUsers.length;
+                console.log(`🚀 [Background] Starting broadcast for Service ${service._id} (Offer: ${type.toLowerCase() === 'offer'})`);
 
-            const { createNotification } = require('./notificationController');
+                // 1. Prepare Content Once
+                const isOffer = type.toLowerCase() === 'offer';
+                const creatorNotification = {
+                    title: isOffer ? 'Your Offer is Live!' : 'Your Request is Live!',
+                    titleTe: isOffer ? 'మీ ఆఫర్ ప్రత్యక్ష ప్రసారంలో ఉంది!' : 'మీ అభ్యర్థన ప్రత్యక్ష ప్రసారంలో ఉంది!',
+                    body: isOffer
+                        ? `Your offer "${title}" has been sent to ${totalTargets} people in your community.`
+                        : `Your request "${title}" has been sent to ${totalTargets} people. You'll receive follow-up updates.`,
+                    bodyTe: isOffer
+                        ? `మీ ఆఫర్ "${title}" మీ కమ్యూనిటీలోని ${totalTargets} మందికి పంపబడింది.`
+                        : `మీ అభ్యర్థన "${title}" ${totalTargets} మందికి పంపబడింది. మీకు ఫాలో-అప్ అప్‌డేట్‌లు వస్తాయి.`
+                };
 
-            // 1. SEND CONFIRMATION TO CREATOR (Immediate feedback)
-            const isOffer = type.toLowerCase() === 'offer';
-            const creatorNotification = {
-                title: isOffer ? 'Your Offer is Live!' : 'Your Request is Live!',
-                titleTe: isOffer ? 'మీ ఆఫర్ ప్రత్యక్ష ప్రసారంలో ఉంది!' : 'మీ అభ్యర్థన ప్రత్యక్ష ప్రసారంలో ఉంది!',
-                body: isOffer
-                    ? `Your offer "${title}" has been sent to ${targetUsers.length} people in your community.`
-                    : `Your request "${title}" has been sent to ${targetUsers.length} people. You'll receive follow-up updates.`,
-                bodyTe: isOffer
-                    ? `మీ ఆఫర్ "${title}" మీ కమ్యూనిటీలోని ${targetUsers.length} మందికి పంపబడింది.`
-                    : `మీ అభ్యర్థన "${title}" ${targetUsers.length} మందికి పంపబడింది. మీకు ఫాలో-అప్ అప్‌డేట్‌లు వస్తాయి.`
-            };
-
-            await createNotification(
-                user._id,
-                creatorNotification,
-                'service',
-                `/service/${service._id}`,
-                creatorEmailHtml
-            );
-            console.log(`[Background] Creator confirmation sent to ${user.name}`);
-
-            // 2. BROADCAST TO TARGET USERS
-            for (const targetUser of targetUsers) {
-                const recipientIsTelugu = targetUser.language === 'Telugu';
-
-                // Prepare bilingual content
-                const notificationData = {
+                const recipientNotificationData = {
                     title: isOffer ? 'New Service Offer' : 'New Help Request',
                     titleTe: isOffer ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన',
                     body: `${user.name} posted: ${title}`,
                     bodyTe: `${user.name} పోస్ట్ చేశారు: ${title}`
                 };
 
-                await createNotification(
-                    targetUser._id,
-                    notificationData,
+                // 2. Parallelize: Creator Confirmation + Start of broadcast
+                // We don't await the creator confirmation before starting the loop to ensure speed
+                const creatorTask = createNotification(
+                    user._id,
+                    creatorNotification,
                     'service',
                     `/service/${service._id}`,
-                    emailHtml
-                );
+                    creatorEmailHtml
+                ).then(() => console.log(`✅ [Background] Creator confirmation delivered to ${user.name}`))
+                    .catch(e => console.error(`❌ [Background] Creator confirmation FAILED:`, e.message));
+
+                // 3. BROADCAST TO TARGET USERS
+                console.log(`📡 [Background] Sending to ${totalTargets} recipients...`);
+                let successCount = 0;
+
+                // Process in small batches or one by one to avoid overwhelming SMTP
+                for (const targetUser of targetUsers) {
+                    try {
+                        await createNotification(
+                            targetUser._id,
+                            recipientNotificationData,
+                            'service',
+                            `/service/${service._id}`,
+                            emailHtml
+                        );
+                        successCount++;
+                    } catch (targetErr) {
+                        console.error(`❌ [Background] Failed to notify target ${targetUser._id}:`, targetErr.message);
+                    }
+                }
+
+                await creatorTask; // Ensure creator task log is finished
+                console.log(`🏁 [Background] Broadcast COMPLETE. Success: ${successCount}/${totalTargets}`);
+            } catch (err) {
+                console.error('💥 [Background] Critical failure in broadcast loop:', err);
             }
-            console.log(`[Background] Service Broadcast COMPLETE for ${targetUsers.length} users.`);
         });
 
         res.status(201).json({

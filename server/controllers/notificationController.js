@@ -85,20 +85,26 @@ const createNotification = async (userId, data, type = 'system', link = null, em
 
         // 1. Send Email (Dual Channel)
         if (user.email && !skipEmail) {
+            console.log(`📧 [Notification] Attempting email to ${user.email}...`);
             try {
                 const emailResult = await sendEmail(user.email, finalTitle, finalBody, emailHtml);
                 if (emailResult.success) {
                     delivered = true;
                     methods.push('email');
-                    console.log(`[Notification] Email sent to ${user.email}`);
+                    console.log(`✅ [Notification] Email SUCCESS for ${user.email}`);
+                } else {
+                    console.warn(`⚠️ [Notification] Email REJECTED: ${emailResult.reason || 'Unknown reason'}`);
                 }
             } catch (err) {
-                console.error(`[Notification] Email error for ${user.email}:`, err.message);
+                console.error(`❌ [Notification] Email ERROR:`, err.message);
             }
+        } else {
+            console.log(`ℹ️ [Notification] Skipping email for ${user.name} (No email or skipEmail=true)`);
         }
 
         // 2. Send FCM Push (Dual Channel - WhatsApp style)
         if (user.fcmToken) {
+            console.log(`📱 [Notification] Attempting push to ${user.name}...`);
             try {
                 // Dual channel delivery - ensuring high priority for immediate visibility
                 await admin.messaging().send({

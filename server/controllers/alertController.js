@@ -73,49 +73,55 @@ const createAlert = async (req, res) => {
 
         // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
-            console.log(`[Background] Starting dual-channel broadcast for Alert ${alert._id} to ${targetUsers.length} users`);
+            try {
+                console.log(`🚀 [Background] Starting broadcast for Alert ${alert._id} to ${targetUsers.length} users`);
 
-            const { createNotification } = require('./notificationController');
+                const { createNotification } = require('./notificationController');
 
-            // 1. SEND CONFIRMATION TO ALERT CREATOR
-            const creatorAlertNotification = {
-                title: 'Your Alert is Live!',
-                titleTe: 'మీ హెచ్చరిక ప్రత్యక్ష ప్రసారంలో ఉంది!',
-                body: `Your ${category} alert "${subType}" has been broadcast to ${targetUsers.length} people.`,
-                bodyTe: `మీ ${category} హెచ్చరిక "${subType}" ${targetUsers.length} మందికి ప్రసారం చేయబడింది.`
-            };
-
-            await createNotification(
-                req.user._id,
-                creatorAlertNotification,
-                'ALERT',
-                '/alerts',
-                creatorAlertEmailHtml
-            );
-            console.log(`[Background] Alert confirmation sent to creator ${req.user.name}`);
-
-            // 2. BROADCAST TO TARGET USERS
-            for (const user of targetUsers) {
-                // Prepare bilingual content for the notification
-                const notificationData = {
-                    title: `ALERT: ${category} (${subType})`,
-                    titleTe: `హెచ్చరిక: ${category} (${subType})`,
-                    body: description,
-                    bodyTe: description
+                // 1. SEND CONFIRMATION TO ALERT CREATOR
+                const creatorAlertNotification = {
+                    title: 'Your Alert is Live!',
+                    titleTe: 'మీ హెచ్చరిక ప్రత్యక్ష ప్రసారంలో ఉంది!',
+                    body: `Your ${category} alert "${subType}" has been broadcast to ${targetUsers.length} people.`,
+                    bodyTe: `మీ ${category} హెచ్చరిక "${subType}" ${targetUsers.length} మందికి ప్రసారం చేయబడింది.`
                 };
 
-                // For alerts, we use the generateAlertEmailTemplate
-                const emailHtml = generateAlertEmailTemplate(alert, req.user);
-
                 await createNotification(
-                    user._id,
-                    notificationData,
+                    req.user._id,
+                    creatorAlertNotification,
                     'ALERT',
                     '/alerts',
-                    emailHtml
+                    creatorAlertEmailHtml
                 );
+                console.log(`✅ [Background] Alert confirmation sent to creator ${req.user.name}`);
+
+                // 2. BROADCAST TO TARGET USERS
+                let successCount = 0;
+                for (const user of targetUsers) {
+                    try {
+                        const notificationData = {
+                            title: `ALERT: ${category} (${subType})`,
+                            titleTe: `హెచ్చరిక: ${category} (${subType})`,
+                            body: description,
+                            bodyTe: description
+                        };
+
+                        await createNotification(
+                            user._id,
+                            notificationData,
+                            'ALERT',
+                            '/alerts',
+                            emailHtml
+                        );
+                        successCount++;
+                    } catch (targetErr) {
+                        console.error(`❌ [Background] Failed to notify target ${user._id}:`, targetErr.message);
+                    }
+                }
+                console.log(`🏁 [Background] Alert Broadcast COMPLETE. Success: ${successCount}/${targetUsers.length}`);
+            } catch (err) {
+                console.error('💥 [Background] Critical failure in alert broadcast loop:', err);
             }
-            console.log(`[Background] Alert Broadcast COMPLETE for ${targetUsers.length} users.`);
         });
 
         res.status(201).json({
