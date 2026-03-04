@@ -69,6 +69,7 @@ const createAlert = async (req, res) => {
         // Generate rich HTML email with full details and sender info
         const isTelugu = req.user.language === 'Telugu';
         const emailHtml = generateAlertEmailTemplate(alert, req.user);
+        const creatorAlertEmailHtml = generateAlertEmailTemplate(alert, req.user, true);
 
         // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
@@ -89,7 +90,7 @@ const createAlert = async (req, res) => {
                 creatorAlertNotification,
                 'ALERT',
                 '/alerts',
-                null
+                creatorAlertEmailHtml
             );
             console.log(`[Background] Alert confirmation sent to creator ${req.user.name}`);
 

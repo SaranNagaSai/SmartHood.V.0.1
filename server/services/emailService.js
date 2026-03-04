@@ -278,19 +278,38 @@ const generateCompletionEmailTemplate = (service, provider, amount) => {
     `;
 };
 
-const generateAlertEmailTemplate = (alert, sender) => {
+const generateAlertEmailTemplate = (alert, sender, isConfirmation = false) => {
     const isTelugu = sender.language === 'Telugu';
     const categoryColors = { 'Emergency': '#dc2626', 'Welfare': '#16a34a', 'Official': '#2563eb', 'General': '#6366f1' };
     const headerColor = categoryColors[alert.category] || '#6366f1';
     const categoryTe = { 'Emergency': 'అత్యవసర', 'Welfare': 'సంక్షేమం', 'Official': 'అధికారిక', 'General': 'సాధారణ' };
 
+    let title = isTelugu ? 'రాష్ట్ర/స్థానిక హెచ్చరిక' : 'Community Alert';
+    if (isConfirmation) {
+        title = isTelugu ? 'మీ హెచ్చరిక ప్రత్యక్ష ప్రసారంలో ఉంది!' : 'Your Alert is Live!';
+    }
+
     return `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
             <div style="background: ${headerColor}; padding: 25px; text-align: center; color: white;">
-                <p>${isTelugu ? 'రాష్ట్ర/స్థానిక హెచ్చరిక' : 'Community Alert'}</p>
+                <p>${title}</p>
                 <h2>${sender.locality || alert.locality}</h2>
             </div>
             <div style="padding: 30px;">
+                <!-- Alert Attachments (if any) -->
+                ${alert.attachments && alert.attachments.length > 0 ? `
+                    <div style="margin-bottom: 25px; text-align: center;">
+                        <p style="margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; color: #94a3b8;">
+                            ${isTelugu ? 'జత చేసిన మీడియా' : 'Attached Media'}
+                        </p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                            ${alert.attachments.map(att => {
+        const fullAttUrl = att.startsWith('http') ? att : `${process.env.BACKEND_URL || 'https://smarthood.onrender.com'}/${att.replace(/\\/g, '/')}`;
+        return `<img src="${fullAttUrl}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`;
+    }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
                 <div style="text-align: center; margin-bottom: 20px;">
                     <span style="background: ${headerColor}20; color: ${headerColor}; padding: 5px 15px; border-radius: 50px; font-weight: bold;">
                         ${isTelugu ? categoryTe[alert.category] || alert.category : alert.category}
