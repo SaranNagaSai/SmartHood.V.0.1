@@ -130,18 +130,19 @@ const getUsersByLocality = async (req, res) => {
     }
 };
 
-// @desc    Get users by profession in locality
-// @route   GET /api/users/by-profession/:profession
+// @desc    Get users by profession in locality (supports ?locality= override for Explore Town)
+// @route   GET /api/users/by-profession/:profession?locality=X
 // @access  Private
 const getUsersByProfession = async (req, res) => {
     try {
         const { profession } = req.params;
+        const { locality } = req.query; // Optional: override locality for Explore Town
         const currentUser = req.user;
 
         // Use normalized locality for cross-language matching
         const { normalizeToEnglish } = require('../utils/locationMap');
-        const normLocality = normalizeToEnglish(currentUser.locality);
-        const localityRegex = new RegExp(`^\\s*${normLocality.trim()}\\s*$`, 'i');
+        const targetLocality = locality ? normalizeToEnglish(locality) : normalizeToEnglish(currentUser.locality);
+        const localityRegex = new RegExp(`^\\s*${targetLocality.trim()}\\s*$`, 'i');
 
         const users = await User.find({
             normalizedLocality: { $regex: localityRegex },
@@ -448,6 +449,29 @@ const getUsersByState = async (req, res) => {
     }
 };
 
+// @desc    Get all localities in the user's town (for Explore Town)
+// @route   GET /api/users/town-localities
+// @access  Private
+const getTownLocalities = async (req, res) => {
+    try {
+        const currentUser = req.user;
+        const { normalizeToEnglish } = require('../utils/locationMap');
+        const normTown = normalizeToEnglish(currentUser.town);
+        const townRegex = new RegExp(`^\\s*${normTown}\\s*$`, 'i');
+
+        const localities = await User.aggregate([
+            { $match: { normalizedTown: { $regex: townRegex } } },
+            { $group: { _id: '$locality', count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+        ]);
+
+        res.json(localities);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getLocalityStats,
     getUsersByProfession,
@@ -458,5 +482,6 @@ module.exports = {
     getUsersByLocality,
     uploadPhoto,
     searchUsers,
-    getUsersByState
+    getUsersByState,
+    getTownLocalities
 };

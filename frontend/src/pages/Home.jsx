@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import { Map, Zap, MapPin, Shield, X, Briefcase, Award } from 'lucide-react';
+import { Map, Zap, MapPin, Shield, X, Briefcase, Award, Navigation } from 'lucide-react';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const Home = () => {
@@ -15,6 +15,11 @@ const Home = () => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [loadingUsers, setLoadingUsers] = useState(false);
 
+    // Explore Town state
+    const [townLocalities, setTownLocalities] = useState([]);
+    const [selectedLocality, setSelectedLocality] = useState(null); // null = user's own locality
+    const [loadingLocalities, setLoadingLocalities] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -23,7 +28,9 @@ const Home = () => {
             if (userData) {
                 setUser(userData);
                 try {
-                    const res = await fetch(`${API_URL}/users/stats`, {
+                    // Fetch stats with optional locality filter
+                    const localityParam = selectedLocality ? `?localities=${encodeURIComponent(selectedLocality)}` : '';
+                    const res = await fetch(`${API_URL}/users/stats${localityParam}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const data = await res.json();
@@ -40,7 +47,27 @@ const Home = () => {
             setLoading(false);
         };
         fetchData();
-    }, [navigate]);
+    }, [navigate, selectedLocality]);
+
+    // Fetch town localities for Explore Town
+    useEffect(() => {
+        const fetchLocalities = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            setLoadingLocalities(true);
+            try {
+                const res = await fetch(`${API_URL}/users/town-localities`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await res.json();
+                setTownLocalities(data || []);
+            } catch (err) {
+                console.error("Failed to fetch town localities", err);
+            }
+            setLoadingLocalities(false);
+        };
+        fetchLocalities();
+    }, []);
 
     // Fetch users by profession when card is clicked
     const handleProfessionClick = async (profession) => {
@@ -49,7 +76,8 @@ const Home = () => {
         setLoadingUsers(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${API_URL}/users/by-profession/${encodeURIComponent(profession)}`, {
+            const localityParam = selectedLocality ? `?locality=${encodeURIComponent(selectedLocality)}` : '';
+            const res = await fetch(`${API_URL}/users/by-profession/${encodeURIComponent(profession)}${localityParam}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -229,7 +257,74 @@ const Home = () => {
 
             {/* Profession Grid */}
             <div className="mt-4 px-4">
-                <h2 className="text-lg font-bold text-[var(--col-text-primary)] mb-4">{t('local_professionals')}</h2>
+                {/* Explore Town Header + Locality Pills */}
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-bold text-[var(--col-text-primary)]">{t('local_professionals')}</h2>
+                    <div className="flex items-center gap-1.5">
+                        <Navigation size={14} className="text-primary" />
+                        <span className="text-xs font-bold text-primary">{t('explore_town') || 'Explore Town'}</span>
+                    </div>
+                </div>
+
+                {/* Locality Pills - Horizontal Scroll */}
+                {townLocalities.length > 1 && (
+                    <div className="mb-4 -mx-1 overflow-x-auto scrollbar-hide">
+                        <div className="flex gap-2 px-1 pb-2" style={{ minWidth: 'max-content' }}>
+                            {/* "My Locality" pill (default) */}
+                            <button
+                                onClick={() => setSelectedLocality(null)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all whitespace-nowrap ${selectedLocality === null
+                                        ? 'bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white border-transparent shadow-md scale-105'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-[var(--col-primary)] hover:text-[var(--col-primary)]'
+                                    }`}
+                            >
+                                <MapPin size={12} />
+                                {translateValue(user.locality)}
+                            </button>
+
+                            {/* Other localities in the town */}
+                            {townLocalities
+                                .filter(loc => {
+                                    // Don't show user's own locality again (it's the first pill)
+                                    const locName = (loc._id || '').trim().toLowerCase();
+                                    const userLoc = (user.locality || '').trim().toLowerCase();
+                                    return locName !== userLoc;
+                                })
+                                .map((loc, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setSelectedLocality(loc._id)}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all whitespace-nowrap ${selectedLocality === loc._id
+                                                ? 'bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white border-transparent shadow-md scale-105'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:border-[var(--col-primary)] hover:text-[var(--col-primary)]'
+                                            }`}
+                                    >
+                                        <MapPin size={12} />
+                                        {translateValue(loc._id)}
+                                        <span className={`text-[10px] px-1 rounded-full ${selectedLocality === loc._id ? 'bg-white/20' : 'bg-gray-100'
+                                            }`}>{loc.count}</span>
+                                    </button>
+                                ))
+                            }
+                        </div>
+                    </div>
+                )}
+
+                {/* Selected locality indicator */}
+                {selectedLocality && (
+                    <div className="mb-3 flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+                        <MapPin size={14} className="text-blue-600" />
+                        <span className="text-xs font-bold text-blue-700">
+                            {t('showing_professionals_from') || 'Showing professionals from'}: {translateValue(selectedLocality)}
+                        </span>
+                        <button
+                            onClick={() => setSelectedLocality(null)}
+                            className="ml-auto text-blue-400 hover:text-blue-600"
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                )}
                 {stats.professions.length > 0 ? (
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                         {stats.professions.map((prof, idx) => {

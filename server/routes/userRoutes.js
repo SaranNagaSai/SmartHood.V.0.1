@@ -11,7 +11,8 @@ const {
     getUsersByLocality,
     uploadPhoto,
     searchUsers,
-    getUsersByState
+    getUsersByState,
+    getTownLocalities
 } = require('../controllers/userController');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -25,5 +26,6 @@ router.put('/fcm-token', protect, updateFcmToken);
 router.get('/locality/:locality', protect, getUsersByLocality);
 router.get('/search', protect, searchUsers);
 router.get('/state/:stateName', protect, getUsersByState);
+router.get('/town-localities', protect, getTownLocalities);
 
 module.exports = router;
