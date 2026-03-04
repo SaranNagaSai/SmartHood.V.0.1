@@ -407,6 +407,13 @@ const completeService = async (req, res) => {
         provider.revenue = (provider.revenue || 0) + (amountSpent || 0);
         await provider.save();
 
+        // Update requester stats (Expenditure)
+        const requester = await User.findById(req.user._id);
+        if (requester) {
+            requester.totalSpent = (requester.totalSpent || 0) + (amountSpent || 0);
+            await requester.save();
+        }
+
         // Create Revenue Log
         await Revenue.create({
             serviceId: service._id,

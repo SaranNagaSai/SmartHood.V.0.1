@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import {
     User, MapPin, Briefcase, Phone, Mail, Droplet,
-    Edit3, Save, X, Award, TrendingUp, DollarSign, Camera, Upload
+    Edit3, Save, X, Award, TrendingUp, DollarSign, Camera, Upload, ShoppingCart
 } from 'lucide-react';
 import Webcam from 'react-webcam';
 import VoiceInput from '../components/common/VoiceInput';
@@ -229,21 +229,26 @@ const Profile = () => {
 
             {/* Stats Cards */}
             <div className="px-4 mt-4 sm:mt-6 mb-4 sm:mb-6">
-                <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center border-b-4 border-amber-400">
                         <Award className="mx-auto text-amber-500 mb-1" size={20} sm:size={24} />
                         <p className="text-lg sm:text-xl font-bold text-gray-800">{user.impactScore || 0}</p>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">{t('impact')}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight font-bold">{t('impact')}</p>
                     </div>
-                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center border-b-4 border-green-400">
                         <TrendingUp className="mx-auto text-green-500 mb-1" size={20} sm:size={24} />
                         <p className="text-lg sm:text-xl font-bold text-gray-800">{user.experience || 0}</p>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">{t('exp')}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight font-bold">{t('exp')}</p>
                     </div>
-                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center">
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center border-b-4 border-blue-400">
                         <DollarSign className="mx-auto text-blue-500 mb-1" size={20} sm:size={24} />
-                        <p className="text-lg sm:text-xl font-bold text-gray-800">₹{user.revenue || 0}</p>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-tight">{t('rev')}</p>
+                        <p className="text-lg sm:text-xl font-bold text-gray-800 text-blue-600">₹{user.revenue || 0}</p>
+                        <p className="text-[10px] sm:text-xs text-blue-500 uppercase tracking-tight font-bold">{t('rev')} ({t('earned')})</p>
+                    </div>
+                    <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg text-center border-b-4 border-rose-400">
+                        <ShoppingCart className="mx-auto text-rose-500 mb-1" size={20} sm:size={24} />
+                        <p className="text-lg sm:text-xl font-bold text-gray-800 text-rose-600">₹{user.totalSpent || 0}</p>
+                        <p className="text-[10px] sm:text-xs text-rose-500 uppercase tracking-tight font-bold">{t('spent')}</p>
                     </div>
                 </div>
             </div>

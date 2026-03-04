@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
     experience: { type: Number, default: 0 }, // Years of experience
     impactScore: { type: Number, default: 0 },
     revenue: { type: Number, default: 0 },
+    totalSpent: { type: Number, default: 0 },
 
     isAdmin: { type: Boolean, default: false },
     language: { type: String, default: 'English' }, // Persisted language preference
