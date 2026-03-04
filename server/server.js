@@ -72,6 +72,12 @@ app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/professions', require('./routes/professionRoutes'));
 app.use('/api/communities', require('./routes/communityRoutes'));
 
+// Health & Keep-Alive Route
+app.get('/api/health/ping', (req, res) => {
+    console.log(`[Ping] Received at ${new Date().toISOString()}`);
+    res.json({ status: 'active', time: new Date().toISOString() });
+});
+
 app.get('/', (req, res) => res.json({ status: 'ok', message: 'SmartHood API Running' }));
 
 // Error Handling Middleware
@@ -88,6 +94,18 @@ mongoose.connect(process.env.MONGODB_URI)
         app.listen(PORT, () => {
             console.log(`--- Server ready on port ${PORT} ---`);
             schedulerService.start();
+
+            // Self-pinging mechanism (mitigation for Render cold starts)
+            // It pings its own health endpoint every 10 minutes
+            const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+            const serverUrl = process.env.RENDER_EXTERNAL_URL || (FRONTEND_URL.includes('localhost') ? `http://localhost:${PORT}` : FRONTEND_URL.replace('5173', PORT.toString()));
+
+            setInterval(() => {
+                const axios = require('axios');
+                axios.get(`${serverUrl}/api/health/ping`)
+                    .then(() => console.log('[Stay-Alive] Self-ping successful'))
+                    .catch(e => console.log('[Stay-Alive] Self-ping failed (expected if local)'));
+            }, 10 * 60 * 1000); // 10 minutes
         });
     })
     .catch(err => {

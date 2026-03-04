@@ -59,20 +59,25 @@ class SchedulerService {
      */
     async runCatchUp() {
         try {
-            console.log('🔄 Running startup catch-up for missed follow-ups...');
+            console.log('🔄 [Scheduler] Running startup catch-up for missed follow-ups...');
 
             const activeServices = await Service.find({
-                type: 'request',
-                status: 'active',
+                type: { $in: ['request', 'REQUEST'] },
+                status: { $in: ['active', 'in_progress', 'OPEN'] },
                 followUpComplete: false
             }).populate('createdBy', 'name email language fcmToken _id');
+
+            console.log(`🔍 [Scheduler] Found ${activeServices.length} active requests to evaluate.`);
 
             const now = new Date();
             let catchUpCount = 0;
 
             for (const service of activeServices) {
                 const user = service.createdBy;
-                if (!user) continue;
+                if (!user) {
+                    console.log(`⚠️ [Scheduler] Skipping service ${service._id} - No owner found.`);
+                    continue;
+                }
 
                 const minsFromCreation = Math.floor((now - new Date(service.createdAt)) / 60000);
                 const currentStage = service.followUpStage;
@@ -86,29 +91,33 @@ class SchedulerService {
 
                 // If we need to advance stages
                 if (targetStage > currentStage) {
-                    console.log(`🔄 Catch-up: Service ${service._id} at stage ${currentStage}, should be at stage ${targetStage} (${minsFromCreation} mins old)`);
+                    console.log(`🚀 [Scheduler] Catching up Service ${service._id}: Stage ${currentStage} ➔ ${targetStage} (${minsFromCreation}m old)`);
 
-                    // Send only the LATEST missed notification (don't spam all intermediate stages)
+                    // Send only the LATEST missed notification
                     const isTermination = targetStage >= 4;
-                    await this.sendStageNotification(service, user, targetStage, isTermination);
+                    try {
+                        await this.sendStageNotification(service, user, targetStage, isTermination);
 
-                    // Update to the correct stage
-                    service.followUpStage = targetStage;
-                    service.lastNotificationSentAt = now;
+                        // Update to the correct stage
+                        service.followUpStage = targetStage;
+                        service.lastNotificationSentAt = now;
 
-                    if (isTermination) {
-                        service.status = 'unsatisfied';
-                        service.followUpComplete = true;
+                        if (isTermination) {
+                            service.status = 'unsatisfied';
+                            service.followUpComplete = true;
+                        }
+
+                        await service.save();
+                        catchUpCount++;
+                    } catch (err) {
+                        console.error(`❌ [Scheduler] Failed to send catch-up for ${service._id}:`, err.message);
                     }
-
-                    await service.save();
-                    catchUpCount++;
                 }
             }
 
-            console.log(`✅ Catch-up complete: ${catchUpCount} services updated`);
+            console.log(`✅ [Scheduler] Catch-up complete: ${catchUpCount} services updated`);
         } catch (error) {
-            console.error('❌ Catch-up error:', error);
+            console.error('❌ [Scheduler] General Catch-up error:', error);
         }
     }
 
@@ -124,8 +133,8 @@ class SchedulerService {
     async checkServiceFollowUps() {
         try {
             const activeServices = await Service.find({
-                type: 'request',
-                status: 'active',
+                type: { $in: ['request', 'REQUEST'] },
+                status: { $in: ['active', 'in_progress', 'OPEN'] },
                 followUpComplete: false
             }).populate('createdBy', 'name email language fcmToken _id');
 
