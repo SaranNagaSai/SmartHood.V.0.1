@@ -2,7 +2,7 @@ const Service = require('../models/Service');
 const User = require('../models/User');
 const Revenue = require('../models/Revenue');
 const { createNotification } = require('./notificationController');
-const { generateServiceEmailTemplate, generateInterestEmailTemplate, generateCompletionEmailTemplate } = require('../services/emailService');
+const { sendEmail, generateServiceEmailTemplate, generateInterestEmailTemplate, generateCompletionEmailTemplate } = require('../services/emailService');
 
 // @desc    Create a new service offer/request
 // @route   POST /api/services
