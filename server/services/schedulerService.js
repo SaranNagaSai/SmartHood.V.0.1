@@ -24,7 +24,7 @@ const STAGE_THRESHOLDS = {
     1: 30,       // Stage 0→1: 30 minutes
     2: 90,       // Stage 1→2: 1.5 hours (30 + 60)
     3: 150,      // Stage 2→3: 2.5 hours (30 + 60 + 60)
-    4: 510       // Stage 3→4: 8.5 hours (30 + 60 + 60 + 360) → TERMINATION
+    4: 210       // Stage 3→4: 3.5 hours (30 + 60 + 60 + 60) → TERMINATION
 };
 
 class SchedulerService {
