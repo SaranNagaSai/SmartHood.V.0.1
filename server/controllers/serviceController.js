@@ -137,6 +137,7 @@ const createService = async (req, res) => {
         // Generate rich HTML email
         const isTelugu = user.language === 'Telugu';
         const emailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase());
+        const creatorEmailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase(), true);
 
         // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
@@ -162,7 +163,7 @@ const createService = async (req, res) => {
                 creatorNotification,
                 'service',
                 `/service/${service._id}`,
-                null // No custom email HTML for confirmation - uses default template
+                creatorEmailHtml
             );
             console.log(`[Background] Creator confirmation sent to ${user.name}`);
 

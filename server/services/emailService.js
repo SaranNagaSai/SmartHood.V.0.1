@@ -120,13 +120,19 @@ const sendWelcomeEmail = async (user) => {
     return sendEmail(user.email, subject, text, html);
 };
 
-const generateServiceEmailTemplate = (service, creator, type) => {
+const generateServiceEmailTemplate = (service, creator, type, isConfirmation = false) => {
     const isTelugu = creator.language === 'Telugu';
     const isOffer = type === 'offer';
     const actionColor = isOffer ? '#059669' : '#d97706';
-    const title = isTelugu
+    let title = isTelugu
         ? (isOffer ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన')
         : (isOffer ? 'New Service Offer' : 'New Help Request');
+
+    if (isConfirmation) {
+        title = isTelugu
+            ? (isOffer ? 'మీ ఆఫర్ ప్రత్యక్ష ప్రసారంలో ఉంది!' : 'మీ అభ్యర్థన ప్రత్యక్ష ప్రసారంలో ఉంది!')
+            : (isOffer ? 'Your Offer is Live!' : 'Your Request is Live!');
+    }
 
     // Get profession display
     let professionStr = creator.professionCategory || '';
@@ -153,6 +159,21 @@ const generateServiceEmailTemplate = (service, creator, type) => {
                 <div style="background: #f8fafc; padding: 16px; border-left: 4px solid ${actionColor}; border-radius: 0 8px 8px 0; margin-bottom: 25px;">
                     <p style="margin: 0; color: #475569; line-height: 1.6; font-size: 14px;">${service.description}</p>
                 </div>
+
+                <!-- Service Attachments (if any) -->
+                ${service.attachments && service.attachments.length > 0 ? `
+                    <div style="margin-bottom: 25px; text-align: center;">
+                        <p style="margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; color: #94a3b8;">
+                            ${isTelugu ? 'జత చేసిన మీడియా' : 'Attached Media'}
+                        </p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                            ${service.attachments.map(att => {
+        const fullAttUrl = att.startsWith('http') ? att : `${process.env.BACKEND_URL || 'https://smarthood.onrender.com'}/${att.replace(/\\/g, '/')}`;
+        return `<img src="${fullAttUrl}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`;
+    }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
 
                 <!-- Sender Profile Card -->
                 <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: center;">
