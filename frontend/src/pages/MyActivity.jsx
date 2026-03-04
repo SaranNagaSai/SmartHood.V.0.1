@@ -10,7 +10,7 @@ import { API_URL } from '../utils/apiConfig';
 import Loader from '../components/common/Loader';
 
 const MyActivity = () => {
-    const { t } = useLanguage();
+    const { t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const [stats, setStats] = useState({
         financial: { earned: 0, spent: 0, monthly: [] },

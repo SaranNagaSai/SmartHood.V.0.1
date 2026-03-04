@@ -10,7 +10,7 @@ import VoiceInput from '../components/common/VoiceInput';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
 
 const Profile = () => {
-    const { t } = useLanguage();
+    const { language, t, translateValue } = useLanguage();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);

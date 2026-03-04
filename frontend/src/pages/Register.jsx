@@ -10,7 +10,7 @@ import { User, MapPin, Briefcase, Check, Camera, Upload, X } from 'lucide-react'
 import './Register.css';
 
 const Register = () => {
-    const { t, language } = useLanguage();
+    const { t, language, translateValue } = useLanguage();
     const { login } = useAuth();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
