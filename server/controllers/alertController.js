@@ -76,14 +76,31 @@ const createAlert = async (req, res) => {
 
             const { createNotification } = require('./notificationController');
 
+            // 1. SEND CONFIRMATION TO ALERT CREATOR
+            const creatorAlertNotification = {
+                title: 'Your Alert is Live!',
+                titleTe: 'మీ హెచ్చరిక ప్రత్యక్ష ప్రసారంలో ఉంది!',
+                body: `Your ${category} alert "${subType}" has been broadcast to ${targetUsers.length} people.`,
+                bodyTe: `మీ ${category} హెచ్చరిక "${subType}" ${targetUsers.length} మందికి ప్రసారం చేయబడింది.`
+            };
+
+            await createNotification(
+                req.user._id,
+                creatorAlertNotification,
+                'ALERT',
+                '/alerts',
+                null
+            );
+            console.log(`[Background] Alert confirmation sent to creator ${req.user.name}`);
+
+            // 2. BROADCAST TO TARGET USERS
             for (const user of targetUsers) {
                 // Prepare bilingual content for the notification
                 const notificationData = {
                     title: `ALERT: ${category} (${subType})`,
-                    titleTe: `హెచ్చరిక: ${category} (${subType})`, // We can use translationUtility if needed, but categories are defined
+                    titleTe: `హెచ్చరిక: ${category} (${subType})`,
                     body: description,
-                    bodyTe: description // createNotification will handle translation if we pass just body, 
-                    // but for precision let's provide bilingual if possible.
+                    bodyTe: description
                 };
 
                 // For alerts, we use the generateAlertEmailTemplate

@@ -144,13 +144,36 @@ const createService = async (req, res) => {
 
             const { createNotification } = require('./notificationController');
 
+            // 1. SEND CONFIRMATION TO CREATOR (Immediate feedback)
+            const isOffer = type.toLowerCase() === 'offer';
+            const creatorNotification = {
+                title: isOffer ? 'Your Offer is Live!' : 'Your Request is Live!',
+                titleTe: isOffer ? 'మీ ఆఫర్ ప్రత్యక్ష ప్రసారంలో ఉంది!' : 'మీ అభ్యర్థన ప్రత్యక్ష ప్రసారంలో ఉంది!',
+                body: isOffer
+                    ? `Your offer "${title}" has been sent to ${targetUsers.length} people in your community.`
+                    : `Your request "${title}" has been sent to ${targetUsers.length} people. You'll receive follow-up updates.`,
+                bodyTe: isOffer
+                    ? `మీ ఆఫర్ "${title}" మీ కమ్యూనిటీలోని ${targetUsers.length} మందికి పంపబడింది.`
+                    : `మీ అభ్యర్థన "${title}" ${targetUsers.length} మందికి పంపబడింది. మీకు ఫాలో-అప్ అప్‌డేట్‌లు వస్తాయి.`
+            };
+
+            await createNotification(
+                user._id,
+                creatorNotification,
+                'service',
+                `/service/${service._id}`,
+                null // No custom email HTML for confirmation - uses default template
+            );
+            console.log(`[Background] Creator confirmation sent to ${user.name}`);
+
+            // 2. BROADCAST TO TARGET USERS
             for (const targetUser of targetUsers) {
                 const recipientIsTelugu = targetUser.language === 'Telugu';
 
                 // Prepare bilingual content
                 const notificationData = {
-                    title: type === 'offer' ? 'New Service Offer' : 'New Help Request',
-                    titleTe: type === 'offer' ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన',
+                    title: isOffer ? 'New Service Offer' : 'New Help Request',
+                    titleTe: isOffer ? 'కొత్త సర్వీస్ ఆఫర్' : 'కొత్త సహాయం అభ్యర్థన',
                     body: `${user.name} posted: ${title}`,
                     bodyTe: `${user.name} పోస్ట్ చేశారు: ${title}`
                 };
