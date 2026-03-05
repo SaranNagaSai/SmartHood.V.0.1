@@ -7,7 +7,19 @@ const { generateAlertEmailTemplate } = require('../services/emailService');
 // @access  Private
 const createAlert = async (req, res) => {
     try {
-        const { category, subType, bloodGroup, description, locality, town, district, state } = req.body;
+        const { category, subType: rawSubType, bloodGroup, description, locality, town, district, state } = req.body;
+
+        // Map frontend snake_case subTypes to backend Enum values
+        const subTypeMap = {
+            'blood_donation': 'Blood Donation',
+            'accident': 'Accident',
+            'cash_donation': 'Cash Donation',
+            'climate_alert': 'Climate',
+            'theft': 'Theft',
+            'general_alert': 'General'
+        };
+
+        const subType = subTypeMap[rawSubType] || rawSubType;
 
         // Process attachments from multer if any
         let attachmentPaths = [];
@@ -30,7 +42,8 @@ const createAlert = async (req, res) => {
 
         // NOTIFICATION LOGIC
         // Broaden to TOWN-wide alerts for community emergency/general alerts
-        const townRegex = new RegExp(`^\\s*${req.user.town.trim()}\\s*$`, 'i');
+        const userTown = req.user.town || town || '';
+        const townRegex = new RegExp(`^\\s*${userTown.trim()}\\s*$`, 'i');
         let query = {};
 
         // Normalize targetUserIds (handle string or array from formData)
