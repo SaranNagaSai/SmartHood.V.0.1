@@ -5,6 +5,7 @@ import { useNotificationsContext } from '../../context/NotificationContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useDevice } from '../../context/DeviceContext';
 import logo from '../../assets/images/Smart Hood Logo.png';
+import { API_URL } from '../../utils/apiConfig';
 
 const Header = () => {
     const { unreadCount } = useNotificationsContext();
