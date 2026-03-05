@@ -104,8 +104,10 @@ const useNotifications = (isAuthenticated) => {
         try {
             unsubscribe = onMessage(messaging, (payload) => {
                 console.log('[FCM] Foreground message received:', payload);
+                console.log('[FCM] Notification Permission Status:', Notification.permission);
 
                 if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+                    console.log('[FCM] Attempting to show notification via Service Worker...');
                     navigator.serviceWorker.ready.then(registration => {
                         const title = payload.notification?.title || payload.data?.title || 'SmartHood';
                         const body = payload.notification?.body || payload.data?.body || '';
@@ -121,13 +123,19 @@ const useNotifications = (isAuthenticated) => {
                                 url: payload.data?.url || '/home',
                                 ...payload.data
                             }
+                        }).then(() => {
+                            console.log('[FCM] registration.showNotification SUCCESS');
+                        }).catch(e => {
+                            console.error('[FCM] registration.showNotification FAILED:', e);
                         });
                     });
                 } else if ('Notification' in window && Notification.permission === 'granted') {
-                    // Fallback for desktops without active SW
+                    console.log('[FCM] Falling back to standard Notification...');
                     const title = payload.notification?.title || payload.data?.title || 'SmartHood';
                     const body = payload.notification?.body || payload.data?.body || '';
                     new Notification(title, { body, icon: '/logo.png' });
+                } else {
+                    console.warn('[FCM] Cannot show notification: Permissions denied or SW not supported');
                 }
             });
         } catch (err) {

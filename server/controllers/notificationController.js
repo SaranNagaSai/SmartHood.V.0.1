@@ -114,42 +114,35 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody
                     },
                     webpush: {
+                        headers: {
+                            Urgency: "high"
+                        },
                         notification: {
                             title: finalTitle,
                             body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody,
                             icon: '/logo.png',
                             badge: '/logo.png',
                             vibrate: [200, 100, 200],
-                            requireInteraction: true // Keeps the notification on screen until user interacts
+                            requireInteraction: true,
+                            actions: [
+                                { action: 'open', title: 'View Alert' }
+                            ]
                         },
                         fcmOptions: {
-                            link: link ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}${link}` : `${process.env.FRONTEND_URL || 'http://localhost:5173'}/home`
+                            link: link ? `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}${link}` : `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}/home`
                         }
                     },
                     android: {
                         priority: 'high',
-                        ttl: 86400000, // 1 day
                         notification: {
                             sound: 'default',
                             priority: 'high',
-                            channelId: 'high_priority_alerts',
-                            clickAction: 'FLUTTER_NOTIFICATION_CLICK' // For mobile compatibility
-                        }
-                    },
-                    apns: {
-                        payload: {
-                            aps: {
-                                sound: 'default',
-                                badge: 1,
-                                'content-available': 1
-                            }
+                            channelId: 'high_priority_alerts'
                         }
                     },
                     data: {
                         url: link || '/home',
-                        type: type,
-                        title: finalTitle,
-                        body: finalBody
+                        type: type
                     }
                 });
                 delivered = true;
