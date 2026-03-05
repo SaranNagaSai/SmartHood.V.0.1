@@ -8,66 +8,20 @@ import {
     AlertTriangle, Briefcase, MessageCircle, Info
 } from 'lucide-react';
 
+import { useNotificationsContext } from '../context/NotificationContext';
+
 const Notifications = () => {
     const { t } = useLanguage();
     const { token, logout } = useAuth();
     const navigate = useNavigate();
-    const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { notifications, unreadCount, loading, fetchNotifications, markAsRead, markAllRead } = useNotificationsContext();
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
         if (token) {
             fetchNotifications();
         }
-    }, [token]);
-
-    const fetchNotifications = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch(`${API_URL}/notifications`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (res.status === 401) {
-                logout();
-                navigate('/login');
-                return;
-            }
-
-            const data = await res.json();
-            setNotifications(data || []);
-        } catch (err) {
-            console.error('Failed to fetch notifications', err);
-        }
-        setLoading(false);
-    };
-
-    const markAsRead = async (id) => {
-        try {
-            await fetch(`${API_URL}/notifications/${id}/read`, {
-                method: 'PUT',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setNotifications(prev =>
-                prev.map(n => n._id === id ? { ...n, read: true } : n)
-            );
-        } catch (err) {
-            console.error('Failed to mark as read', err);
-        }
-    };
-
-    const markAllAsRead = async () => {
-        try {
-            await fetch(`${API_URL}/notifications/read-all`, {
-                method: 'PUT',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-        } catch (err) {
-            console.error('Failed to mark all as read', err);
-        }
-    };
+    }, [token, fetchNotifications]);
 
     const getIcon = (type) => {
         switch (type) {
@@ -88,7 +42,6 @@ const Notifications = () => {
             ? notifications.filter(n => !n.read)
             : notifications.filter(n => n.type === filter);
 
-    const unreadCount = notifications.filter(n => !n.read).length;
 
     if (loading) {
         return (
@@ -114,7 +67,7 @@ const Notifications = () => {
                         </p>
                     </div>
                     <button
-                        onClick={markAllAsRead}
+                        onClick={markAllRead}
                         className="flex items-center gap-1 px-3 py-2 bg-white/20 rounded-xl text-sm hover:bg-white/30 transition"
                     >
                         <Check size={16} />

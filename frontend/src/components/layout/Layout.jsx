@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import Header from './Header';
 import BottomNav from './BottomNav';
 import HamburgerMenu from './HamburgerMenu';
 import useNotifications from '../../hooks/useNotifications';
@@ -41,8 +42,11 @@ const Layout = ({ children }) => {
             )}
 
             {/* Main Content */}
-            <div className={`flex-1 ${!isMobile ? 'md:ml-64' : 'pb-24 pt-4'} mb-safe overflow-y-auto w-full`}>
-                {children}
+            <div className={`flex-1 ${!isMobile ? 'md:ml-64' : 'pb-24 pt-0'} mb-safe overflow-y-auto w-full`}>
+                <Header />
+                <div className="max-w-7xl mx-auto">
+                    {children}
+                </div>
             </div>
         </div>
     );

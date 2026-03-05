@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
     Menu, X, Home, Map, HeartHandshake,
@@ -13,6 +13,13 @@ const HamburgerMenu = () => {
     const { t } = useLanguage();
     const { logout } = useAuth();
     const navigate = useNavigate();
+
+    // Listen for custom toggle events from Header
+    useEffect(() => {
+        const toggleMenu = () => setIsOpen(prev => !prev);
+        window.addEventListener('toggle-menu', toggleMenu);
+        return () => window.removeEventListener('toggle-menu', toggleMenu);
+    }, []);
 
     const menuItems = [
         { name: t('home'), path: '/home', icon: Home },
@@ -30,20 +37,13 @@ const HamburgerMenu = () => {
 
     const handleLogout = () => {
         logout();
+        setIsOpen(false);
         navigate('/login');
     };
 
     return (
         <>
-            {/* Hamburger Toggle Button */}
-            <button
-                onClick={() => setIsOpen(true)}
-                className="fixed top-4 left-4 z-[2000] p-2 bg-white rounded-full shadow-lg border border-gray-100 text-gray-700 active:scale-90 transition-transform md:hidden"
-            >
-                <Menu size={24} />
-            </button>
-
-            {/* Menu Overlay */}
+            {/* Overlay */}
             {isOpen && (
                 <div
                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[3000] md:hidden animate-fade-in"
