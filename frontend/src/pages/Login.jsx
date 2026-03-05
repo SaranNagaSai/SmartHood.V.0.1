@@ -23,7 +23,7 @@ const Login = () => {
         let cancelled = false;
         const wakeServer = async () => {
             try {
-                await axios.get(`${SERVER_URL}/api/auth`, { timeout: 45000 });
+                await axios.get(`${SERVER_URL}/api/health/ping`, { timeout: 45000 });
                 if (!cancelled) {
                     setServerReady(true);
                     setWarmingUp(false);

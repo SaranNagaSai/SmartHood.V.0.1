@@ -30,7 +30,7 @@ const Header = () => {
     }, []);
 
     return (
-        <header className="sticky top-0 z-[50] bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm px-4 py-2 flex items-center justify-between h-16">
+        <header className="sticky top-0 z-[50] bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm px-6 py-4 flex items-center justify-between min-h-[80px] md:min-h-[90px]">
             {/* Left: Menu & Logo (Mobile) or Branding (Desktop) */}
             <div className="flex items-center gap-3">
                 {isMobile ? (
