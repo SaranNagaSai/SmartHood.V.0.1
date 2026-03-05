@@ -11,17 +11,6 @@ dotenv.config();
 
 const app = express();
 
-// Security Headers
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
-
-// Request Logging
-app.use(morgan('dev'));
-
-// Rate Limiting
-app.use(rateLimiter);
-
 // Helper to normalize origins
 const normalizeOrigin = (url) => url ? url.replace(/\/$/, '') : '';
 
@@ -42,11 +31,25 @@ app.use(cors({
             callback(null, true);
         } else {
             console.warn(`[CORS] Blocked request from origin: ${origin}`);
-            callback(new Error('Not allowed by CORS'));
+            callback(null, false); // Blocked
         }
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
+
+// Security Headers
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Request Logging
+app.use(morgan('dev'));
+
+// Rate Limiting
+app.use(rateLimiter);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 

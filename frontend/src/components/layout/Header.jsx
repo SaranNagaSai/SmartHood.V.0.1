@@ -26,7 +26,7 @@ const Header = () => {
             }
         };
         checkHealth();
-        const interval = setInterval(checkHealth, 30000); // Check every 30s
+        const interval = setInterval(checkHealth, 120000); // Check every 120s
         return () => clearInterval(interval);
     }, []);
 
