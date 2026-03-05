@@ -105,17 +105,29 @@ const useNotifications = (isAuthenticated) => {
             unsubscribe = onMessage(messaging, (payload) => {
                 console.log('[FCM] Foreground message received:', payload);
 
-                if ('Notification' in window && Notification.permission === 'granted') {
+                if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+                    navigator.serviceWorker.ready.then(registration => {
+                        const title = payload.notification?.title || payload.data?.title || 'SmartHood';
+                        const body = payload.notification?.body || payload.data?.body || '';
+
+                        registration.showNotification(title, {
+                            body,
+                            icon: '/logo.png',
+                            badge: '/logo.png',
+                            vibrate: [200, 100, 200],
+                            tag: 'smarthood-alert',
+                            renotify: true,
+                            data: {
+                                url: payload.data?.url || '/home',
+                                ...payload.data
+                            }
+                        });
+                    });
+                } else if ('Notification' in window && Notification.permission === 'granted') {
+                    // Fallback for desktops without active SW
                     const title = payload.notification?.title || payload.data?.title || 'SmartHood';
                     const body = payload.notification?.body || payload.data?.body || '';
-
-                    new Notification(title, {
-                        body,
-                        icon: '/logo.png',
-                        badge: '/logo.png',
-                        vibrate: [200, 100, 200],
-                        data: payload.data
-                    });
+                    new Notification(title, { body, icon: '/logo.png' });
                 }
             });
         } catch (err) {

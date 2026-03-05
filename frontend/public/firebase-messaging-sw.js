@@ -22,8 +22,12 @@ messaging.onBackgroundMessage((payload) => {
         icon: '/logo.png',
         badge: '/logo.png',
         vibrate: [200, 100, 200],
+        tag: 'smarthood-alert',
+        renotify: true,
         requireInteraction: true,
+        silent: false,
         data: {
+            url: payload.notification?.click_action || payload.data?.url || '/home',
             ...payload.data,
             receivedAt: Date.now()
         }
