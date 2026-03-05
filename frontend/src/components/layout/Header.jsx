@@ -35,19 +35,25 @@ const Header = () => {
             {/* Left: Menu & Logo (Mobile) or Branding (Desktop) */}
             <div className="flex items-center gap-3">
                 {isMobile ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 w-full">
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('toggle-menu'))}
-                            className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors"
+                            className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors"
                         >
-                            <Menu size={22} />
+                            <Menu size={24} />
                         </button>
-                        <img src={logo} alt="Logo" className="w-8 h-8 object-contain" onClick={() => navigate('/home')} />
-                        <div>
-                            <p className="text-[10px] font-bold text-primary uppercase tracking-tighter leading-none">SmartHood</p>
-                            <div className="flex items-center gap-0.5 text-gray-500">
-                                <div className={`w-1.5 h-1.5 rounded-full ${isServerAwake ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`}></div>
-                                <span className="text-[9px] font-bold truncate max-w-[70px]">
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-1.5" onClick={() => navigate('/home')}>
+                                <img src={logo} alt="Logo" className="w-6 h-6 object-contain" />
+                                <h1 className="text-sm font-bold text-gray-800">SmartHood</h1>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <div className={`w-2 h-2 rounded-full ${isServerAwake ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-amber-500 animate-pulse'}`}></div>
+                                <span className={`text-[10px] font-bold ${isServerAwake ? 'text-green-600' : 'text-amber-600'}`}>
+                                    {isServerAwake ? 'Active' : 'Waking Up...'}
+                                </span>
+                                <span className="text-gray-300 mx-1">|</span>
+                                <span className="text-[10px] text-gray-500 font-medium truncate max-w-[80px]">
                                     {user ? translateValue(user.locality) : ''}
                                 </span>
                             </div>

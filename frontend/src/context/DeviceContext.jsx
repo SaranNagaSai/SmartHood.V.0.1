@@ -5,8 +5,20 @@ const DeviceContext = createContext();
 export const DeviceProvider = ({ children }) => {
     const [isMobile, setIsMobile] = useState(() => {
         const stored = sessionStorage.getItem('deviceType');
-        return stored === 'mobile';
+        if (stored) return stored === 'mobile';
+        // Fallback to screen width if no stored preference
+        return window.innerWidth < 768;
     });
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (!sessionStorage.getItem('deviceType')) {
+                setIsMobile(window.innerWidth < 768);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (isMobile) {
