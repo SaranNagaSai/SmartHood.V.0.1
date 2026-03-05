@@ -46,7 +46,7 @@ const Register = () => {
         name: '',
         phone: '',
         age: '',
-        gender: 'Male',
+        gender: 'male',
         email: '',
         bloodGroup: 'A+',
         address: '',
@@ -54,7 +54,7 @@ const Register = () => {
         town: '',
         district: '',
         state: '',
-        professionCategory: 'Employed',
+        professionCategory: 'employed',
         professionDetails: {
             jobRole: '',
             sector: '',
@@ -69,7 +69,7 @@ const Register = () => {
     const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     const genders = ['male', 'female', 'other_gender'];
     const professionCategories = ['employed', 'business', 'student', 'homemaker', 'others_cat'];
-    const educationLevels = ['high_school', 'intermediate', 'undergraduate', 'postgraduate', 'phd', 'other_gender'];
+    const educationLevels = ['high_school', 'intermediate', 'undergraduate', 'postgraduate', 'phd', 'others_cat'];
 
     const indianStates = [
         "Andaman and Nicobar Islands",
@@ -143,12 +143,27 @@ const Register = () => {
             }
         }
         if (step === 3) {
+            const pd = formData.professionDetails;
             if (!formData.professionCategory) {
                 alert(t('select_profession_cat_error'));
                 return;
             }
+
+            // Mandatory sub-field validation
+            if (formData.professionCategory === 'employed' && !pd.jobRole) {
+                alert(t('fill_all_error'));
+                return;
+            }
+            if (formData.professionCategory === 'business' && !pd.businessType) {
+                alert(t('fill_all_error'));
+                return;
+            }
+            if (formData.professionCategory === 'student' && (!pd.educationLevel || !pd.course)) {
+                alert(t('fill_all_error'));
+                return;
+            }
+
             if (language === 'Telugu') {
-                const pd = formData.professionDetails;
                 const fieldsToVerify = [pd.jobRole, pd.sector, pd.businessType, pd.course, pd.description];
                 if (fieldsToVerify.some(f => f && !isTelugu(f))) {
                     alert(t('telugu_only_error'));
@@ -541,7 +556,7 @@ const Register = () => {
 
                                     {/* Dynamic fields based on profession category */}
                                     <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 space-y-4">
-                                        {formData.professionCategory === 'Employed' && (
+                                        {formData.professionCategory === 'employed' && (
                                             <>
                                                 <VoiceInput
                                                     label={t('job_role_label') + " *"}
@@ -569,7 +584,7 @@ const Register = () => {
                                             </>
                                         )}
 
-                                        {formData.professionCategory === 'Business' && (
+                                        {formData.professionCategory === 'business' && (
                                             <>
                                                 <VoiceInput
                                                     label={t('business_type_label') + " *"}
@@ -590,7 +605,7 @@ const Register = () => {
                                             </>
                                         )}
 
-                                        {formData.professionCategory === 'Student' && (
+                                        {formData.professionCategory === 'student' && (
                                             <>
                                                 <div className="space-y-1">
                                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">{t('education_level_label')} *</label>
@@ -625,7 +640,7 @@ const Register = () => {
                                             </>
                                         )}
 
-                                        {(['Homemaker', 'Others'].includes(formData.professionCategory)) && (
+                                        {(['homemaker', 'others_cat'].includes(formData.professionCategory)) && (
                                             <>
                                                 <VoiceInput
                                                     label={t('description_label')}

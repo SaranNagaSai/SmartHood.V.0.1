@@ -30,6 +30,20 @@ const generateUniqueId = async () => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
+    const categoryMap = {
+        'employed': 'Employed',
+        'business': 'Business',
+        'student': 'Student',
+        'homemaker': 'Homemaker',
+        'others_cat': 'Others'
+    };
+
+    const genderMap = {
+        'male': 'Male',
+        'female': 'Female',
+        'other_gender': 'Other'
+    };
+
     try {
         const {
             name, phone, age, gender, email, bloodGroup,
@@ -103,9 +117,10 @@ const registerUser = async (req, res) => {
             district: (district || '').trim(),
             normalizedDistrict: normDistrict,
             state: (state || '').trim(),
-            professionCategory,
+            professionCategory: categoryMap[professionCategory] || professionCategory,
             professionDetails,
             experience: parseInt(experience) || 0,
+            gender: genderMap[gender] || gender,
             language: language || req.body.language || 'English'
         });
 
