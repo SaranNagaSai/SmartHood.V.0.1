@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { sendEmail } = require('../services/emailService');
 const admin = require('../config/firebase');
 const twilioService = require('../utils/twilioService');
+const { translateText } = require('../utils/translationUtility');
 
 // @desc    Get user notifications
 // @route   GET /api/notifications
@@ -70,8 +71,15 @@ const createNotification = async (userId, data, type = 'system', link = null, em
         }
 
         const isTelugu = user.language === 'Telugu';
-        const finalTitle = isTelugu && titleTe ? titleTe : title;
-        const finalBody = isTelugu && bodyTe ? bodyTe : body;
+        const targetLang = isTelugu ? 'Telugu' : 'English';
+
+        // Pick best available title/body then translate if necessary
+        let finalTitle = isTelugu && titleTe ? titleTe : title;
+        let finalBody = isTelugu && bodyTe ? bodyTe : body;
+
+        // Best effort translation for user-provided strings
+        finalTitle = translateText(finalTitle, targetLang);
+        finalBody = translateText(finalBody, targetLang);
 
         const notification = await Notification.create({
             userId,
@@ -188,12 +196,13 @@ const createNotification = async (userId, data, type = 'system', link = null, em
 
                     const intelligentEnding = type.toLowerCase() === 'alert' ? L.alertEnding : L.serviceEnding;
 
-                    // Localization prioritization
-                    const finalWorkTitle = lang === 'Telugu' ? (workTitleTe || workTitle) : workTitle;
-                    const finalWorkInfo = lang === 'Telugu' ? (workInfoTe || workInfo) : workInfo;
+                    // Localization prioritization with translation fallback
+                    const finalWorkTitle = translateText(lang === 'Telugu' ? (workTitleTe || workTitle) : workTitle, lang);
+                    const finalWorkInfo = translateText(lang === 'Telugu' ? (workInfoTe || workInfo) : workInfo, lang);
+                    const finalSmsTitle = translateText(lang === 'Telugu' && data.titleTe ? data.titleTe : data.title, lang);
 
                     smsBody = `${L.header}\n` +
-                        `📍 ${lang === 'Telugu' && data.titleTe ? data.titleTe : data.title}\n` +
+                        `📍 ${finalSmsTitle}\n` +
                         `📋 ${L.work}: ${finalWorkTitle || (lang === 'Telugu' ? 'సాధారణం' : 'General')}\n` +
                         `📝 ${L.info}: ${finalWorkInfo ? (finalWorkInfo.substring(0, 60) + (finalWorkInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
                         `👤 ${L.from}: ${senderName} (${senderPhone || 'N/A'})\n` +

@@ -5,7 +5,23 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
 const fromPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
-const client = twilio(accountSid, authToken);
+// Validate environment variables early
+if (!accountSid || !authToken || !verifyServiceSid) {
+    console.warn('⚠️ TWILIO WARNING: Mandatory credentials missing from .env!');
+    console.warn(`- SID: ${accountSid ? 'Detected' : 'MISSING'}`);
+    console.warn(`- Token: ${authToken ? 'Detected' : 'MISSING'}`);
+    console.warn(`- Verify SID: ${verifyServiceSid ? 'Detected' : 'MISSING'}`);
+}
+
+const client = (accountSid && authToken) ? twilio(accountSid, authToken) : null;
+
+const checkTwilio = (method) => {
+    if (!client) {
+        console.error(`❌ Twilio Error: client not initialized inside ${method}`);
+        return false;
+    }
+    return true;
+};
 
 /**
  * Normalize phone number to E.164 format
@@ -41,6 +57,9 @@ const normalizePhone = (phone) => {
  * @returns {Promise<object>}
  */
 const sendOTP = async (phoneNumber) => {
+    if (!checkTwilio('sendOTP')) return { success: false, error: 'Twilio client not configured' };
+    if (!verifyServiceSid) return { success: false, error: 'Twilio Verify Service SID missing' };
+
     try {
         const formattedPhone = normalizePhone(phoneNumber);
         const verification = await client.verify.v2.services(verifyServiceSid)
@@ -60,6 +79,9 @@ const sendOTP = async (phoneNumber) => {
  * @returns {Promise<object>}
  */
 const verifyOTP = async (phoneNumber, code) => {
+    if (!checkTwilio('verifyOTP')) return { success: false, error: 'Twilio client not configured' };
+    if (!verifyServiceSid) return { success: false, error: 'Twilio Verify Service SID missing' };
+
     try {
         const formattedPhone = normalizePhone(phoneNumber);
         const verificationCheck = await client.verify.v2.services(verifyServiceSid)
@@ -84,6 +106,8 @@ const verifyOTP = async (phoneNumber, code) => {
  * @returns {Promise<object>}
  */
 const sendDirectSMS = async (to, body) => {
+    if (!checkTwilio('sendDirectSMS')) return { success: false, error: 'Twilio client not configured' };
+
     try {
         const formattedPhone = normalizePhone(to);
         const message = await client.messages.create({

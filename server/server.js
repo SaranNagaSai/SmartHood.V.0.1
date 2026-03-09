@@ -9,6 +9,16 @@ const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
 dotenv.config();
 
+console.log('--- Environment Diagnostics ---');
+console.log(`- NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`- MONGODB_URI: ${process.env.MONGODB_URI ? 'Detected' : 'MISSING'}`);
+console.log(`- JWT_SECRET (OLD): ${process.env.JWT_SECRET ? 'Warning: Still present' : 'Clean'}`);
+console.log(`- SMARTHOOD_JWT_SECRET: ${process.env.SMARTHOOD_JWT_SECRET ? 'Detected' : 'MISSING'}`);
+console.log(`- TWILIO_ACCOUNT_SID: ${process.env.TWILIO_ACCOUNT_SID ? 'Detected' : 'MISSING'}`);
+console.log(`- TWILIO_VERIFY_SID: ${process.env.TWILIO_VERIFY_SERVICE_SID ? 'Detected' : 'MISSING'}`);
+console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'Detected' : 'MISSING'}`);
+console.log('-------------------------------');
+
 const app = express();
 
 // Helper to normalize origins
