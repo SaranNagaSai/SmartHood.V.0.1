@@ -128,7 +128,8 @@ const createService = async (req, res) => {
         }
 
         const targetUsers = await User.find(query);
-        console.log(`[Service] Found ${targetUsers.length} recipients. Query:`, JSON.stringify(query, (k, v) => v instanceof RegExp ? v.toString() : v));
+        console.log(`[Service Broadcast] Found ${targetUsers.length} target users for ${type}.`);
+        console.log(`[Service Broadcast] Query constraints: ${JSON.stringify(query)}`);
 
         // Store recipient IDs for tracking
         service.sentTo = targetUsers.map(u => u._id);

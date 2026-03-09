@@ -6,11 +6,12 @@ const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
 const fromPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 // Validate environment variables early
-if (!accountSid || !authToken || !verifyServiceSid) {
+if (!accountSid || !authToken || !verifyServiceSid || !fromPhoneNumber) {
     console.warn('⚠️ TWILIO WARNING: Mandatory credentials missing from .env!');
     console.warn(`- SID: ${accountSid ? 'Detected' : 'MISSING'}`);
     console.warn(`- Token: ${authToken ? 'Detected' : 'MISSING'}`);
     console.warn(`- Verify SID: ${verifyServiceSid ? 'Detected' : 'MISSING'}`);
+    console.warn(`- From Number: ${fromPhoneNumber ? 'Detected' : 'MISSING'}`);
 }
 
 const client = (accountSid && authToken) ? twilio(accountSid, authToken) : null;

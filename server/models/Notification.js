@@ -16,7 +16,6 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['service', 'alert', 'ALERT', 'message', 'system', 'reminder'],
         default: 'system'
     },
     link: {
@@ -28,7 +27,6 @@ const notificationSchema = new mongoose.Schema({
     },
     deliveryMethod: {
         type: String,
-        enum: ['email', 'fcm', 'both'],
         default: 'fcm'
     },
     delivered: {

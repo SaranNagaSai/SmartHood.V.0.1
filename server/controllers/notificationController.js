@@ -66,9 +66,11 @@ const createNotification = async (userId, data, type = 'system', link = null, em
         console.log(`[Notification] Creating for userId: ${userId}, type: ${type}`);
         const user = await User.findById(userId);
         if (!user) {
-            console.log(`[Notification] User NOT found: ${userId}`);
+            console.error(`[Notification] CRITICAL: User NOT found for ID: ${userId}`);
             return null;
         }
+
+        console.log(`[Notification] 🎯 TARGET: ${user.name} (${user.phone || 'No Phone'}, ${user.email || 'No Email'}, Lang: ${user.language})`);
 
         const isTelugu = user.language === 'Telugu';
         const targetLang = isTelugu ? 'Telugu' : 'English';
@@ -213,13 +215,17 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                     smsBody = `${header}: ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
                 }
 
-                const smsResult = await twilioService.sendDirectSMS(user.phone, smsBody);
-                if (smsResult.success) {
-                    delivered = true;
-                    methods.push('sms');
-                    console.log(`✅ [Notification] SMS SUCCESS for ${user.phone}`);
+                if (!process.env.TWILIO_PHONE_NUMBER) {
+                    console.warn('⚠️ [Notification] SMS SKIPPED: TWILIO_PHONE_NUMBER not defined');
                 } else {
-                    console.warn(`⚠️ [Notification] SMS FAILED:`, smsResult.error);
+                    const smsResult = await twilioService.sendDirectSMS(user.phone, smsBody);
+                    if (smsResult.success) {
+                        delivered = true;
+                        methods.push('sms');
+                        console.log(`✅ [Notification] SMS SUCCESS for ${user.phone}`);
+                    } else {
+                        console.warn(`⚠️ [Notification] SMS FAILED:`, smsResult.error);
+                    }
                 }
             } catch (err) {
                 console.error(`❌ [Notification] SMS ERROR:`, err.message);
@@ -228,8 +234,11 @@ const createNotification = async (userId, data, type = 'system', link = null, em
 
         if (delivered) {
             notification.delivered = true;
-            notification.deliveryMethod = methods.join('+');
+            notification.deliveryMethod = methods.length > 0 ? methods.join('+') : 'none';
             await notification.save();
+            console.log(`🏁 [Notification] FINISHED: Delivered via ${notification.deliveryMethod}`);
+        } else {
+            console.warn(`🏁 [Notification] FINISHED: No channel delivered (methods: ${methods.length})`);
         }
 
         return notification;

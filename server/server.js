@@ -16,6 +16,7 @@ console.log(`- JWT_SECRET (OLD): ${process.env.JWT_SECRET ? 'Warning: Still pres
 console.log(`- SMARTHOOD_JWT_SECRET: ${process.env.SMARTHOOD_JWT_SECRET ? 'Detected' : 'MISSING'}`);
 console.log(`- TWILIO_ACCOUNT_SID: ${process.env.TWILIO_ACCOUNT_SID ? 'Detected' : 'MISSING'}`);
 console.log(`- TWILIO_VERIFY_SID: ${process.env.TWILIO_VERIFY_SERVICE_SID ? 'Detected' : 'MISSING'}`);
+console.log(`- TWILIO_PHONE_NUMBER: ${process.env.TWILIO_PHONE_NUMBER ? 'Detected' : 'MISSING'}`);
 console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'Detected' : 'MISSING'}`);
 console.log('-------------------------------');
 
