@@ -21,6 +21,12 @@ const Register = () => {
     const webcamRef = React.useRef(null);
     const [publicStats, setPublicStats] = useState({ totalUsers: 0, totalLocalities: 0, totalTowns: 0 });
 
+    // OTP related states
+    const [otpSent, setOtpSent] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+    const [otpLoading, setOtpLoading] = useState(false);
+
     useEffect(() => {
         const fetchPublicStats = async () => {
             try {
@@ -112,6 +118,47 @@ const Register = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        // Reset verification if phone changes
+        if (e.target.name === 'phone') {
+            setIsPhoneVerified(false);
+            setOtpSent(false);
+        }
+    };
+
+    const handleSendOTP = async () => {
+        if (!formData.phone) {
+            alert(t('phone_placeholder'));
+            return;
+        }
+        setOtpLoading(true);
+        try {
+            const res = await axios.post(`${API_URL}/auth/send-registration-otp`, { phone: formData.phone });
+            if (res.data.success) {
+                setOtpSent(true);
+                alert(t('otp_sent_success', 'Verification code sent to your mobile.'));
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Failed to send OTP');
+        }
+        setOtpLoading(false);
+    };
+
+    const handleVerifyOTP = async () => {
+        if (!otp) {
+            alert('Please enter the OTP');
+            return;
+        }
+        setOtpLoading(true);
+        try {
+            const res = await axios.post(`${API_URL}/auth/verify-registration-otp`, { phone: formData.phone, otp });
+            if (res.data.success) {
+                setIsPhoneVerified(true);
+                alert(t('phone_verified', 'Phone verified successfully!'));
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Invalid OTP');
+        }
+        setOtpLoading(false);
     };
 
 
@@ -127,6 +174,10 @@ const Register = () => {
         if (step === 1) {
             if (!formData.name || !formData.phone || !formData.age || !formData.bloodGroup) {
                 alert(t('fill_all_error'));
+                return;
+            }
+            if (!isPhoneVerified) {
+                alert(t('verify_phone_error', 'Please verify your phone number first.'));
                 return;
             }
         }
@@ -392,18 +443,64 @@ const Register = () => {
                                             required
                                         />
 
-                                        <VoiceInput
-                                            name="phone"
-                                            label={t('phone_label') + " *"}
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            type="tel"
-                                            placeholder={t('phone_placeholder')}
-                                            className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
-                                            required
-                                        />
+                                        <div className="relative">
+                                            <VoiceInput
+                                                name="phone"
+                                                label={t('phone_label') + " *"}
+                                                value={formData.phone}
+                                                onChange={handleChange}
+                                                type="tel"
+                                                placeholder={t('phone_placeholder')}
+                                                className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3 pr-24"
+                                                required
+                                                disabled={isPhoneVerified}
+                                            />
+                                            {!isPhoneVerified && !otpSent && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSendOTP}
+                                                    disabled={otpLoading || !formData.phone}
+                                                    className="absolute right-2 top-8 bg-primary text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/90 transition disabled:opacity-50"
+                                                >
+                                                    {otpLoading ? '...' : t('get_otp', 'Get OTP')}
+                                                </button>
+                                            )}
+                                            {isPhoneVerified && (
+                                                <div className="absolute right-3 top-9 text-success flex items-center gap-1">
+                                                    <Check size={16} strokeWidth={3} />
+                                                    <span className="text-[10px] font-bold uppercase">{t('verified', 'Verified')}</span>
+                                                </div>
+                                            )}
+                                        </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {otpSent && !isPhoneVerified && (
+                                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 animate-fade-in">
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">{t('enter_otp', 'Enter 6-Digit OTP')}</label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        maxLength="6"
+                                                        value={otp}
+                                                        onChange={(e) => setOtp(e.target.value)}
+                                                        className="flex-1 p-3 border border-gray-200 rounded-lg text-center font-bold tracking-[0.5em] focus:ring-2 focus:ring-primary outline-none"
+                                                        placeholder="000000"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleVerifyOTP}
+                                                        disabled={otpLoading || otp.length < 6}
+                                                        className="bg-success text-white px-6 py-3 rounded-lg font-bold hover:bg-success/90 transition disabled:opacity-50"
+                                                    >
+                                                        {otpLoading ? '...' : t('verify', 'Verify')}
+                                                    </button>
+                                                </div>
+                                                <p className="text-[10px] text-gray-400 mt-2 text-center">
+                                                    Didn't receive? <button type="button" onClick={handleSendOTP} className="text-primary font-bold">Resend</button>
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ${!isPhoneVerified ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
                                             <VoiceInput
                                                 name="age"
                                                 label={t('age') + " *"}
@@ -427,7 +524,7 @@ const Register = () => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ${!isPhoneVerified ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
                                             <div>
                                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">{t('blood_group')} *</label>
                                                 <select
@@ -453,7 +550,8 @@ const Register = () => {
 
                                     <button
                                         onClick={nextStep}
-                                        className="w-full bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all mt-4"
+                                        disabled={!isPhoneVerified}
+                                        className="w-full bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {t('continue_location')} →
                                     </button>

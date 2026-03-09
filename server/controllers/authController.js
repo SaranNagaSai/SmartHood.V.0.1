@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { sendWelcomeEmail } = require('../services/emailService');
+const twilioService = require('../utils/twilioService');
 
 const isTelugu = (text) => {
     if (!text) return true;
@@ -183,6 +184,42 @@ const registerUser = async (req, res) => {
     }
 };
 
+// @desc    Send OTP for Registration
+// @route   POST /api/auth/send-registration-otp
+// @access  Public
+const sendRegistrationOTP = async (req, res) => {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ success: false, message: 'Phone number is required' });
+
+    // Check if user exists
+    const userExists = await User.findOne({ phone });
+    if (userExists) {
+        return res.status(400).json({ success: false, message: 'User already exists with this phone number' });
+    }
+
+    const result = await twilioService.sendOTP(phone);
+    if (result.success) {
+        res.json({ success: true, message: 'OTP sent successfully' });
+    } else {
+        res.status(500).json({ success: false, message: 'Failed to send OTP: ' + result.error });
+    }
+};
+
+// @desc    Verify OTP for Registration
+// @route   POST /api/auth/verify-registration-otp
+// @access  Public
+const verifyRegistrationOTP = async (req, res) => {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) return res.status(400).json({ success: false, message: 'Phone and OTP are required' });
+
+    const result = await twilioService.verifyOTP(phone, otp);
+    if (result.success) {
+        res.json({ success: true, message: 'Phone verified successfully' });
+    } else {
+        res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+    }
+};
+
 const fs = require('fs');
 const path = require('path');
 
@@ -216,35 +253,55 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid phone number' });
         }
 
-        // Log found user details for comparison
-        fs.appendFileSync(path.join(__dirname, '../debug_login.log'), `[MATCH CHECK] User Found: Name="${user.name}", UniqueID="${user.uniqueId}"\n`);
-
-        // Check if uniqueId or name matches (Defensive lowercase checks)
-        const inputName = name.toLowerCase().trim(); // Added trim for safety
+        // Check if uniqueId or name matches
+        const inputName = name.toLowerCase().trim();
         const userName = (user.name || "").toLowerCase().trim();
         const userUniqueId = (user.uniqueId || "").toLowerCase().trim();
 
         const nameMatch = userName === inputName;
         const idMatch = userUniqueId === inputName;
 
-        if (nameMatch || idMatch) {
-            fs.appendFileSync(path.join(__dirname, '../debug_login.log'), `[SUCCESS] Login Successful for ${user.name}\n`);
-            res.json({
-                _id: user._id,
-                uniqueId: user.uniqueId,
-                name: user.name,
-                phone: user.phone,
-                locality: user.locality,
-                town: user.town,
-                district: user.district,
-                state: user.state,
-                profilePhoto: user.profilePhoto,
-                token: generateToken(user._id)
-            });
-        } else {
-            const errorLog = `[${new Date().toISOString()}] Name/ID Mismatch - Input: "${inputName}" vs DB Name: "${userName}" / DB ID: "${userUniqueId}"\n`;
+        if (!nameMatch && !idMatch) {
+            const errorLog = `[${new Date().toISOString()}] Name/ID Mismatch\n`;
             fs.appendFileSync(path.join(__dirname, '../debug_login.log'), errorLog);
-            res.status(401).json({ message: 'Invalid name or unique ID' });
+            return res.status(401).json({ message: 'Invalid name or unique ID' });
+        }
+
+        // If credentials match, check if OTP is provided
+        const { otp } = req.body;
+
+        if (!otp) {
+            // STEP 1: Credentials valid, trigger OTP
+            const twilioResult = await twilioService.sendOTP(phone);
+            if (twilioResult.success) {
+                return res.json({
+                    success: true,
+                    requireOTP: true,
+                    message: 'Verification code sent to your mobile.'
+                });
+            } else {
+                return res.status(500).json({ message: 'Failed to send OTP: ' + twilioResult.error });
+            }
+        } else {
+            // STEP 2: Verify OTP
+            const verifyResult = await twilioService.verifyOTP(phone, otp);
+            if (verifyResult.success) {
+                fs.appendFileSync(path.join(__dirname, '../debug_login.log'), `[SUCCESS] Login Successful for ${user.name}\n`);
+                return res.json({
+                    _id: user._id,
+                    uniqueId: user.uniqueId,
+                    name: user.name,
+                    phone: user.phone,
+                    locality: user.locality,
+                    town: user.town,
+                    district: user.district,
+                    state: user.state,
+                    profilePhoto: user.profilePhoto,
+                    token: generateToken(user._id)
+                });
+            } else {
+                return res.status(401).json({ message: 'Invalid or expired OTP' });
+            }
         }
     } catch (error) {
         console.error('Login Error:', error);
@@ -303,5 +360,11 @@ const magicLogin = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, magicLogin };
+module.exports = {
+    registerUser,
+    loginUser,
+    magicLogin,
+    sendRegistrationOTP,
+    verifyRegistrationOTP
+};
 

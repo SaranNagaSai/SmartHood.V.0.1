@@ -2,6 +2,7 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const { sendEmail } = require('../services/emailService');
 const admin = require('../config/firebase');
+const twilioService = require('../utils/twilioService');
 
 // @desc    Get user notifications
 // @route   GET /api/notifications
@@ -150,6 +151,25 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                 console.log(`[Notification] FCM sent to ${user.name}`);
             } catch (fcmError) {
                 console.error(`[Notification] FCM error for ${user.name}:`, fcmError.message);
+            }
+        }
+
+        // 3. Send SMS via Twilio (Parallel Mobile Channel)
+        if (user.phone) {
+            console.log(`📱 [Notification] Attempting SMS to ${user.phone}...`);
+            try {
+                // Determine SMS body (Shortened for costs/deliverability)
+                const smsBody = `${finalTitle}: ${finalBody.length > 100 ? finalBody.substring(0, 97) + '...' : finalBody}`;
+                const smsResult = await twilioService.sendDirectSMS(user.phone, smsBody);
+                if (smsResult.success) {
+                    delivered = true;
+                    methods.push('sms');
+                    console.log(`✅ [Notification] SMS SUCCESS for ${user.phone}`);
+                } else {
+                    console.warn(`⚠️ [Notification] SMS FAILED:`, smsResult.error);
+                }
+            } catch (err) {
+                console.error(`❌ [Notification] SMS ERROR:`, err.message);
             }
         }
 

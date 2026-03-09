@@ -14,6 +14,8 @@ const Login = () => {
     const [formData, setFormData] = useState({ name: '', phone: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isOTPStep, setIsOTPStep] = useState(false);
+    const [otp, setOtp] = useState('');
     const [serverReady, setServerReady] = useState(false);
     const [warmingUp, setWarmingUp] = useState(true);
     const retryCountRef = useRef(0);
@@ -68,6 +70,11 @@ const Login = () => {
                 const res = await axios.post(`${API_URL}/auth/login`, formData, {
                     timeout: 30000 // 30s timeout for cold starts
                 });
+                if (res.data.requireOTP) {
+                    setIsOTPStep(true);
+                    setLoading(false);
+                    return;
+                }
                 login(res.data, res.data.token);
                 navigate('/home');
             } catch (err) {
@@ -106,7 +113,7 @@ const Login = () => {
                 <div className="text-center mb-8">
                     <div className="flex flex-col items-center justify-center gap-4 mb-6">
                         <img src={smartHoodLogo} alt="SmartHood" className="w-40 h-40 md:w-56 md:h-56 object-contain drop-shadow-2xl" />
-                        <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight drop-shadow-md">{t('smarthood') || 'SmartHood'}</h2>
+                        {!isOTPStep && <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight drop-shadow-md">{t('smarthood') || 'SmartHood'}</h2>}
                     </div>
                 </div>
 
@@ -132,59 +139,120 @@ const Login = () => {
                         </div>
                     )}
 
-                    <div className="space-y-6">
-                        <div className="space-y-4">
-                            <VoiceInput
-                                label={t('name_label')}
-                                value={formData.name}
-                                onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setError(''); }}
-                                placeholder={t('name_placeholder')}
-                                className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
-                                labelClassName="text-white drop-shadow-sm"
-                            />
-                            <VoiceInput
-                                label={t('phone_label')}
-                                value={formData.phone}
-                                onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setError(''); }}
-                                placeholder={t('phone_placeholder')}
-                                type="tel"
-                                className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
-                                labelClassName="text-white drop-shadow-sm"
-                            />
-                        </div>
+                    {!isOTPStep ? (
+                        <div className="space-y-6">
+                            <div className="space-y-4">
+                                <VoiceInput
+                                    label={t('name_label')}
+                                    value={formData.name}
+                                    onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setError(''); }}
+                                    placeholder={t('name_placeholder')}
+                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
+                                    labelClassName="text-white drop-shadow-sm"
+                                />
+                                <VoiceInput
+                                    label={t('phone_label')}
+                                    value={formData.phone}
+                                    onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setError(''); }}
+                                    placeholder={t('phone_placeholder')}
+                                    type="tel"
+                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
+                                    labelClassName="text-white drop-shadow-sm"
+                                />
+                            </div>
 
-                        <button
-                            onClick={handleLogin}
-                            disabled={loading}
-                            className="w-full bg-primary text-white p-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2 group border border-white/10 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                        >
-                            {loading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                                    <span>{t('signing_in') || 'Signing in...'}</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>{t('sign_in')}</span>
-                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                                </>
-                            )}
-                        </button>
-
-                        <p className="text-center text-xs text-gray-300 mt-6 pt-4 border-t border-white/10 flex items-center justify-center gap-2">
-                            <span className={`w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)] ${serverReady ? 'bg-green-400' : 'bg-amber-400'}`}></span>
-                            {t('secure_login')}
-                        </p>
-
-                        <div className="text-center mt-4">
                             <button
-                                onClick={() => navigate('/register')}
-                                className="text-white font-bold hover:text-blue-200 hover:underline transition-colors shadow-sm"
+                                onClick={handleLogin}
+                                disabled={loading}
+                                className="w-full bg-primary text-white p-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2 group border border-white/10 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                             >
-                                {t('new_user_prompt') || "Don't have an account? Create one"}
+                                {loading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                                        <span>{t('signing_in') || 'Signing in...'}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>{t('sign_in')}</span>
+                                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                    </>
+                                )}
                             </button>
+
+                            <p className="text-center text-xs text-gray-300 mt-6 pt-4 border-t border-white/10 flex items-center justify-center gap-2">
+                                <span className={`w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)] ${serverReady ? 'bg-green-400' : 'bg-amber-400'}`}></span>
+                                {t('secure_login')}
+                            </p>
+
+                            <div className="text-center mt-4">
+                                <button
+                                    onClick={() => navigate('/register')}
+                                    className="text-white font-bold hover:text-blue-200 hover:underline transition-colors shadow-sm"
+                                >
+                                    {t('new_user_prompt') || "Don't have an account? Create one"}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="space-y-6 animate-fade-in">
+                            <div className="text-center bg-blue-500/10 p-4 rounded-2xl border border-blue-400/20 mb-6">
+                                <p className="text-blue-200 text-sm">{t('otp_sent_to', 'Verification code sent to')} <br /> <span className="font-bold text-white text-base">{formData.phone}</span></p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="block text-center text-xs font-bold text-gray-300 uppercase tracking-widest mb-4">Enter 6-Digit Code</label>
+                                <div className="flex justify-center">
+                                    <input
+                                        type="text"
+                                        maxLength="6"
+                                        autoFocus
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                        className="w-full max-w-[280px] p-4 bg-white/10 border border-white/20 rounded-2xl text-center text-3xl font-bold tracking-[0.5em] text-white focus:outline-none focus:ring-4 focus:ring-primary/40 focus:bg-white/20 transition-all font-mono"
+                                        placeholder="000000"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 pt-4">
+                                <button
+                                    onClick={() => {
+                                        const attemptWithOTP = async () => {
+                                            setLoading(true);
+                                            try {
+                                                const res = await axios.post(`${API_URL}/auth/login`, { ...formData, otp });
+                                                login(res.data, res.data.token);
+                                                navigate('/home');
+                                            } catch (err) {
+                                                setError(err.response?.data?.message || 'Invalid or expired OTP');
+                                                setLoading(false);
+                                            }
+                                        };
+                                        attemptWithOTP();
+                                    }}
+                                    disabled={loading || otp.length < 6}
+                                    className="w-full bg-success text-white p-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-success/40 transition-all active:scale-95 disabled:opacity-50"
+                                >
+                                    {loading ? t('verifying', 'Verifying...') : t('verify_login', 'Verify & Sign In')}
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setIsOTPStep(false);
+                                        setOtp('');
+                                        setError('');
+                                    }}
+                                    className="w-full bg-transparent text-gray-300 font-bold p-3 hover:text-white transition-colors"
+                                >
+                                    ← {t('back_to_login', 'Back to Login')}
+                                </button>
+                            </div>
+
+                            <p className="text-center text-xs text-gray-400 mt-4">
+                                Didn't receive the code? <button onClick={handleLogin} className="text-primary font-bold hover:underline">Resend SMS</button>
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
