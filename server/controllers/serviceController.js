@@ -188,7 +188,14 @@ const createService = async (req, res) => {
                             recipientNotificationData,
                             'service',
                             `/service/${service._id}`,
-                            emailHtml
+                            emailHtml,
+                            false,
+                            {
+                                workTitle: title,
+                                workInfo: description,
+                                senderName: user.name,
+                                senderPhone: user.phone
+                            }
                         );
                         successCount++;
                     } catch (targetErr) {

@@ -124,7 +124,14 @@ const createAlert = async (req, res) => {
                             notificationData,
                             'ALERT',
                             '/alerts',
-                            emailHtml
+                            emailHtml,
+                            false,
+                            {
+                                workTitle: `${category} (${subType})`,
+                                workInfo: description,
+                                senderName: req.user.name,
+                                senderPhone: req.user.phone
+                            }
                         );
                         successCount++;
                     } catch (targetErr) {

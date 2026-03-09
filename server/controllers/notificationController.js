@@ -57,7 +57,7 @@ const markAllAsRead = async (req, res) => {
     }
 };
 
-const createNotification = async (userId, data, type = 'system', link = null, emailHtml = null, skipEmail = false) => {
+const createNotification = async (userId, data, type = 'system', link = null, emailHtml = null, skipEmail = false, extendedData = null) => {
     try {
         // Support both simple string or bilingual object
         const { title, body, titleTe, bodyTe } = typeof data === 'string' ? { title: data, body: '' } : data;
@@ -158,8 +158,33 @@ const createNotification = async (userId, data, type = 'system', link = null, em
         if (user.phone) {
             console.log(`📱 [Notification] Attempting SMS to ${user.phone}...`);
             try {
-                // Determine SMS body (Shortened for costs/deliverability)
-                const smsBody = `${finalTitle}: ${finalBody.length > 100 ? finalBody.substring(0, 97) + '...' : finalBody}`;
+                let smsBody;
+
+                // If it's a Service or Alert, follow the user's requested layout:
+                // Title (SmartHood)
+                // Title of Work
+                // Info (Description)
+                // Personal Info
+                // Intelligent Ending
+                if (extendedData && (type.toLowerCase() === 'service' || type.toLowerCase() === 'alert')) {
+                    const { workTitle, workInfo, senderName, senderPhone } = extendedData;
+
+                    // Intelligent endings based on context
+                    const intelligentEnding = type.toLowerCase() === 'alert'
+                        ? "Stay safe and connected with your neighbors."
+                        : "Building a stronger neighborhood together.";
+
+                    smsBody = `SmartHood\n` +
+                        `📍 ${data.title}\n` +
+                        `📋 Work: ${workTitle || 'General'}\n` +
+                        `📝 Info: ${workInfo ? (workInfo.substring(0, 60) + (workInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
+                        `👤 From: ${senderName} (${senderPhone || 'N/A'})\n` +
+                        `✨ ${intelligentEnding}`;
+                } else {
+                    // Fallback to standard "SmartHood: Title: Body" format
+                    smsBody = `SmartHood: ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
+                }
+
                 const smsResult = await twilioService.sendDirectSMS(user.phone, smsBody);
                 if (smsResult.success) {
                     delivered = true;

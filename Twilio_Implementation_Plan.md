@@ -51,6 +51,13 @@ Created **`server/utils/twilioService.js`**.
     1. **Email** (via Nodemailer)
     2. **Push Notifications** (via Firebase FCM)
     3. **SMS** (via Twilio SMS API) - **NEW**
+  - **Custom SMS Layout (Requested)**:
+    - **Header**: "SmartHood" (Primary identification)
+    - **Context**: Icon + Notification category (e.g., 📍 New Service Offer)
+    - **Work**: Detailed title of the job or alert.
+    - **Info**: Truncated description for quick reading.
+    - **User**: Name and Phone number of the sender.
+    - **Intelligent Closing**: AI-generated community-building taglines.
   - **Coverage**: This automatically enables SMS alerts for:
     - Emergency Alerts (Accidents, SOS, Blood Requests)
     - Service Offers & Requests
