@@ -344,6 +344,20 @@ Looking forward to connecting!`;
             );
         });
 
+        // 3. Send confirmation to Sender (Creator)
+        sendPromises.push(createNotification(
+            sender._id,
+            {
+                title: isTelugu ? 'ఇంటర్‌లింక్ అభ్యర్థన పంపబడింది 🚀' : 'Interlink Request Sent 🚀',
+                body: isTelugu
+                    ? `మీ అభ్యర్థన ${targetUserIds.length} మంది పొరుగువారికి పంపబడింది.`
+                    : `Your request has been delivered to ${targetUserIds.length} neighbors.`
+            },
+            'interlink',
+            '/profile',
+            emailHtml // Optional: use the same preview or a dedicated confirmation template
+        ));
+
         await Promise.all(sendPromises);
 
         res.json({ message: `Successfully sent interlink requests to ${targetUserIds.length} neighbors!` });

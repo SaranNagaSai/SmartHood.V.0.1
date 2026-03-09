@@ -361,6 +361,20 @@ const expressInterest = async (req, res) => {
                 );
             }
 
+            // Also Notify the interested person (Confirmation for them)
+            await createNotification(
+                req.user._id,
+                {
+                    title: isTelugu ? 'ఆసక్తి పంపబడింది 🚀' : 'Interest Sent 🚀',
+                    body: isTelugu
+                        ? `మీరు "${service.title}" పై ఆసక్తిని తెలియజేశారు. కమ్యూనికేషన్ ప్రారంభమైంది.`
+                        : `You have expressed interest in "${service.title}". Communication established.`
+                },
+                'interest',
+                `/service/${service._id}`,
+                generateInterestEmailTemplate(service, req.user)
+            );
+
             // Create DB Notification for Creator
             await createNotification(
                 service.createdBy,
@@ -464,6 +478,20 @@ const completeService = async (req, res) => {
                 generateCompletionEmailTemplate(service, provider, amount)
             );
         }
+
+        // Notification for Requester (Confirmation)
+        await createNotification(
+            req.user._id,
+            {
+                title: isTelugu ? 'మీ సేవ పూర్తయినట్లు గుర్తించారు ✅' : 'Service Marked Completed ✅',
+                body: isTelugu
+                    ? `మీరు "${service.title}" పూర్తయినట్లు ధృవీకరించారు. ఖర్చు: ₹${amount}`
+                    : `You've confirmed completion of "${service.title}". Total: ₹${amount}`
+            },
+            'completion',
+            `/service/${service._id}`,
+            generateCompletionEmailTemplate(service, provider, amount)
+        );
 
         // Notification for Provider
         await createNotification(
