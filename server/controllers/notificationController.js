@@ -160,29 +160,44 @@ const createNotification = async (userId, data, type = 'system', link = null, em
             try {
                 let smsBody;
 
-                // If it's a Service or Alert, follow the user's requested layout:
-                // Title (SmartHood)
-                // Title of Work
-                // Info (Description)
-                // Personal Info
-                // Intelligent Ending
                 if (extendedData && (type.toLowerCase() === 'service' || type.toLowerCase() === 'alert')) {
                     const { workTitle, workInfo, senderName, senderPhone } = extendedData;
 
-                    // Intelligent endings based on context
-                    const intelligentEnding = type.toLowerCase() === 'alert'
-                        ? "Stay safe and connected with your neighbors."
-                        : "Building a stronger neighborhood together.";
+                    // Multilingual Labels
+                    const smsLabels = {
+                        English: {
+                            header: "SmartHood",
+                            work: "Work",
+                            info: "Info",
+                            from: "From",
+                            alertEnding: "Stay safe and connected with your neighbors.",
+                            serviceEnding: "Building a stronger neighborhood together."
+                        },
+                        Telugu: {
+                            header: "SmartHood (స్మార్ట్ హుడ్)",
+                            work: "పని",
+                            info: "వివరాలు",
+                            from: "నుండి",
+                            alertEnding: "సురక్షితంగా ఉండండి మరియు మీ పొరుగువారితో కనెక్ట్ అవ్వండి.",
+                            serviceEnding: "కలిసి పటిష్టమైన సమాజాన్ని నిర్మిద్దాం."
+                        }
+                    };
 
-                    smsBody = `SmartHood\n` +
-                        `📍 ${data.title}\n` +
-                        `📋 Work: ${workTitle || 'General'}\n` +
-                        `📝 Info: ${workInfo ? (workInfo.substring(0, 60) + (workInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
-                        `👤 From: ${senderName} (${senderPhone || 'N/A'})\n` +
+                    const lang = user.language === 'Telugu' ? 'Telugu' : 'English';
+                    const L = smsLabels[lang];
+
+                    const intelligentEnding = type.toLowerCase() === 'alert' ? L.alertEnding : L.serviceEnding;
+
+                    smsBody = `${L.header}\n` +
+                        `📍 ${lang === 'Telugu' && data.titleTe ? data.titleTe : data.title}\n` +
+                        `📋 ${L.work}: ${workTitle || (lang === 'Telugu' ? 'సాధారణం' : 'General')}\n` +
+                        `📝 ${L.info}: ${workInfo ? (workInfo.substring(0, 60) + (workInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
+                        `👤 ${L.from}: ${senderName} (${senderPhone || 'N/A'})\n` +
                         `✨ ${intelligentEnding}`;
                 } else {
                     // Fallback to standard "SmartHood: Title: Body" format
-                    smsBody = `SmartHood: ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
+                    const header = user.language === 'Telugu' ? 'స్మార్ట్ హుడ్' : 'SmartHood';
+                    smsBody = `${header}: ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
                 }
 
                 const smsResult = await twilioService.sendDirectSMS(user.phone, smsBody);

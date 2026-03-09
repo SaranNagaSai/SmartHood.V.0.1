@@ -69,6 +69,9 @@ const createAlert = async (req, res) => {
             }
         }
 
+        // Language Filtering: Match recipients with the sender's language preference
+        query.language = req.user.language || 'English';
+
         const targetUsers = await User.find(query);
         console.log(`[Alert Debug] Category: ${category}, SubType: ${subType}`);
         console.log(`[Alert Debug] Initial targetIdsRaw: ${JSON.stringify(req.body.targetUserIds || req.body['targetUserIds[]'])}`);
