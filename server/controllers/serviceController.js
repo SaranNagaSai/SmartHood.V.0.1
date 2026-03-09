@@ -172,7 +172,14 @@ const createService = async (req, res) => {
                     creatorNotification,
                     'service',
                     `/service/${service._id}`,
-                    creatorEmailHtml
+                    creatorEmailHtml,
+                    false, // skipEmail
+                    {
+                        workTitle: title,
+                        workInfo: description,
+                        senderName: user.name,
+                        senderPhone: user.phone
+                    }
                 ).then(() => console.log(`✅ [Background] Creator confirmation delivered to ${user.name}`))
                     .catch(e => console.error(`❌ [Background] Creator confirmation FAILED:`, e.message));
 

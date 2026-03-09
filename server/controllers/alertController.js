@@ -99,12 +99,29 @@ const createAlert = async (req, res) => {
                     bodyTe: `మీ ${category} హెచ్చరిక "${subType}" ${targetUsers.length} మందికి ప్రసారం చేయబడింది.`
                 };
 
+                const subTypeTeMap = {
+                    'Blood Donation': 'రక్తదానం',
+                    'Accident': 'ప్రమాదం',
+                    'Cash Donation': 'నగదు విరాళం',
+                    'Climate': 'వాతావరణం',
+                    'Theft': 'దొంగతనం',
+                    'General': 'సాధారణం'
+                };
+
                 await createNotification(
                     req.user._id,
                     creatorAlertNotification,
                     'ALERT',
                     '/alerts',
-                    creatorAlertEmailHtml
+                    creatorAlertEmailHtml,
+                    false, // skipEmail
+                    {
+                        workTitle: `${category} (${subType})`,
+                        workTitleTe: `${category === 'Emergency' ? 'అత్యవసర' : 'సాధారణ'} (${subTypeTeMap[subType] || subType})`,
+                        workInfo: description,
+                        senderName: req.user.name,
+                        senderPhone: req.user.phone
+                    }
                 );
                 console.log(`✅ [Background] Alert confirmation sent to creator ${req.user.name}`);
 
