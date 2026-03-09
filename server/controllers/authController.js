@@ -220,8 +220,6 @@ const verifyRegistrationOTP = async (req, res) => {
     }
 };
 
-const fs = require('fs');
-const path = require('path');
 
 // @desc    Login user (Name + Phone)
 // @route   POST /api/auth/login
@@ -229,18 +227,12 @@ const path = require('path');
 const loginUser = async (req, res) => {
     const { name, phone } = req.body;
 
-    // PERSISTENT DEBUG LOGGING
-    const logEntry = `[${new Date().toISOString()}] Login Attempt - Name: "${name}", Phone: "${phone}"\n`;
-    try {
-        fs.appendFileSync(path.join(__dirname, '../debug_login.log'), logEntry);
-    } catch (e) {
-        console.error('Log write failed', e);
-    }
+    // Use console.log for production-safe debugging
+    console.log(`[Login Attempt] Name: "${name}", Phone: "${phone}"`);
 
     try {
         if (!name || !phone) {
-            const errorLog = `[${new Date().toISOString()}] Missing Credentials\n`;
-            fs.appendFileSync(path.join(__dirname, '../debug_login.log'), errorLog);
+            console.warn('[Login Error] Missing Credentials');
             return res.status(400).json({ message: 'Name/ID and Phone Number are required' });
         }
 
@@ -248,8 +240,7 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ phone });
 
         if (!user) {
-            const errorLog = `[${new Date().toISOString()}] Phone Mismatch - Input Phone: "${phone}" not found in DB\n`;
-            fs.appendFileSync(path.join(__dirname, '../debug_login.log'), errorLog);
+            console.warn(`[Login Error] Phone Mismatch - Input Phone: "${phone}" not found in DB`);
             return res.status(401).json({ message: 'Invalid phone number' });
         }
 
@@ -262,8 +253,7 @@ const loginUser = async (req, res) => {
         const idMatch = userUniqueId === inputName;
 
         if (!nameMatch && !idMatch) {
-            const errorLog = `[${new Date().toISOString()}] Name/ID Mismatch\n`;
-            fs.appendFileSync(path.join(__dirname, '../debug_login.log'), errorLog);
+            console.warn(`[Login Error] Name/ID Mismatch for phone ${phone}`);
             return res.status(401).json({ message: 'Invalid name or unique ID' });
         }
 
@@ -286,7 +276,7 @@ const loginUser = async (req, res) => {
             // STEP 2: Verify OTP
             const verifyResult = await twilioService.verifyOTP(phone, otp);
             if (verifyResult.success) {
-                fs.appendFileSync(path.join(__dirname, '../debug_login.log'), `[SUCCESS] Login Successful for ${user.name}\n`);
+                console.log(`[SUCCESS] Login Successful for ${user.name}`);
                 return res.json({
                     _id: user._id,
                     uniqueId: user.uniqueId,
@@ -305,7 +295,6 @@ const loginUser = async (req, res) => {
         }
     } catch (error) {
         console.error('Login Error:', error);
-        fs.appendFileSync(path.join(__dirname, '../debug_login.log'), `[ERROR] Server Error: ${error.message}\n`);
         res.status(500).json({ message: 'Server Error: ' + error.message });
     }
 };
