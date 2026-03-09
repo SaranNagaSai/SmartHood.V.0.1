@@ -69,9 +69,6 @@ const createAlert = async (req, res) => {
             }
         }
 
-        // Language Filtering: Match recipients with the sender's language preference
-        query.language = req.user.language || 'English';
-
         const targetUsers = await User.find(query);
         console.log(`[Alert Debug] Category: ${category}, SubType: ${subType}`);
         console.log(`[Alert Debug] Initial targetIdsRaw: ${JSON.stringify(req.body.targetUserIds || req.body['targetUserIds[]'])}`);
@@ -122,6 +119,15 @@ const createAlert = async (req, res) => {
                             bodyTe: description
                         };
 
+                        const subTypeTeMap = {
+                            'Blood Donation': 'రక్తదానం',
+                            'Accident': 'ప్రమాదం',
+                            'Cash Donation': 'నగదు విరాళం',
+                            'Climate': 'వాతావరణం',
+                            'Theft': 'దొంగతనం',
+                            'General': 'సాధారణం'
+                        };
+
                         await createNotification(
                             user._id,
                             notificationData,
@@ -131,6 +137,7 @@ const createAlert = async (req, res) => {
                             false,
                             {
                                 workTitle: `${category} (${subType})`,
+                                workTitleTe: `${category === 'Emergency' ? 'అత్యవసర' : 'సాధారణ'} (${subTypeTeMap[subType] || subType})`,
                                 workInfo: description,
                                 senderName: req.user.name,
                                 senderPhone: req.user.phone

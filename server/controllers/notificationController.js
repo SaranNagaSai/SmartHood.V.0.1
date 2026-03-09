@@ -161,7 +161,7 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                 let smsBody;
 
                 if (extendedData && (type.toLowerCase() === 'service' || type.toLowerCase() === 'alert')) {
-                    const { workTitle, workInfo, senderName, senderPhone } = extendedData;
+                    const { workTitle, workInfo, workTitleTe, workInfoTe, senderName, senderPhone } = extendedData;
 
                     // Multilingual Labels
                     const smsLabels = {
@@ -188,10 +188,14 @@ const createNotification = async (userId, data, type = 'system', link = null, em
 
                     const intelligentEnding = type.toLowerCase() === 'alert' ? L.alertEnding : L.serviceEnding;
 
+                    // Localization prioritization
+                    const finalWorkTitle = lang === 'Telugu' ? (workTitleTe || workTitle) : workTitle;
+                    const finalWorkInfo = lang === 'Telugu' ? (workInfoTe || workInfo) : workInfo;
+
                     smsBody = `${L.header}\n` +
                         `📍 ${lang === 'Telugu' && data.titleTe ? data.titleTe : data.title}\n` +
-                        `📋 ${L.work}: ${workTitle || (lang === 'Telugu' ? 'సాధారణం' : 'General')}\n` +
-                        `📝 ${L.info}: ${workInfo ? (workInfo.substring(0, 60) + (workInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
+                        `📋 ${L.work}: ${finalWorkTitle || (lang === 'Telugu' ? 'సాధారణం' : 'General')}\n` +
+                        `📝 ${L.info}: ${finalWorkInfo ? (finalWorkInfo.substring(0, 60) + (finalWorkInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
                         `👤 ${L.from}: ${senderName} (${senderPhone || 'N/A'})\n` +
                         `✨ ${intelligentEnding}`;
                 } else {

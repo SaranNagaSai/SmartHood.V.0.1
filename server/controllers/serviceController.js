@@ -127,9 +127,6 @@ const createService = async (req, res) => {
             ];
         }
 
-        // Language Filtering: Match recipients with the creator's language preference
-        query.language = user.language || 'English';
-
         const targetUsers = await User.find(query);
         console.log(`[Service] Found ${targetUsers.length} recipients. Query:`, JSON.stringify(query, (k, v) => v instanceof RegExp ? v.toString() : v));
 
