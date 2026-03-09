@@ -301,11 +301,11 @@ const loginUser = async (req, res) => {
 
 // Generate JWT
 const generateToken = (id) => {
-    if (!process.env.JWT_SECRET) {
-        console.error('CRITICAL: JWT_SECRET is not defined in .env');
+    if (!process.env.SMARTHOOD_JWT_SECRET) {
+        console.error('CRITICAL: SMARTHOOD_JWT_SECRET is not defined in .env');
         return 'temp_token_fix_env'; // Fallback to avoid crash, but warning logged
     }
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+    return jwt.sign({ id }, process.env.SMARTHOOD_JWT_SECRET, {
         expiresIn: '30d',
     });
 };
@@ -322,7 +322,7 @@ const magicLogin = async (req, res) => {
         }
 
         // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.SMARTHOOD_JWT_SECRET);
         const user = await User.findById(decoded.id);
 
         if (!user) {

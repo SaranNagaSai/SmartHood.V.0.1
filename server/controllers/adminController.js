@@ -29,7 +29,7 @@ const adminLogin = async (req, res) => {
 
         const token = jwt.sign(
             { id: admin._id, isAdmin: true },
-            process.env.JWT_SECRET,
+            process.env.SMARTHOOD_JWT_SECRET,
             { expiresIn: '1d' }
         );
 
