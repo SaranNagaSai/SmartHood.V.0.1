@@ -215,6 +215,7 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         `📋 ${L.work}: ${finalWorkTitle || (lang === 'Telugu' ? 'సాధారణం' : 'General')}\n` +
                         `📝 ${L.info}: ${finalWorkInfo ? (finalWorkInfo.substring(0, 60) + (finalWorkInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
                         `👤 ${L.from}: ${senderName || (lang === 'Telugu' ? 'వ్యవస్థ' : 'System')} (${senderPhone || 'N/A'})\n` +
+                        `🔗 Log in: https://smarthood.onrender.com\n` +
                         `✨ ${intelligentEnding}`;
                 } else if (isRichType) {
                     // Semi-rich format for types without extendedData
@@ -222,11 +223,12 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                     smsBody = `${header}\n` +
                         `📍 ${finalTitle}\n` +
                         `📝 ${finalBody.substring(0, 100)}${finalBody.length > 100 ? '...' : ''}\n` +
+                        `🔗 Login: https://smarthood.onrender.com\n` +
                         `✨ Building a better neighborhood.`;
                 } else {
                     // Fallback to standard "SmartHood: Title: Body" format
                     const header = user.language === 'Telugu' ? '[స్మార్ట్ హుడ్]' : '[SmartHood]';
-                    smsBody = `${header} ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
+                    smsBody = `${header} ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}\nLogin: https://smarthood.onrender.com`;
                 }
 
                 if (!process.env.TWILIO_PHONE_NUMBER) {

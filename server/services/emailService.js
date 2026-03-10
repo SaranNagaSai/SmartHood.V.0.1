@@ -68,10 +68,8 @@ const sendEmail = async (to, subject, text, html = null) => {
                         </div>
                     </div>
                     <div style="padding: 20px; background: #f8fafc; text-align: center; border-top: 1px solid #eee;">
-                        <p style="color: #64748b; margin: 0; font-size: 12px;">
-                            ${isTelugu
-                    ? 'మీకు ఈమెయిల్ మీ పరిసరాల వేదిక అయిన స్మార్ట్ హుడ్ నుండి పంపబడినది.'
-                    : 'You received this email from SmartHood, your hyperlocal community platform.'}
+                        <p style="color: #64748b; margin: 0; font-size: 13px; font-weight: bold;">
+                            <a href="https://smarthood.onrender.com" style="color: #2563eb; text-decoration: none;">Visit: https://smarthood.onrender.com</a>
                         </p>
                         <p style="color: #94a3b8; margin: 10px 0 0; font-size: 12px;">
                             © ${new Date().getFullYear()} SmartHood. All rights reserved.
@@ -113,6 +111,9 @@ const sendWelcomeEmail = async (user) => {
                 <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 50px; font-weight: bold;">${isTelugu ? 'డాష్‌బోర్డ్ వెళ్ళండి' : 'Go to Dashboard'}</a>
             </div>
             <div style="padding: 20px; background: #f1f5f9; text-align: center;">
+                <p style="margin: 0 0 10px; font-weight: bold;">
+                   <a href="https://smarthood.onrender.com" style="color: #2563eb; text-decoration: none;">https://smarthood.onrender.com</a>
+                </p>
                 <p style="font-size: 11px; color: #94a3b8;">© ${new Date().getFullYear()} SmartHood. ${isTelugu ? 'మన పరిసర వేదిక' : 'Your Community Platform'}</p>
             </div>
         </div>
@@ -226,9 +227,14 @@ const generateServiceEmailTemplate = (service, creator, type, isConfirmation = f
                 </div>
 
                 <!-- Footer -->
-                <p style="text-align: center; color: #94a3b8; font-size: 11px; margin-top: 25px;">
-                    ${isTelugu ? 'SmartHood కమ్యూనిటీ నెట్‌వర్క్ ద్వారా పంపబడింది' : 'Sent via SmartHood Community Network'}
-                </p>
+                <div style="text-align: center; margin-top: 25px;">
+                    <p style="margin: 0 0 5px; font-weight: 700;">
+                        <a href="https://smarthood.onrender.com" style="color: ${actionColor}; text-decoration: none; font-size: 14px;">LOG IN: https://smarthood.onrender.com</a>
+                    </p>
+                    <p style="text-align: center; color: #94a3b8; font-size: 11px; margin: 0;">
+                        ${isTelugu ? 'SmartHood కమ్యూనిటీ నెట్‌వర్క్ ద్వారా పంపబడింది' : 'Sent via SmartHood Community Network'}
+                    </p>
+                </div>
             </div>
         </div>
     `;
@@ -316,9 +322,11 @@ const generateAlertEmailTemplate = (alert, sender, isConfirmation = false) => {
                     </span>
                 </div>
                 <p style="font-size: 16px; line-height: 1.6;">${alert.description}</p>
-                <div style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
-                    <strong>${isTelugu ? 'పంపినవారు:' : 'Sender:'}</strong> ${sender.name}<br>
-                    <strong>${isTelugu ? 'ఫోన్:' : 'Phone:'}</strong> ${sender.phone}
+                <div style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; text-align: center;">
+                    <strong>${isTelugu ? 'పంపినవారు:' : 'Sender:'}</strong> ${sender.name} | ${sender.phone}<br>
+                    <p style="margin: 15px 0 0; font-weight: bold;">
+                        <a href="https://smarthood.onrender.com" style="color: ${headerColor}; text-decoration: none;">TAKE ACTION: https://smarthood.onrender.com</a>
+                    </p>
                 </div>
             </div>
         </div>
