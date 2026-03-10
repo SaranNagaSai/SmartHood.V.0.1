@@ -101,24 +101,38 @@ const verifyOTP = async (phoneNumber, code) => {
     }
 };
 
-/**
- * Send a direct SMS message
- * @param {string} to - E.164 formatted phone number
- * @param {string} body - Message body
- * @returns {Promise<object>}
- */
 const sendDirectSMS = async (to, body) => {
     if (!checkTwilio('sendDirectSMS')) return { success: false, error: 'Twilio client not configured' };
 
+    const formattedPhone = normalizePhone(to);
+
     try {
-        const formattedPhone = normalizePhone(to);
+        // Attempt 1: Try with Alphanumeric Sender ID (e.g., SmartHood)
         const message = await client.messages.create({
             body: body,
-            from: senderId, // This can be the phone number or Alphanumeric Sender ID
+            from: senderId,
             to: formattedPhone
         });
         return { success: true, sid: message.sid };
     } catch (error) {
+        // If error is related to Alphanumeric Sender ID (Trial account restriction or unregistered ID)
+        // Error code 21608: Alphanumeric Sender IDs not supported in Trial
+        // Error code 21212: From number is not a valid phone number / Sender ID not allowed
+        if (error.code === 21608 || error.code === 21212 || error.status === 400) {
+            console.warn(`⚠️ [Twilio] Sender ID "${senderId}" rejected. Falling back to Phone Number...`);
+            try {
+                const retryMessage = await client.messages.create({
+                    body: body,
+                    from: fromPhoneNumber,
+                    to: formattedPhone
+                });
+                return { success: true, sid: retryMessage.sid, note: 'Fallback to phone used' };
+            } catch (retryError) {
+                console.error('Error sending SMS via Twilio fallback:', retryError);
+                return { success: false, error: retryError.message };
+            }
+        }
+
         console.error('Error sending SMS via Twilio:', error);
         return { success: false, error: error.message };
     }
