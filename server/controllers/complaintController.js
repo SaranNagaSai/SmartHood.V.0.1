@@ -47,6 +47,35 @@ const createComplaint = async (req, res) => {
             }
         );
 
+        // Notify Admins
+        const User = require('../models/User');
+        setImmediate(async () => {
+            try {
+                const admins = await User.find({ isAdmin: true, _id: { $ne: req.user._id } });
+                for (const admin of admins) {
+                    await createNotification(
+                        admin._id,
+                        {
+                            title: `ADMIN: New Complaint - ${category}`,
+                            body: `User ${req.user.name} logged a complaint: ${subject}`
+                        },
+                        'complaint',
+                        '/complaints/all',
+                        null,
+                        false,
+                        {
+                            workTitle: category,
+                            workInfo: `Ticket: ${complaint.ticketId} - ${subject}`,
+                            senderName: req.user.name,
+                            senderPhone: req.user.phone
+                        }
+                    );
+                }
+            } catch (e) {
+                console.error('Admin complaint notify fail:', e);
+            }
+        });
+
         res.status(201).json(complaint);
     } catch (error) {
         console.error(error);

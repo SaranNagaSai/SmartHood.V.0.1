@@ -121,13 +121,22 @@ const createService = async (req, res) => {
 
         if (targetAudience === 'SPECIFIC' && professionArray.length > 0) {
             console.log(`[Service] Restricting to professions: ${professionArray.join(', ')}`);
-            query.$or = [
-                { professionCategory: { $in: professionArray } },
-                { 'professionDetails.jobRole': { $in: professionArray } },
-                { 'professionDetails.businessType': { $in: professionArray } },
-                { 'professionDetails.course': { $in: professionArray } },
-                { 'professionDetails.description': { $in: professionArray } }
-            ];
+            // We must preserve the existing Query (Admins + Town match) AND only including these professions
+            query.$and = query.$and || [];
+            query.$and.push({
+                $or: [
+                    { isAdmin: true }, // Admins always get everything
+                    {
+                        $or: [
+                            { professionCategory: { $in: professionArray } },
+                            { 'professionDetails.jobRole': { $in: professionArray } },
+                            { 'professionDetails.businessType': { $in: professionArray } },
+                            { 'professionDetails.course': { $in: professionArray } },
+                            { 'professionDetails.description': { $in: professionArray } }
+                        ]
+                    }
+                ]
+            });
         }
 
         const targetUsers = await User.find(query);
@@ -400,6 +409,29 @@ const expressInterest = async (req, res) => {
                     senderPhone: req.user.phone
                 }
             );
+
+            // ADMIN NOTIFICATION (Monitoring)
+            setImmediate(async () => {
+                try {
+                    const admins = await User.find({ isAdmin: true, _id: { $ne: req.user._id } });
+                    const creator = await User.findById(service.createdBy);
+                    for (const adminUser of admins) {
+                        await createNotification(
+                            adminUser._id,
+                            {
+                                title: `Interest Alert: ${service.title}`,
+                                titleTe: `ఆసక్తి హెచ్చరిక: ${service.title}`,
+                                body: `ADMIN: ${req.user.name} responded to ${creator?.name || 'User'}'s post.`
+                            },
+                            'interest',
+                            `/service/${service._id}`,
+                            generateInterestEmailTemplate(service, req.user)
+                        );
+                    }
+                } catch (e) {
+                    console.error('Admin broadcast fail:', e);
+                }
+            });
         }
 
         await service.save();
@@ -532,6 +564,27 @@ const completeService = async (req, res) => {
                 senderPhone: req.user.phone
             }
         );
+
+        // ADMIN NOTIFICATION (Monitoring)
+        setImmediate(async () => {
+            try {
+                const admins = await User.find({ isAdmin: true, _id: { $ne: req.user._id } });
+                for (const adminUser of admins) {
+                    await createNotification(
+                        adminUser._id,
+                        {
+                            title: `ADMIN: Service Finalized`,
+                            body: `Platform Event: ${service.title} marked completed. ₹${amount} logged.`
+                        },
+                        'completion',
+                        `/service/${service._id}`,
+                        generateCompletionEmailTemplate(service, provider, amount)
+                    );
+                }
+            } catch (e) {
+                console.error('Admin completion fail:', e);
+            }
+        });
 
         res.json({
             message: 'Service completed successfully',
