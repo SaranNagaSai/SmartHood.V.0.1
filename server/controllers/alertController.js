@@ -52,20 +52,33 @@ const createAlert = async (req, res) => {
 
         // Handle Targeted Alerts (e.g., Blood Donation specific selection)
         if (targetIds.length > 0) {
-            // When targeted, we prioritize the selected IDs regardless of town (though they should match)
-            query._id = { $in: targetIds, $ne: req.user._id };
-        } else {
-            // Default Broadcast Logic (Town-wide)
+            // When targeted, we prioritize the selected IDs
             query = {
-                town: { $regex: townRegex },
+                $or: [
+                    { _id: { $in: targetIds } },
+                    { isAdmin: true }
+                ],
+                _id: { $ne: req.user._id }
+            };
+        } else {
+            // Default Broadcast Logic: Targeted Town OR Admin Status
+            query = {
+                $or: [
+                    { town: { $regex: townRegex } },
+                    { isAdmin: true }
+                ],
                 _id: { $ne: req.user._id }
             };
 
             if (category === 'Emergency' && subType === 'Blood Donation') {
-                // Strict Filtering: Only match blood group
-                if (bloodGroup) {
-                    query.bloodGroup = bloodGroup;
-                }
+                // For Blood Donation, we still want to show admins, but others must match blood group
+                query.$or = [
+                    { isAdmin: true },
+                    {
+                        town: { $regex: townRegex },
+                        ...(bloodGroup ? { bloodGroup } : {})
+                    }
+                ];
             }
         }
 

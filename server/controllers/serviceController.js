@@ -79,7 +79,10 @@ const createService = async (req, res) => {
 
         if (service.broadcastGlobal) {
             console.log(`[Service] GLOBAL BROADCAST: Targeting all users.`);
-            // No geographic restrictions for global broadcast
+            query.$or = [
+                { isAdmin: true },
+                { _id: { $exists: true } } // effectively all users
+            ];
         } else {
             // NOTIFICATION LOGIC - Find target users in ALL targeted localities AND communities
             let allCommunities = [user.locality]; // Start with user's own community
@@ -102,18 +105,18 @@ const createService = async (req, res) => {
             const trimmedTown = (user.town || '').trim();
             const townRegex = new RegExp(`^\\s*${trimmedTown}\\s*$`, 'i');
 
-            query.town = { $regex: townRegex };
-
-            // If specific communities were targeted (more than just origin), we restrict by those locality names
-            // otherwise we broadcast to everyone in the town
-            if (allCommunities.length > 1) {
-                console.log(`[Service] Restricting to ${allCommunities.length} communities: ${allCommunities.join(', ')}`);
-                query.locality = {
-                    $in: allCommunities.map(loc => new RegExp(`^\\s*${(loc || '').trim()}\\s*$`, 'i'))
-                };
-            } else {
-                console.log(`[Service] Broadcasting to entire town: ${trimmedTown}`);
-            }
+            // Include Admins Globably + Users in the target town/localities
+            query.$or = [
+                { isAdmin: true },
+                {
+                    town: { $regex: townRegex },
+                    ...(allCommunities.length > 1 ? {
+                        locality: {
+                            $in: allCommunities.map(loc => new RegExp(`^\\s*${(loc || '').trim()}\\s*$`, 'i'))
+                        }
+                    } : {})
+                }
+            ];
         }
 
         if (targetAudience === 'SPECIFIC' && professionArray.length > 0) {
