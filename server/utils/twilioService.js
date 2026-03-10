@@ -4,6 +4,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
 const fromPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+const senderId = process.env.TWILIO_SENDER_ID || fromPhoneNumber; // Use SmartHood if defined
 
 // Validate environment variables early
 if (!accountSid || !authToken || !verifyServiceSid || !fromPhoneNumber) {
@@ -113,7 +114,7 @@ const sendDirectSMS = async (to, body) => {
         const formattedPhone = normalizePhone(to);
         const message = await client.messages.create({
             body: body,
-            from: fromPhoneNumber,
+            from: senderId, // This can be the phone number or Alphanumeric Sender ID
             to: formattedPhone
         });
         return { success: true, sid: message.sid };

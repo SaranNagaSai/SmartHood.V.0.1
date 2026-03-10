@@ -29,14 +29,22 @@ const createComplaint = async (req, res) => {
             category
         });
 
-        // Notify user
         await createNotification(
             req.user._id,
             {
                 title: 'Complaint Submitted',
                 body: `Your complaint "${subject}" has been submitted. Ticket: ${complaint.ticketId}`
             },
-            'system'
+            'complaint',
+            '/complaints',
+            null,
+            false,
+            {
+                workTitle: category,
+                workInfo: subject,
+                senderName: req.user.name,
+                senderPhone: req.user.phone
+            }
         );
 
         res.status(201).json(complaint);
@@ -88,14 +96,22 @@ const updateComplaintStatus = async (req, res) => {
             return res.status(404).json({ message: 'Complaint not found' });
         }
 
-        // Notify user of status update
         await createNotification(
             complaint.userId,
             {
                 title: 'Complaint Status Updated',
                 body: `Your complaint "${complaint.subject}" is now ${status}`
             },
-            'system'
+            'complaint',
+            '/complaints',
+            null,
+            false,
+            {
+                workTitle: status.toUpperCase(),
+                workInfo: adminResponse || complaint.subject,
+                senderName: 'SmartHood Admin',
+                senderPhone: 'Support'
+            }
         );
 
         res.json(complaint);

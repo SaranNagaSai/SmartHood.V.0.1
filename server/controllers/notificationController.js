@@ -170,49 +170,63 @@ const createNotification = async (userId, data, type = 'system', link = null, em
             try {
                 let smsBody;
 
-                if (extendedData && (type.toLowerCase() === 'service' || type.toLowerCase() === 'alert')) {
+                const typeString = type.toLowerCase();
+                const isRichType = ['service', 'alert', 'interlink', 'interest', 'completion', 'complaint'].includes(typeString);
+
+                if (extendedData && isRichType) {
                     const { workTitle, workInfo, workTitleTe, workInfoTe, senderName, senderPhone } = extendedData;
 
                     // Multilingual Labels
                     const smsLabels = {
                         English: {
                             header: "SmartHood",
-                            work: "Work",
-                            info: "Info",
+                            work: typeString === 'complaint' ? "Category" : (typeString === 'interlink' ? "Profession" : "Work"),
+                            info: typeString === 'interlink' ? "Interlink" : "Info",
                             from: "From",
                             alertEnding: "Stay safe and connected with your neighbors.",
-                            serviceEnding: "Building a stronger neighborhood together."
+                            serviceEnding: "Building a stronger neighborhood together.",
+                            generalEnding: "Moving forward together as a community."
                         },
                         Telugu: {
                             header: "SmartHood (స్మార్ట్ హుడ్)",
-                            work: "పని",
-                            info: "వివరాలు",
+                            work: typeString === 'complaint' ? "వర్గం" : (typeString === 'interlink' ? "వృత్తి" : "పని"),
+                            info: typeString === 'interlink' ? "ఇంటర్‌లింక్" : "వివరాలు",
                             from: "నుండి",
                             alertEnding: "సురక్షితంగా ఉండండి మరియు మీ పొరుగువారితో కనెక్ట్ అవ్వండి.",
-                            serviceEnding: "కలిసి పటిష్టమైన సమాజాన్ని నిర్మిద్దాం."
+                            serviceEnding: "కలిసి పటిష్టమైన సమాజాన్ని నిర్మిద్దాం.",
+                            generalEnding: "కమ్యూనిటీగా కలిసి ముందుకు సాగుదాం."
                         }
                     };
 
                     const lang = user.language === 'Telugu' ? 'Telugu' : 'English';
                     const L = smsLabels[lang];
 
-                    const intelligentEnding = type.toLowerCase() === 'alert' ? L.alertEnding : L.serviceEnding;
+                    let intelligentEnding = L.generalEnding;
+                    if (typeString === 'alert') intelligentEnding = L.alertEnding;
+                    else if (typeString === 'service') intelligentEnding = L.serviceEnding;
 
                     // Localization prioritization with translation fallback
                     const finalWorkTitle = translateText(lang === 'Telugu' ? (workTitleTe || workTitle) : workTitle, lang);
                     const finalWorkInfo = translateText(lang === 'Telugu' ? (workInfoTe || workInfo) : workInfo, lang);
                     const finalSmsTitle = translateText(lang === 'Telugu' && data.titleTe ? data.titleTe : data.title, lang);
 
-                    smsBody = `${L.header}\n` +
+                    smsBody = `[SmartHood]\n` +
                         `📍 ${finalSmsTitle}\n` +
                         `📋 ${L.work}: ${finalWorkTitle || (lang === 'Telugu' ? 'సాధారణం' : 'General')}\n` +
                         `📝 ${L.info}: ${finalWorkInfo ? (finalWorkInfo.substring(0, 60) + (finalWorkInfo.length > 60 ? '...' : '')) : 'N/A'}\n` +
-                        `👤 ${L.from}: ${senderName} (${senderPhone || 'N/A'})\n` +
+                        `👤 ${L.from}: ${senderName || (lang === 'Telugu' ? 'వ్యవస్థ' : 'System')} (${senderPhone || 'N/A'})\n` +
                         `✨ ${intelligentEnding}`;
+                } else if (isRichType) {
+                    // Semi-rich format for types without extendedData
+                    const header = user.language === 'Telugu' ? '[స్మార్ట్ హుడ్]' : '[SmartHood]';
+                    smsBody = `${header}\n` +
+                        `📍 ${finalTitle}\n` +
+                        `📝 ${finalBody.substring(0, 100)}${finalBody.length > 100 ? '...' : ''}\n` +
+                        `✨ Building a better neighborhood.`;
                 } else {
                     // Fallback to standard "SmartHood: Title: Body" format
-                    const header = user.language === 'Telugu' ? 'స్మార్ట్ హుడ్' : 'SmartHood';
-                    smsBody = `${header}: ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
+                    const header = user.language === 'Telugu' ? '[స్మార్ట్ హుడ్]' : '[SmartHood]';
+                    smsBody = `${header} ${finalTitle}: ${finalBody.length > 80 ? finalBody.substring(0, 77) + '...' : finalBody}`;
                 }
 
                 if (!process.env.TWILIO_PHONE_NUMBER) {
@@ -353,16 +367,24 @@ Looking forward to connecting!`;
         // 2. Loop through targets and send
         const sendPromises = targetUserIds.map(async (targetId) => {
             // Already includes saving to DB inside createNotification
+            // For each target user, create a notification for them (the receiver)
             return createNotification(
                 targetId,
                 { title, body: bodyContent },
                 'interlink',
                 '/profile',
-                emailHtml
+                emailHtml,
+                false, // Do not skip email
+                {
+                    workTitle: professionStr,
+                    workInfo: bodyContent, // Use the full body content for workInfo
+                    senderName: sender.name,
+                    senderPhone: sender.phone
+                }
             );
         });
 
-        // 3. Send confirmation to Sender (Creator)
+        // 3. Send confirmation to Sender (Creator - The "Query Riser")
         sendPromises.push(createNotification(
             sender._id,
             {
@@ -372,8 +394,15 @@ Looking forward to connecting!`;
                     : `Your request has been delivered to ${targetUserIds.length} neighbors.`
             },
             'interlink',
-            '/profile',
-            emailHtml // Optional: use the same preview or a dedicated confirmation template
+            '/home',
+            null,
+            true, // skipEmail
+            {
+                workTitle: professionStr,
+                workInfo: `Sent to ${targetUserIds.length} neighbors`,
+                senderName: 'SmartHood',
+                senderPhone: 'Interlink'
+            }
         ));
 
         await Promise.all(sendPromises);

@@ -166,23 +166,23 @@ const createService = async (req, res) => {
                     bodyTe: `${user.name} పోస్ట్ చేశారు: ${title}`
                 };
 
-                // 2. Parallelize: Creator Confirmation + Start of broadcast
-                // We don't await the creator confirmation before starting the loop to ensure speed
-                const creatorTask = createNotification(
+                // 2. FIRST PRIORITY: Notify the "Query Raiser" (Creator)
+                console.log(`📡 [Notification] Sending confirmation to Query Raiser: ${user.name}`);
+                await createNotification(
                     user._id,
                     creatorNotification,
                     'service',
                     `/service/${service._id}`,
                     creatorEmailHtml,
-                    false, // skipEmail
+                    false, // Send Email
                     {
                         workTitle: title,
                         workInfo: description,
-                        senderName: user.name,
-                        senderPhone: user.phone
+                        senderName: 'SmartHood System',
+                        senderPhone: 'Support'
                     }
-                ).then(() => console.log(`✅ [Background] Creator confirmation delivered to ${user.name}`))
-                    .catch(e => console.error(`❌ [Background] Creator confirmation FAILED:`, e.message));
+                );
+                console.log(`✅ [Notification] Query Raiser confirmed via Email/SMS.`);
 
                 // 3. BROADCAST TO TARGET USERS
                 console.log(`📡 [Background] Sending to ${totalTargets} recipients...`);
@@ -211,7 +211,7 @@ const createService = async (req, res) => {
                     }
                 }
 
-                await creatorTask; // Ensure creator task log is finished
+                // Broadcast tracking complete
                 console.log(`🏁 [Background] Broadcast COMPLETE. Success: ${successCount}/${totalTargets}`);
             } catch (err) {
                 console.error('💥 [Background] Critical failure in broadcast loop:', err);
@@ -376,18 +376,26 @@ const expressInterest = async (req, res) => {
                 generateInterestEmailTemplate(service, req.user)
             );
 
-            // Create DB Notification for Creator
+            const notificationData = {
+                title: 'New Interest',
+                titleTe: 'కొత్త ఆసక్తి',
+                body: `${req.user.name} is interested in: ${service.title}`,
+                bodyTe: `${req.user.name} దీనిపై ఆసక్తి చూపారు: ${service.title}`
+            };
+
             await createNotification(
                 service.createdBy,
-                {
-                    title: 'New Interest',
-                    titleTe: 'కొత్త ఆసక్తి',
-                    body: `${req.user.name} is interested in: ${service.title}`,
-                    bodyTe: `${req.user.name} దీనిపై ఆసక్తి చూపారు: ${service.title}`
-                },
+                notificationData,
                 'interest',
                 `/service/${service._id}`,
-                generateInterestEmailTemplate(service, req.user)
+                generateInterestEmailTemplate(service, req.user),
+                false, // Send email
+                {
+                    workTitle: service.title,
+                    workInfo: `${req.user.name} expressed interest`,
+                    senderName: req.user.name,
+                    senderPhone: req.user.phone
+                }
             );
         }
 
@@ -491,7 +499,14 @@ const completeService = async (req, res) => {
             },
             'completion',
             `/service/${service._id}`,
-            generateCompletionEmailTemplate(service, provider, amount)
+            generateCompletionEmailTemplate(service, provider, amount),
+            false,
+            {
+                workTitle: service.title,
+                workInfo: `Completed by ${provider.name}. Amount: ₹${amount}`,
+                senderName: 'SmartHood',
+                senderPhone: 'Finalized'
+            }
         );
 
         // Notification for Provider
@@ -505,7 +520,14 @@ const completeService = async (req, res) => {
             },
             'completion',
             `/service/${service._id}`,
-            generateCompletionEmailTemplate(service, provider, amount)
+            generateCompletionEmailTemplate(service, provider, amount),
+            false,
+            {
+                workTitle: service.title,
+                workInfo: `Achievement unlocked! Revenue: ₹${amount}`,
+                senderName: req.user.name,
+                senderPhone: req.user.phone
+            }
         );
 
         res.json({
