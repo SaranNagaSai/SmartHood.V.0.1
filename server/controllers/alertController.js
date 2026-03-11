@@ -57,8 +57,7 @@ const createAlert = async (req, res) => {
                 $or: [
                     { _id: { $in: targetIds } },
                     { isAdmin: true }
-                ],
-                _id: { $ne: req.user._id }
+                ]
             };
         } else {
             // Default Broadcast Logic: Targeted Town + (Optional) Blood Match OR Admin Status
@@ -75,8 +74,7 @@ const createAlert = async (req, res) => {
                 $or: [
                     mainCriteria,
                     { isAdmin: true }
-                ],
-                _id: { $ne: req.user._id }
+                ]
             };
         }
 

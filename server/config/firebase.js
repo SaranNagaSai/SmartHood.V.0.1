@@ -3,17 +3,22 @@ const admin = require('firebase-admin');
 const cleanKey = (key) => {
     if (!key) return undefined;
 
-    // 1. Remove surrounding quotes (both single and double)
-    let cleaned = key.replace(/^["']|["']$/g, '');
-
-    // 2. Replace literal "\n" (two chars) with actual newline character
+    // Remove any surrounding quotes and replace both literal \n and real newlines
+    let cleaned = key.trim();
+    if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+        cleaned = cleaned.substring(1, cleaned.length - 1);
+    }
     cleaned = cleaned.replace(/\\n/g, '\n');
 
-    // 3. Ensure correct header/footer spacing if missing
+    // Safety check: ensure the key starts and ends correctly
     if (!cleaned.includes('-----BEGIN PRIVATE KEY-----')) {
-        // If the key is just the base64 part, wrap it (unlikely but possible)
         cleaned = `-----BEGIN PRIVATE KEY-----\n${cleaned}\n-----END PRIVATE KEY-----`;
     }
+
+    // Log key stats for debugging
+    console.log('[Firebase] Key Cleaned. Length:', cleaned.length);
+    console.log('[Firebase] Key Starts With:', cleaned.substring(0, 30));
+    console.log('[Firebase] Key Ends With:', cleaned.substring(cleaned.length - 30));
 
     return cleaned;
 };
@@ -21,27 +26,34 @@ const cleanKey = (key) => {
 // Log raw key presence (security safe)
 console.log('Parsing Firebase Key... Present:', !!process.env.FIREBASE_PRIVATE_KEY);
 
-const serviceAccount = {
-    "type": "service_account",
-    "project_id": process.env.FIREBASE_PROJECT_ID,
-    "private_key_id": "e0b83a5e7cc4b8f94d1ad4ee808078fcf5693de5ea43ba57cb80049c5dc83231",
-    "private_key": cleanKey(process.env.FIREBASE_PRIVATE_KEY),
-    "client_email": process.env.FIREBASE_CLIENT_EMAIL,
-    "client_id": "111816408253136270836",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_x509_cert_url": `https://www.googleapis.com/robot/v1/metadata/x509/${encodeURIComponent(process.env.FIREBASE_CLIENT_EMAIL || '')}`
+// Construct service account object from environment variables
+const sa = {
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    private_key: cleanKey(process.env.FIREBASE_PRIVATE_KEY)
 };
 
+console.log('[Firebase] Configuring for Project:', sa.project_id);
+console.log('[Firebase] Client Email Present:', !!sa.client_email);
+console.log('[Firebase] Private Key Present:', !!sa.private_key);
+
 try {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-    console.log('Firebase Admin initialized successfully');
+    if (!sa.project_id || !sa.private_key || !sa.client_email) {
+        throw new Error('Missing essential Firebase configuration (Project ID, Private Key, or Client Email)');
+    }
+
+    // Only initialize if not already initialized
+    if (admin.apps.length === 0) {
+        admin.initializeApp({
+            credential: admin.credential.cert(sa)
+        });
+        console.log('✅ Firebase Admin initialized successfully');
+    }
 } catch (error) {
-    console.error('Firebase Admin initialization failed:', error);
-    console.log('ℹ️  Continuing without Firebase');
+    console.error('❌ Firebase Admin initialization failed:', error.message);
+    if (error.stack && error.stack.includes('parse')) {
+        console.log('ℹ️  Tip: This usually means the PRIVATE_KEY format in .env is incorrect.');
+    }
 }
 
 module.exports = admin;

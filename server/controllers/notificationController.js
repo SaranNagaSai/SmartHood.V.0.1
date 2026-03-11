@@ -122,7 +122,7 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                     token: user.fcmToken,
                     notification: {
                         title: finalTitle,
-                        body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody
+                        body: finalBody.substring(0, 200)
                     },
                     webpush: {
                         headers: {
@@ -130,13 +130,15 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         },
                         notification: {
                             title: finalTitle,
-                            body: finalBody.length > 150 ? finalBody.substring(0, 147) + '...' : finalBody,
+                            body: finalBody.substring(0, 200),
                             icon: '/logo.png',
                             badge: '/logo.png',
-                            vibrate: [200, 100, 200],
+                            vibrate: [200, 100, 200, 100, 200],
                             requireInteraction: true,
+                            renotify: true,
+                            tag: 'smarthood-' + type + '-' + Date.now(),
                             actions: [
-                                { action: 'open', title: 'View Alert' }
+                                { action: 'open', title: 'Open SmartHood' }
                             ]
                         },
                         fcmOptions: {
@@ -148,7 +150,8 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         notification: {
                             sound: 'default',
                             priority: 'high',
-                            channelId: 'high_priority_alerts'
+                            channelId: 'high_priority_alerts',
+                            notificationCount: 1
                         }
                     },
                     data: {

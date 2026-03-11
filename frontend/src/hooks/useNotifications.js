@@ -104,38 +104,32 @@ const useNotifications = (isAuthenticated) => {
         try {
             unsubscribe = onMessage(messaging, (payload) => {
                 console.log('[FCM] Foreground message received:', payload);
-                console.log('[FCM] Notification Permission Status:', Notification.permission);
 
+                // FORCE SYSTEM POPUP EVEN IN FOREGROUND
                 if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-                    console.log('[FCM] Attempting to show notification via Service Worker...');
                     navigator.serviceWorker.ready.then(registration => {
-                        const title = payload.notification?.title || payload.data?.title || 'SmartHood';
-                        const body = payload.notification?.body || payload.data?.body || '';
+                        const title = payload.notification?.title || payload.data?.title || 'SmartHood Alert';
+                        const body = payload.notification?.body || payload.data?.body || 'New update in your neighborhood';
+                        const url = payload.data?.url || '/home';
 
                         registration.showNotification(title, {
-                            body,
+                            body: body,
                             icon: '/logo.png',
                             badge: '/logo.png',
-                            vibrate: [200, 100, 200],
-                            tag: 'smarthood-alert',
+                            vibrate: [200, 100, 200, 100, 200],
+                            tag: 'smarthood-alert-' + Date.now(),
                             renotify: true,
-                            data: {
-                                url: payload.data?.url || '/home',
-                                ...payload.data
-                            }
-                        }).then(() => {
-                            console.log('[FCM] registration.showNotification SUCCESS');
-                        }).catch(e => {
-                            console.error('[FCM] registration.showNotification FAILED:', e);
+                            requireInteraction: true,
+                            data: { url }
                         });
                     });
                 } else if ('Notification' in window && Notification.permission === 'granted') {
-                    console.log('[FCM] Falling back to standard Notification...');
                     const title = payload.notification?.title || payload.data?.title || 'SmartHood';
-                    const body = payload.notification?.body || payload.data?.body || '';
-                    new Notification(title, { body, icon: '/logo.png' });
-                } else {
-                    console.warn('[FCM] Cannot show notification: Permissions denied or SW not supported');
+                    new Notification(title, {
+                        body: payload.notification?.body || payload.data?.body || '',
+                        icon: '/logo.png',
+                        requireInteraction: true
+                    });
                 }
             });
         } catch (err) {
