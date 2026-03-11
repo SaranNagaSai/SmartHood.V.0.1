@@ -472,6 +472,44 @@ const getTownLocalities = async (req, res) => {
     }
 };
 
+// @desc    Test FCM Push for current user
+// @route   POST /api/users/test-push
+// @access  Private
+const testPush = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user || !user.fcmToken) {
+            return res.status(400).json({ message: 'No FCM token found for this account. Please enable notifications first.' });
+        }
+
+        const admin = require('../config/firebase');
+        const message = {
+            token: user.fcmToken,
+            notification: {
+                title: '🔔 SmartHood Test',
+                body: 'If you see this, your system-level notifications are working perfectly!'
+            },
+            webpush: {
+                headers: { Urgency: "high" },
+                notification: {
+                    title: '🔔 SmartHood Test',
+                    body: 'Your browser is connected to the alert system.',
+                    requireInteraction: true,
+                    renotify: true,
+                    tag: 'test-' + Date.now()
+                }
+            },
+            data: { url: '/home', type: 'test' }
+        };
+
+        const response = await admin.messaging().send(message);
+        res.json({ message: 'Test notification sent!', response });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Push Error: ' + error.message });
+    }
+};
+
 module.exports = {
     getLocalityStats,
     getUsersByProfession,
@@ -483,5 +521,6 @@ module.exports = {
     uploadPhoto,
     searchUsers,
     getUsersByState,
-    getTownLocalities
+    getTownLocalities,
+    testPush
 };

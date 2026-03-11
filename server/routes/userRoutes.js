@@ -23,6 +23,7 @@ router.put('/profile', protect, updateProfile);
 router.post('/photo', protect, upload.single('profilePhoto'), uploadPhoto);
 router.get('/activity', protect, getActivity);
 router.put('/fcm-token', protect, updateFcmToken);
+router.post('/test-push', protect, testPush);
 router.get('/locality/:locality', protect, getUsersByLocality);
 router.get('/search', protect, searchUsers);
 router.get('/state/:stateName', protect, getUsersByState);

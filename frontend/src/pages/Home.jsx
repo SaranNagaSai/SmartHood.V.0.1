@@ -3,10 +3,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { Map, Zap, MapPin, Shield, X, Briefcase, Award, Navigation } from 'lucide-react';
 import { API_URL, SERVER_URL, getProfilePhotoUrl } from '../utils/apiConfig';
+import useNotifications from '../hooks/useNotifications';
 
 const Home = () => {
     const { language, t, translateValue } = useLanguage();
     const navigate = useNavigate();
+    const { syncFcmToken } = useNotifications(true); // Always check notifications on Home load
     const [user, setUser] = useState(null);
     const [stats, setStats] = useState({ professions: [], states: [] });
     const [loading, setLoading] = useState(true);
@@ -176,6 +178,42 @@ const Home = () => {
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
             </div>
 
+            {/* Notification Status & Test (Admin/User Diagnostic) */}
+            <div className="mt-4 px-4">
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                            <Zap size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('connectivity') || 'NEIGHBORHOOD ALERT SYSTEM'}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className={`w-2 h-2 rounded-full ${'Notification' in window && Notification.permission === 'granted' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                <span className="text-xs font-bold text-gray-700">
+                                    {'Notification' in window && Notification.permission === 'granted' ? (t('active') || 'System Ready') : (t('inactive') || 'System Blocked')}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        onClick={async () => {
+                            await syncFcmToken(); // Refresh token first
+                            const token = localStorage.getItem('token');
+                            const res = await fetch(`${API_URL}/users/test-push`, {
+                                method: 'POST',
+                                headers: { Authorization: `Bearer ${token}` }
+                            });
+                            const data = await res.json();
+                            if (res.ok) alert('Test signal sent! Wait 2 seconds for popup.');
+                            else alert(data.message);
+                        }}
+                        className="bg-blue-600 text-white text-[10px] font-bold px-3 py-2 rounded-lg shadow-md active:scale-95 transition-transform"
+                    >
+                        {t('test_signal') || 'TEST POPUP'}
+                    </button>
+                </div>
+            </div>
+
             {/* State Cards (Marquee) */}
             <div className="mt-8 px-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
@@ -274,8 +312,8 @@ const Home = () => {
                             <button
                                 onClick={() => setSelectedLocality(null)}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all whitespace-nowrap ${selectedLocality === null
-                                        ? 'bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white border-transparent shadow-md scale-105'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-[var(--col-primary)] hover:text-[var(--col-primary)]'
+                                    ? 'bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white border-transparent shadow-md scale-105'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-[var(--col-primary)] hover:text-[var(--col-primary)]'
                                     }`}
                             >
                                 <MapPin size={12} />
@@ -295,8 +333,8 @@ const Home = () => {
                                         key={idx}
                                         onClick={() => setSelectedLocality(loc._id)}
                                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all whitespace-nowrap ${selectedLocality === loc._id
-                                                ? 'bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white border-transparent shadow-md scale-105'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-[var(--col-primary)] hover:text-[var(--col-primary)]'
+                                            ? 'bg-gradient-to-r from-[var(--col-primary)] to-[var(--col-secondary)] text-white border-transparent shadow-md scale-105'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-[var(--col-primary)] hover:text-[var(--col-primary)]'
                                             }`}
                                     >
                                         <MapPin size={12} />

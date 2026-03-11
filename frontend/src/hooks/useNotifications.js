@@ -141,7 +141,10 @@ const useNotifications = (isAuthenticated) => {
         };
     }, []);
 
-    return { syncFcmToken };
+    return {
+        syncFcmToken: () => syncFcmToken(true),
+        isPermissionGranted: 'Notification' in window && Notification.permission === 'granted'
+    };
 };
 
 export default useNotifications;
