@@ -12,7 +12,8 @@ const {
     uploadPhoto,
     searchUsers,
     getUsersByState,
-    getTownLocalities
+    getTownLocalities,
+    testPush
 } = require('../controllers/userController');
 const upload = require('../middleware/uploadMiddleware');
 
