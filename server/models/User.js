@@ -37,7 +37,9 @@ const userSchema = new mongoose.Schema({
 
     isAdmin: { type: Boolean, default: false },
     language: { type: String, default: 'English' }, // Persisted language preference
-    fcmToken: { type: String }, // For Browser Notifications
+    fcmTokens: [String], // Array of tokens for multiple devices
+    fcmToken: { type: String }, // Legacy field for backwards compatibility
+
     profilePhoto: {
         type: String,
         default: ''

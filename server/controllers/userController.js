@@ -329,8 +329,11 @@ const updateFcmToken = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         if (user) {
-            user.fcmToken = fcmToken;
-            await user.save();
+            // Support multiple devices simultaneously
+            await User.findByIdAndUpdate(req.user._id, {
+                $addToSet: { fcmTokens: fcmToken },
+                fcmToken: fcmToken // Keep legacy field updated too
+            });
             res.json({ message: 'FCM Token updated' });
         } else {
             res.status(404).json({ message: 'User not found' });

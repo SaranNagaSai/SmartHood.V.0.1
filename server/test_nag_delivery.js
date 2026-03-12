@@ -1,7 +1,8 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const { createNotification } = require('./controllers/notificationController');
-require('dotenv').config();
+
 
 async function testNotificationToNag() {
     await mongoose.connect(process.env.MONGODB_URI);

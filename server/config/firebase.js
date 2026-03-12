@@ -17,11 +17,17 @@ const cleanKey = (key) => {
 
     // Log key stats for debugging
     console.log('[Firebase] Key Cleaned. Length:', cleaned.length);
-    console.log('[Firebase] Key Starts With:', cleaned.substring(0, 30));
-    console.log('[Firebase] Key Ends With:', cleaned.substring(cleaned.length - 30));
+    let debugStr = '';
+    for(let i=0; i<Math.min(cleaned.length, 50); i++) {
+        debugStr += `${cleaned.charCodeAt(i)},`;
+    }
+    console.log('[Firebase] First 50 Char Codes:', debugStr);
+    console.log('[Firebase] Key Starts With:', JSON.stringify(cleaned.substring(0, 30)));
+    console.log('[Firebase] Key Ends With:', JSON.stringify(cleaned.substring(cleaned.length - 30)));
 
     return cleaned;
 };
+
 
 // Log raw key presence (security safe)
 console.log('Parsing Firebase Key... Present:', !!process.env.FIREBASE_PRIVATE_KEY);

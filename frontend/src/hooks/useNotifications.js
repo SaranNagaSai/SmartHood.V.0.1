@@ -37,7 +37,7 @@ const useNotifications = (isAuthenticated) => {
 
             if (token && user && authToken) {
                 // 3. Send to backend
-                console.log('[FCM] Token obtained, sending to backend...');
+                console.log(`[FCM] Token obtained. Syncing to: ${API_URL}/users/fcm-token`);
                 const response = await fetch(`${API_URL}/users/fcm-token`, {
                     method: 'PUT',
                     headers: {

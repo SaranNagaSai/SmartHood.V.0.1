@@ -113,59 +113,76 @@ const createNotification = async (userId, data, type = 'system', link = null, em
             console.log(`ℹ️ [Notification] Skipping email for ${user.name} (No email or skipEmail=true)`);
         }
 
-        // 2. Send FCM Push (Dual Channel - WhatsApp style)
-        if (user.fcmToken) {
-            console.log(`📱 [Notification] Attempting push to ${user.name}...`);
-            try {
-                // Dual channel delivery - ensuring high priority for immediate visibility
-                await admin.messaging().send({
-                    token: user.fcmToken,
-                    notification: {
-                        title: finalTitle,
-                        body: finalBody.substring(0, 200)
-                    },
-                    webpush: {
-                        headers: {
-                            Urgency: "high"
-                        },
+        // 2. Send FCM Push (Dual Channel - to all registered devices)
+        const tokens = user.fcmTokens && user.fcmTokens.length > 0 ? user.fcmTokens : (user.fcmToken ? [user.fcmToken] : []);
+        
+        if (tokens.length > 0) {
+            console.log(`📱 [Notification] Attempting push to ${user.name} (${tokens.length} devices)...`);
+            
+            // Send to each token
+            const pushPromises = tokens.map(async (token) => {
+                try {
+                    await admin.messaging().send({
+                        token: token,
                         notification: {
                             title: finalTitle,
-                            body: finalBody.substring(0, 200),
-                            icon: '/logo.png',
-                            badge: '/logo.png',
-                            vibrate: [200, 100, 200, 100, 200],
-                            requireInteraction: true,
-                            renotify: true,
-                            tag: 'smarthood-' + type + '-' + Date.now(),
-                            actions: [
-                                { action: 'open', title: 'Open SmartHood' }
-                            ]
+                            body: finalBody.substring(0, 200)
                         },
-                        fcmOptions: {
-                            link: link ? `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}${link}` : `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}/home`
-                        }
-                    },
-                    android: {
-                        priority: 'high',
-                        notification: {
-                            sound: 'default',
+                        webpush: {
+                            headers: {
+                                Urgency: "high"
+                            },
+                            notification: {
+                                title: finalTitle,
+                                body: finalBody.substring(0, 200),
+                                icon: '/logo.png',
+                                badge: '/logo.png',
+                                vibrate: [200, 100, 200, 100, 200],
+                                requireInteraction: true,
+                                renotify: true,
+                                tag: 'smarthood-' + type + '-' + Date.now(),
+                                actions: [
+                                    { action: 'open', title: 'Open SmartHood' }
+                                ]
+                            },
+                            fcmOptions: {
+                                link: link ? `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}${link}` : `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}/home`
+                            }
+                        },
+                        android: {
                             priority: 'high',
-                            channelId: 'high_priority_alerts',
-                            notificationCount: 1
+                            notification: {
+                                sound: 'default',
+                                priority: 'high',
+                                channelId: 'high_priority_alerts',
+                                notificationCount: 1
+                            }
+                        },
+                        data: {
+                            url: link || '/home',
+                            type: type
                         }
-                    },
-                    data: {
-                        url: link || '/home',
-                        type: type
+                    });
+                    return true;
+                } catch (fcmError) {
+                    console.error(`[Notification] FCM error for token on ${user.name}:`, fcmError.message);
+                    // Automatic Cleanup: If token is expired or invalid, remove it
+                    if (fcmError.code === 'messaging/registration-token-not-registered' || 
+                        fcmError.code === 'messaging/invalid-registration-token') {
+                        await User.findByIdAndUpdate(userId, { $pull: { fcmTokens: token } });
                     }
-                });
+                    return false;
+                }
+            });
+
+            const results = await Promise.all(pushPromises);
+            if (results.some(r => r === true)) {
                 delivered = true;
                 methods.push('fcm');
-                console.log(`[Notification] FCM sent to ${user.name}`);
-            } catch (fcmError) {
-                console.error(`[Notification] FCM error for ${user.name}:`, fcmError.message);
+                console.log(`[Notification] FCM successful for at least one device of ${user.name}`);
             }
         }
+
 
         // 3. Send SMS via Twilio (Parallel Mobile Channel)
         if (user.phone) {

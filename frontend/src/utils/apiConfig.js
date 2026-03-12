@@ -1,5 +1,20 @@
-const defaultApiUrl = 'http://localhost:5000/api';
-export const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
+const getBaseApiUrl = () => {
+    // 1. Check for explicit environment variable first
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+
+    // 2. If we are on Render, use the Render production URL
+    if (window.location.hostname === 'smarthood.onrender.com') {
+        return 'https://smarthood.onrender.com/api';
+    }
+
+    // 3. If accessing via local network (IP address) or localhost, 
+    // dynamically point to the server on port 5000 of the same host
+    const host = window.location.hostname;
+    const protocol = window.location.protocol;
+    return `${protocol}//${host}:5000/api`;
+};
+
+export const API_URL = getBaseApiUrl();
 export const SERVER_URL = API_URL.replace('/api', '');
 
 /**
