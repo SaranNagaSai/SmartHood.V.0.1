@@ -56,7 +56,4 @@ export const getProfilePhotoUrl = (photoPath) => {
 if (import.meta.env.PROD) {
     console.log('[SmartHood] Production Mode Active');
     console.log('[SmartHood] API_URL:', API_URL);
-    if (API_URL === defaultApiUrl) {
-        console.warn('[SmartHood] WARNING: VITE_API_URL is missing! Requests will fail on Render.');
-    }
 }
