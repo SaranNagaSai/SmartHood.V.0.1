@@ -5,6 +5,7 @@ import { messaging } from '../config/firebase';
 import { API_URL } from '../utils/apiConfig';
 
 const useNotifications = (isAuthenticated) => {
+    const [permissionStatus, setPermissionStatus] = useState('Notification' in window ? Notification.permission : 'unsupported');
     const tokenSyncedRef = useRef(false);
     const retryCountRef = useRef(0);
     const MAX_RETRIES = 3;
@@ -14,12 +15,13 @@ const useNotifications = (isAuthenticated) => {
 
         console.log(`[FCM] Starting token sync... (Manual: ${manual})`);
         try {
-            // 1. First, explicitly request notification permission on mobile
+            // 1. First, explicitly request notification permission
             if ('Notification' in window) {
                 if (Notification.permission === 'default') {
                     console.log('[FCM] Requesting notification permission...');
                     const permission = await Notification.requestPermission();
                     console.log(`[FCM] Permission result: ${permission}`);
+                    setPermissionStatus(permission);
                     if (permission !== 'granted') {
                         console.warn('[FCM] Notification permission denied');
                         return;
@@ -28,6 +30,10 @@ const useNotifications = (isAuthenticated) => {
                     alert('Notifications are blocked by your browser settings. Please enable them in your browser settings to receive updates.');
                     return;
                 }
+                setPermissionStatus(Notification.permission);
+            } else {
+                setPermissionStatus('unsupported');
+                return;
             }
 
             // 2. Get FCM token
@@ -83,11 +89,17 @@ const useNotifications = (isAuthenticated) => {
         }
 
         // Initial sync (delayed slightly to let auth settle)
-        const initTimer = setTimeout(() => syncFcmToken(false), 3000);
+        // Note: On mobile, this will fail to prompt for permission if it's 'default'
+        // That's why we added the manual button in the UI.
+        const initTimer = setTimeout(() => {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                syncFcmToken(false);
+            }
+        }, 3000);
 
         // Periodic token refresh (every 30 minutes)
         const refreshInterval = setInterval(() => {
-            if (localStorage.getItem('token')) {
+            if (localStorage.getItem('token') && 'Notification' in window && Notification.permission === 'granted') {
                 syncFcmToken(false);
             }
         }, 30 * 60 * 1000);
@@ -143,7 +155,8 @@ const useNotifications = (isAuthenticated) => {
 
     return {
         syncFcmToken: () => syncFcmToken(true),
-        isPermissionGranted: 'Notification' in window && Notification.permission === 'granted'
+        permissionStatus,
+        isPermissionGranted: permissionStatus === 'granted'
     };
 };
 

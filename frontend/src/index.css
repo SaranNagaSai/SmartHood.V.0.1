@@ -187,19 +187,20 @@ h6 {
   animation-play-state: paused;
 }
 
-/* SINGLE CARD TRAVERSE ANIMATION */
-@keyframes marquee-traverse {
-  0% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
+@keyframes bounceSubtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
-.animate-marquee-single {
-  display: flex;
-  width: 100%;
-  animation: marquee-traverse 8s linear infinite;
+.animate-bounce-subtle {
+  animation: bounceSubtle 2s ease-in-out infinite;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

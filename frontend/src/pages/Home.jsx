@@ -8,7 +8,7 @@ import useNotifications from '../hooks/useNotifications';
 const Home = () => {
     const { language, t, translateValue } = useLanguage();
     const navigate = useNavigate();
-    const { syncFcmToken } = useNotifications(true); // Always check notifications on Home load
+    const { syncFcmToken, permissionStatus } = useNotifications(true); // Always check notifications on Home load
     const [user, setUser] = useState(null);
     const [stats, setStats] = useState({ professions: [], states: [] });
     const [loading, setLoading] = useState(true);
@@ -178,19 +178,48 @@ const Home = () => {
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
             </div>
 
+            {/* Notification Consent Banner (Crucial for Mobile) */}
+            {permissionStatus === 'default' && (
+                <div className="mt-4 px-4 animate-bounce-subtle">
+                    <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-5 shadow-xl border border-white/20 relative overflow-hidden">
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="flex items-start gap-4 text-white text-center md:text-left">
+                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mx-auto md:mx-0">
+                                    🔔
+                                </div>
+                                <div>
+                                    <h3 className="font-extrabold text-lg drop-shadow-sm">{t('enable_notifications_title') || 'Stay Connected!'}</h3>
+                                    <p className="text-white/90 text-sm font-medium leading-tight">
+                                        {t('enable_notifications_body') || 'Never miss a request confirmation or completion status. Turn on alerts for your mobile.'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={syncFcmToken}
+                                className="w-full md:w-auto bg-white text-orange-600 px-6 py-3 rounded-xl font-black text-sm shadow-2xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap border-b-4 border-orange-200"
+                            >
+                                {t('enable_alerts_btn') || '✓ ENABLE ALERTS'}
+                            </button>
+                        </div>
+                        {/* Decorative background glow */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                    </div>
+                </div>
+            )}
+
             {/* Notification Status & Test (Admin/User Diagnostic) */}
             <div className="mt-4 px-4">
                 <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                            <Zap size={20} />
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${permissionStatus === 'granted' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                            {permissionStatus === 'granted' ? <Shield size={20} /> : <Zap size={20} />}
                         </div>
                         <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('connectivity') || 'NEIGHBORHOOD ALERT SYSTEM'}</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('connectivity') || 'SYSTEM STATUS'}</p>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className={`w-2 h-2 rounded-full ${'Notification' in window && Notification.permission === 'granted' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                <span className={`w-2 h-2 rounded-full ${permissionStatus === 'granted' ? 'bg-green-500' : (permissionStatus === 'default' ? 'bg-amber-500' : 'bg-red-500')}`}></span>
                                 <span className="text-xs font-bold text-gray-700">
-                                    {'Notification' in window && Notification.permission === 'granted' ? (t('active') || 'System Ready') : (t('inactive') || 'System Blocked')}
+                                    {permissionStatus === 'granted' ? (t('system_ready') || 'Active & Ready') : (permissionStatus === 'default' ? (t('needs_setup') || 'Setup Required') : (t('system_blocked') || 'Blocked'))}
                                 </span>
                             </div>
                         </div>
@@ -204,12 +233,12 @@ const Home = () => {
                                 headers: { Authorization: `Bearer ${token}` }
                             });
                             const data = await res.json();
-                            if (res.ok) alert('Test signal sent! Wait 2 seconds for popup.');
+                            if (res.ok) alert('Test signal sent! Wait 2 second for popup.');
                             else alert(data.message);
                         }}
-                        className="bg-blue-600 text-white text-[10px] font-bold px-3 py-2 rounded-lg shadow-md active:scale-95 transition-transform"
+                        className={`text-[10px] font-bold px-3 py-2 rounded-lg shadow-md active:scale-95 transition-transform ${permissionStatus === 'granted' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}
                     >
-                        {t('test_signal') || 'TEST POPUP'}
+                        {t('test_signal') || 'TEST PUSH'}
                     </button>
                 </div>
             </div>

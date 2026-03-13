@@ -243,6 +243,16 @@ export const LanguageProvider = ({ children }) => {
             'alert_participation': 'Alert Participation',
             'alerts_responded': 'Alerts you\'ve responded to',
 
+            // NOTIFICATION PERMISSIONS
+            'enable_notifications_title': 'Stay Connected!',
+            'enable_notifications_body': 'Never miss a request confirmation or completion status. Turn on alerts for your mobile.',
+            'enable_alerts_btn': '✓ ENABLE ALERTS',
+            'system_ready': 'Active & Ready',
+            'needs_setup': 'Setup Required',
+            'system_blocked': 'Blocked',
+            'connectivity': 'SYSTEM STATUS',
+            'test_signal': 'TEST PUSH',
+
             'notifications': 'Notifications',
             'unread_notifications': 'unread notifications',
             'mark_all_read': 'Mark all read',
@@ -795,6 +805,17 @@ export const LanguageProvider = ({ children }) => {
             'my_active_posts': 'నా క్రియాశీల పోస్ట్లు',
             'no_active_services': 'క్రియాశీల సర్వీసులు ఏవీ లేవు',
             'post_to_start': 'ప్రారంభించడానికి ఇప్పుడే పోస్ట్ చేయండి',
+
+            // NOTIFICATION PERMISSIONS
+            'enable_notifications_title': 'అప్రమత్తంగా ఉండండి!',
+            'enable_notifications_body': 'అభ్యర్థన నిర్ధారణలు లేదా పని పూర్తి స్థితిని ఎప్పుడూ కోల్పోకండి. మీ మొబైల్ కోసం అలర్ట్‌లను ఆన్ చేయండి.',
+            'enable_alerts_btn': '✓ అలర్ట్‌లను ఆన్ చేయండి',
+            'system_ready': 'సిస్టమ్ సిద్ధంగా ఉంది',
+            'needs_setup': 'సెటప్ అవసరం',
+            'system_blocked': 'నిలిపివేయబడింది',
+            'connectivity': 'సిస్టమ్ స్థితి',
+            'test_signal': 'టెస్ట్ పుష్',
+
             'my_alerts': 'నా హెచ్చరికలు',
             'recipients': 'స్వీకర్తలు',
             'loading': 'లోడ్ అవుతోంది',
