@@ -50,14 +50,21 @@ const sendEmail = async (to, subject, text, html = null) => {
         const subjectPrefix = isTelugu ? '[స్మార్ట్ హుడ్]' : '[SmartHood]';
 
         const mailOptions = {
-            from: `"SmartHood Notifications" <${process.env.EMAIL_FROM || 'smarthoodc03@gmail.com'}>`,
+            from: `"SmartHood Support" <${process.env.EMAIL_FROM || 'smarthoodc03@gmail.com'}>`,
             replyTo: process.env.EMAIL_FROM || 'smarthoodc03@gmail.com',
             to,
             subject: `${subjectPrefix} ${subject}`,
             text,
+            headers: {
+                'X-Priority': '1 (Highest)',
+                'X-MSMail-Priority': 'High',
+                'Importance': 'High',
+                'X-Entity-Ref-ID': Date.now().toString(), // Makes each email unique in thread
+                'X-Auto-Response-Suppress': 'All'
+            },
             html: html || `
                 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
-                    <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 30px; text-align: center; color: white;">
+                    <div style="background: #1e3a8a; padding: 30px; text-align: center; color: white;">
                         <h1 style="margin: 0; font-size: 28px;">Smart Hood</h1>
                         <p style="margin: 5px 0 0; opacity: 0.8; font-weight: bold;">${isTelugu ? 'మన పరిసర వేదిక' : 'Your Neighborhood Platform'}</p>
                     </div>
@@ -131,8 +138,8 @@ const generateServiceEmailTemplate = (service, creator, type, isConfirmation = f
 
     if (isConfirmation) {
         title = isTelugu
-            ? (isOffer ? 'మీ ఆఫర్ ప్రత్యక్ష ప్రసారంలో ఉంది!' : 'మీ అభ్యర్థన ప్రత్యక్ష ప్రసారంలో ఉంది!')
-            : (isOffer ? 'Your Offer is Live!' : 'Your Request is Live!');
+            ? (isOffer ? 'మీ ఆఫర్ అప్‌డేట్' : 'మీ అభ్యర్థన అప్‌డేట్')
+            : (isOffer ? 'Your Offer Update' : 'Your Request Update');
     }
 
     // Get profession display
