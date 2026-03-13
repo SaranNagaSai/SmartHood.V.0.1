@@ -486,8 +486,14 @@ const testPush = async (req, res) => {
         }
 
         const admin = require('../config/firebase');
-        const message = {
-            token: user.fcmToken,
+        const tokens = user.fcmTokens && user.fcmTokens.length > 0 ? user.fcmTokens : (user.fcmToken ? [user.fcmToken] : []);
+        
+        if (tokens.length === 0) {
+            return res.status(400).json({ message: 'No notification device found for this account. Please enable notifications on your mobile.' });
+        }
+
+        const messages = tokens.map(token => ({
+            token: token,
             notification: {
                 title: '🔔 SmartHood Test',
                 body: 'If you see this, your system-level notifications are working perfectly!'
@@ -497,16 +503,22 @@ const testPush = async (req, res) => {
                 notification: {
                     title: '🔔 SmartHood Test',
                     body: 'Your browser is connected to the alert system.',
+                    icon: '/logo.png',
+                    badge: '/logo.png',
+                    vibrate: [200, 100, 200, 100, 200],
                     requireInteraction: true,
                     renotify: true,
-                    tag: 'test-' + Date.now()
+                    tag: 'test-' + Date.now(),
+                    actions: [
+                        { action: 'open', title: 'Open SmartHood' }
+                    ]
                 }
             },
             data: { url: '/home', type: 'test' }
-        };
+        }));
 
-        const response = await admin.messaging().send(message);
-        res.json({ message: 'Test notification sent!', response });
+        const responses = await admin.messaging().sendEach(messages);
+        res.json({ message: `Test signals sent to ${tokens.length} devices!`, responses });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Push Error: ' + error.message });
