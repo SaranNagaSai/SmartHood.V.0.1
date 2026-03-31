@@ -323,66 +323,65 @@ const sendInterlinkRequest = async (req, res) => {
         const isTelugu = sender.language === 'Telugu';
 
         const title = isTelugu
-            ? `SmartHood: ${sender.name} నుండి కొత్త ఇంటర్‌లింక్ కోరిక 🏠`
-            : `SmartHood: New Interlink from ${sender.name} 🏠`;
+            ? `SmartHood: ${sender.name} (${sender.locality}, ${sender.town}) మీతో ఇంటర్‌లింక్ అవ్వాలనుకుంటున్నారు 🏠`
+            : `SmartHood: ${sender.name} (from ${sender.locality}, ${sender.town}) is willing to interact with you 🏠`;
 
         const bodyContent = isTelugu
-            ? `నమస్కారం! నేను మీ పొరుగునే ఉండే ${sender.name} (${sender.locality}). నేను ${professionStr} గా పని చేస్తున్నాను మరియు మీతో వృత్తిపరంగా కనెక్ట్ అవ్వాలనుకుంటున్నాను!
-
-నా వివరాలు:
-📞 ${sender.phone}
-📍 ${sender.address || sender.locality}
-
-త్వరలో మాట్లాడదాం!`
-            : `Hi! I'm your neighbor ${sender.name} from ${sender.locality}. I'm a ${professionStr} and I'd like to interlink with you professionally!
-
-My Contacts:
-📞 ${sender.phone}
-📍 ${sender.address || sender.locality}
-
-Looking forward to connecting!`;
+            ? `నమస్కారం! నేను మీ పొరుగునే ఉండే ${sender.name} (${sender.locality}, ${sender.town}). నేను ${professionStr} గా పని చేస్తున్నాను మరియు "ఈ విధంగా" మీతో వృత్తిపరంగా కనెక్ట్ అవ్వాలనుకుంటున్నాను! 🤝`
+            : `Hi! I'm your neighbor ${sender.name} from ${sender.locality}, ${sender.town}. I work as a ${professionStr} and I'd like to interact with you "Like this" and establish a professional interlink in our community! 🤝`;
 
         const emailHtml = `
-            <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #f0f0f0; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <div style="background: linear-gradient(135deg, #0e7490 0%, #4338ca 100%); width: 70px; height: 70px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
-                        <span style="font-size: 35px;">🏠</span>
+            <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; color: white;">
+                    <div style="background: rgba(255,255,255,0.1); width: 80px; height: 80px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+                        <span style="font-size: 40px;">🤝</span>
                     </div>
-                    <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin: 20px 0 10px;">${isTelugu ? 'కొత్త ఇంటర్‌లింక్ కోరిక' : 'New Interlink Request'}</h1>
-                    <p style="color: #6b7280; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">SmartHood Discovery Hub</p>
+                    <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">${isTelugu ? 'కొత్త కనెక్షన్ కోరిక' : 'New Interlink Request'}</h1>
+                    <p style="margin: 10px 0 0; opacity: 0.7; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">SmartHood Discovery Hub</p>
                 </div>
                 
-                <div style="background-color: #f8fafc; padding: 25px; border-radius: 20px; border: 1px dashed #cbd5e1; margin-bottom: 25px;">
-                    <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0;">
-                        ${isTelugu
-                ? `"నమస్కారం! నేను మీ పొరుగునే ఉండే <b>${sender.name}</b> (${sender.locality}). నేను <b>${professionStr}</b> గా పని చేస్తున్నాను మరియు మన కమ్యూనిటీలో మీతో వృత్తిపరంగా కనెక్ట్ అవ్వాలనుకుంటున్నాను!"`
-                : `"Hi! I'm your neighbor <b>${sender.name}</b> from ${sender.locality}. I work as a <b>${professionStr}</b> and I'd like to establish a professional interlink with you in our community!"`
-            }
+                <div style="padding: 40px; background: white;">
+                    <div style="background-color: #f8fafc; padding: 30px; border-radius: 24px; border: 1px solid #f1f5f9; margin-bottom: 30px; text-align: center;">
+                        <p style="color: #475569; font-size: 18px; line-height: 1.6; margin: 0; font-style: italic;">
+                            ${isTelugu
+                                ? `"నమస్కారం! నేను మీ పొరుగునే ఉండే <b>${sender.name}</b>. నేను మీతో <b>"ఈ విధంగా (Like This)"</b> వృత్తిపరంగా కనెక్ట్ అవ్వాలనుకుంటున్నాను మరియు మన కమ్యూనిటీలో పరస్పరం సహకరించుకోవాలనుకుంటున్నాను!"`
+                                : `"Hi! I'm your neighbor <b>${sender.name}</b>. I'm willing to interact with you <b>"Like This"</b> and establish a professional interlink to strengthen our community bonds!"`
+                            }
+                        </p>
+                    </div>
+                    
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 25px; margin-bottom: 30px;">
+                        <h3 style="margin: 0 0 20px; color: #0f172a; font-size: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">${isTelugu ? 'పంపినవారి ప్రొఫైల్' : 'Sender Highlight'}</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 10px 0; color: #64748b; font-size: 13px; font-weight: 600;">👤 ${isTelugu ? 'పేరు' : 'Name'}</td>
+                                <td style="padding: 10px 0; color: #0f172a; font-size: 15px; font-weight: 700; text-align: right;">${sender.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; color: #64748b; font-size: 13px; font-weight: 600;">💼 ${isTelugu ? 'వృత్తి' : 'Profession'}</td>
+                                <td style="padding: 10px 0; color: #3b82f6; font-size: 14px; font-weight: 700; text-align: right;">${professionStr}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; color: #64748b; font-size: 13px; font-weight: 600;">📍 ${isTelugu ? 'ప్రాంతం' : 'Locality'}</td>
+                                <td style="padding: 10px 0; color: #0f172a; font-size: 14px; font-weight: 600; text-align: right;">${sender.locality}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; color: #64748b; font-size: 13px; font-weight: 600;">🏙️ ${isTelugu ? 'పట్టణం' : 'Town'}</td>
+                                <td style="padding: 10px 0; color: #0f172a; font-size: 14px; font-weight: 600; text-align: right;">${sender.town}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <a href="${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}/profile" style="background: #0f172a; color: #ffffff; padding: 18px 40px; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 14px; letter-spacing: 0.5px;">${isTelugu ? 'ప్రొఫైల్ చూడండి & స్పందించండి' : 'VIEW PROFILE & RESPOND'}</a>
+                    </div>
+                </div>
+                
+                <div style="padding: 25px; background: #f8fafc; text-align: center; border-top: 1px solid #f1f5f9;">
+                    <p style="color: #94a3b8; font-size: 11px; margin: 0;">
+                        ${isTelugu ? 'SmartHood కమ్యూనిటీ నెట్‌వర్క్ ద్వారా పంపబడింది • నేబర్‌హుడ్ ఇంటెలిజెన్స్ సిస్టమ్' : 'Sent via SmartHood Community Network • Neighborhood Intelligence System'}
                     </p>
                 </div>
-                
-                <table style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
-                    <tr>
-                        <td style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase;">${isTelugu ? 'ఫోన్ నంబర్' : 'Phone Number'}</td>
-                        <td style="color: #1e293b; font-size: 15px; font-weight: 700; text-align: right;">${sender.phone}</td>
-                    </tr>
-                    <tr>
-                        <td style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase;">${isTelugu ? 'వృత్తి' : 'Profession'}</td>
-                        <td style="color: #1e293b; font-size: 15px; font-weight: 700; text-align: right;">${professionStr}</td>
-                    </tr>
-                    <tr>
-                        <td style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase;">${isTelugu ? 'ప్రాంతం' : 'Locality'}</td>
-                        <td style="color: #1e293b; font-size: 15px; font-weight: 700; text-align: right;">${sender.locality}</td>
-                    </tr>
-                </table>
-                
-                <div style="text-align: center; margin-top: 35px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile" style="background: linear-gradient(135deg, #0e7490 0%, #4338ca 100%); color: #ffffff; padding: 16px 40px; border-radius: 16px; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: 0 4px 15px rgba(14,116,144,0.3); uppercase;">${isTelugu ? 'ప్రొఫైల్ చూడండి & అంగీకరించండి' : 'VIEW PROFILE & ACCEPT'}</a>
-                </div>
-                
-                <p style="text-align: center; color: #94a3b8; font-size: 11px; margin-top: 30px;">
-                    ${isTelugu ? 'SmartHood కమ్యూనిటీ నెట్‌వర్క్ ద్వారా పంపబడింది • నేబర్‌హుడ్ ఇంటెలిజెన్స్ సిస్టమ్' : 'Sent via SmartHood Community Network • Neighborhood Intelligence System'}
-                </p>
             </div>
         `;
 
