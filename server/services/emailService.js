@@ -128,7 +128,7 @@ const sendWelcomeEmail = async (user) => {
     return sendEmail(user.email, subject, text, html);
 };
 
-const generateServiceEmailTemplate = (service, creator, type, isConfirmation = false) => {
+const generateServiceEmailTemplate = (service, creator, type, isConfirmation = false, magicLink = null) => {
     const isTelugu = creator.language === 'Telugu';
     const isOffer = type === 'offer';
     const actionColor = isOffer ? '#059669' : '#d97706';
@@ -235,6 +235,13 @@ const generateServiceEmailTemplate = (service, creator, type, isConfirmation = f
 
                 <!-- Footer -->
                 <div style="text-align: center; margin-top: 25px;">
+                    ${magicLink ? `
+                        <div style="margin-bottom: 25px;">
+                            <a href="${magicLink}" style="background: ${actionColor}; color: white; padding: 14px 40px; text-decoration: none; border-radius: 50px; font-weight: 800; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px ${actionColor}40;">
+                                ${isTelugu ? 'నేను ఆసక్తి కలిగి ఉన్నాను' : "I'M INTERESTED"}
+                            </a>
+                        </div>
+                    ` : ''}
                     <p style="margin: 0 0 5px; font-weight: 700;">
                         <a href="https://smarthood.onrender.com" style="color: ${actionColor}; text-decoration: none; font-size: 14px;">LOG IN: https://smarthood.onrender.com</a>
                     </p>
@@ -291,7 +298,7 @@ const generateCompletionEmailTemplate = (service, provider, amount) => {
     `;
 };
 
-const generateAlertEmailTemplate = (alert, sender, isConfirmation = false) => {
+const generateAlertEmailTemplate = (alert, sender, isConfirmation = false, magicLink = null) => {
     const isTelugu = sender.language === 'Telugu';
     const categoryColors = { 'Emergency': '#dc2626', 'Welfare': '#16a34a', 'Official': '#2563eb', 'General': '#6366f1' };
     const headerColor = categoryColors[alert.category] || '#6366f1';
@@ -329,7 +336,14 @@ const generateAlertEmailTemplate = (alert, sender, isConfirmation = false) => {
                     </span>
                 </div>
                 <p style="font-size: 16px; line-height: 1.6;">${alert.description}</p>
-                <div style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; text-align: center;">
+                <div style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 25px; text-align: center;">
+                    ${magicLink ? `
+                        <div style="margin-bottom: 25px;">
+                            <a href="${magicLink}" style="background: ${headerColor}; color: white; padding: 14px 40px; text-decoration: none; border-radius: 50px; font-weight: 800; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px ${headerColor}40;">
+                                ${isTelugu ? 'నేను స్పందిస్తాను (I Can Help)' : "I'M INTERESTED / I CAN HELP"}
+                            </a>
+                        </div>
+                    ` : ''}
                     <strong>${isTelugu ? 'పంపినవారు:' : 'Sender:'}</strong> ${sender.name} | ${sender.phone}<br>
                     <p style="margin: 15px 0 0; font-weight: bold;">
                         <a href="https://smarthood.onrender.com" style="color: ${headerColor}; text-decoration: none;">TAKE ACTION: https://smarthood.onrender.com</a>

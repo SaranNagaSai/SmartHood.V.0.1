@@ -313,7 +313,7 @@ const MyActivity = () => {
                                                     onClick={(e) => { e.stopPropagation(); fetchServiceRecipients(service._id); }}
                                                     className={`text-xs px-3 py-1.5 rounded-full font-medium transition ${expandedServiceId === service._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
                                                 >
-                                                    👥 {service.sentTo?.length || 0} sent
+                                                    💙 {service.interestedProviders?.length || 0} Interested
                                                 </button>
                                                 <button
                                                     onClick={() => navigate(`/service/${service._id}`)}
@@ -326,7 +326,7 @@ const MyActivity = () => {
                                         {/* Expandable Recipient List */}
                                         {expandedServiceId === service._id && (
                                             <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
-                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 {t('recipients')} ({recipients.length})</p>
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Interested People ({recipients.length})</p>
                                                 {loadingRecipients ? (
                                                     <p className="text-xs text-gray-400 text-center py-2">{t('loading')}...</p>
                                                 ) : recipients.length > 0 ? (
@@ -343,8 +343,13 @@ const MyActivity = () => {
                                                                 <div className="min-w-0 flex-1">
                                                                     <p className="text-sm font-medium text-gray-800 truncate">{translateValue(user.name)}</p>
                                                                     <p className="text-xs text-gray-400">{translateValue(user.locality)} • {translateValue(user.professionCategory || t('na'))}</p>
+                                                                    <p className="text-xs font-bold text-indigo-600 mt-1 flex items-center gap-1">
+                                                                        <Phone size={10} /> {user.phone}
+                                                                    </p>
                                                                 </div>
-                                                                <span className="text-xs text-gray-300 flex-shrink-0">{user.uniqueId}</span>
+                                                                <a href={`tel:${user.phone}`} className="p-2 bg-green-100 text-green-600 rounded-full">
+                                                                    <Phone size={14} />
+                                                                </a>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -411,7 +416,7 @@ const MyActivity = () => {
                                                             onClick={() => fetchAlertRecipients(alert._id)}
                                                             className={`text-xs px-3 py-1 rounded-full font-medium transition ml-auto ${expandedAlertId === alert._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
                                                         >
-                                                            👥 {alert.sentTo?.length || 0} {t('sent')}
+                                                            💙 {alert.interestedUsers?.length || 0} Responses
                                                         </button>
                                                     </div>
                                                 </div>
@@ -420,7 +425,7 @@ const MyActivity = () => {
                                         {/* Expandable Recipient List */}
                                         {expandedAlertId === alert._id && (
                                             <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
-                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 {t('recipients')} ({alertRecipients.length})</p>
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Interested People ({alertRecipients.length})</p>
                                                 {loadingRecipients ? (
                                                     <p className="text-xs text-gray-400 text-center py-2">{t('loading')}...</p>
                                                 ) : alertRecipients.length > 0 ? (
@@ -437,8 +442,13 @@ const MyActivity = () => {
                                                                 <div className="min-w-0 flex-1">
                                                                     <p className="text-sm font-medium text-gray-800 truncate">{translateValue(user.name)}</p>
                                                                     <p className="text-xs text-gray-400">{translateValue(user.locality)} • {translateValue(user.professionCategory) || t('na')}</p>
+                                                                    <p className="text-xs font-bold text-indigo-600 mt-1 flex items-center gap-1">
+                                                                        <Phone size={10} /> {user.phone}
+                                                                    </p>
                                                                 </div>
-                                                                <span className="text-xs text-gray-300 flex-shrink-0">{user.uniqueId}</span>
+                                                                <a href={`tel:${user.phone}`} className="p-2 bg-green-100 text-green-600 rounded-full">
+                                                                    <Phone size={14} />
+                                                                </a>
                                                             </div>
                                                         ))}
                                                     </div>

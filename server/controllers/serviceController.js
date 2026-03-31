@@ -1,6 +1,7 @@
 const Service = require('../models/Service');
 const User = require('../models/User');
 const Revenue = require('../models/Revenue');
+const jwt = require('jsonwebtoken');
 const { createNotification } = require('./notificationController');
 const { sendEmail, generateServiceEmailTemplate, generateInterestEmailTemplate, generateCompletionEmailTemplate } = require('../services/emailService');
 
@@ -147,9 +148,7 @@ const createService = async (req, res) => {
         service.sentTo = targetUsers.map(u => u._id);
         await service.save();
 
-        // Generate rich HTML email
-        const isTelugu = user.language === 'Telugu';
-        const emailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase());
+        // Personalized Email HTML and Magic Links will be handled inside the loop or per target
         const creatorEmailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase(), true);
 
         // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
@@ -203,12 +202,16 @@ const createService = async (req, res) => {
                 // Process in small batches or one by one to avoid overwhelming SMTP
                 for (const targetUser of targetUsers) {
                     try {
+                        const magicToken = jwt.sign({ id: targetUser._id }, process.env.SMARTHOOD_JWT_SECRET, { expiresIn: '1d' });
+                        const magicLink = `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}/auto-login/${magicToken}?redirect=${encodeURIComponent(`/service/${service._id}?action=interest`)}`;
+                        const personalizedEmailHtml = generateServiceEmailTemplate(service, user, type.toLowerCase(), false, magicLink);
+
                         await createNotification(
                             targetUser._id,
                             recipientNotificationData,
                             'service',
-                            `/service/${service._id}`,
-                            emailHtml,
+                            `/service/${service._id}?action=interest`,
+                            personalizedEmailHtml,
                             false,
                             {
                                 workTitle: title,
@@ -630,18 +633,18 @@ const cancelService = async (req, res) => {
 const getServiceRecipients = async (req, res) => {
     try {
         const service = await Service.findById(req.params.id)
-            .populate('sentTo', 'name uniqueId locality professionCategory profilePhoto phone');
+            .populate('interestedProviders', 'name uniqueId locality professionCategory profilePhoto phone');
 
         if (!service) {
             return res.status(404).json({ message: 'Service not found' });
         }
 
-        // Only the creator can see the recipient list
+        // Only the creator can see the list
         if (service.createdBy.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
         }
 
-        res.json(service.sentTo || []);
+        res.json(service.interestedProviders || []);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });

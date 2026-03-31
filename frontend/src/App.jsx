@@ -12,6 +12,7 @@ import OfferService from './pages/OfferService';
 import RequestService from './pages/RequestService';
 import ServiceDetail from './pages/ServiceDetail';
 import Alerts from './pages/Alerts';
+import AlertDetail from './pages/AlertDetail';
 import ExploreCity from './pages/ExploreCity';
 import Profile from './pages/Profile';
 import StateUsers from './pages/StateUsers';
@@ -110,6 +111,12 @@ function App() {
                 <Route path="/alerts" element={
                     <AuthGuard>
                         <Alerts />
+                    </AuthGuard>
+                } />
+                
+                <Route path="/alert/:id" element={
+                    <AuthGuard>
+                        <AlertDetail />
                     </AuthGuard>
                 } />
 

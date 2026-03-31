@@ -32,14 +32,19 @@ const ServiceDetail = () => {
     }, [id]);
 
     useEffect(() => {
-        // Auto-open logic: ONLY for requests
-        if (service && service.type === 'request') {
-            const queryParams = new URLSearchParams(location.search);
-            if (queryParams.get('action') === 'complete') {
+        // Auto-action logic
+        const queryParams = new URLSearchParams(location.search);
+        const action = queryParams.get('action');
+
+        if (service) {
+            if (action === 'complete' && service.type === 'request') {
                 setShowCompleteModal(true);
+            } else if (action === 'interest' && !isOwner && !isInterested) {
+                // Automatically express interest if redirected from email
+                handleInterest();
             }
         }
-    }, [service, location.search]);
+    }, [service, location.search, isOwner, isInterested]);
 
     const fetchService = async () => {
         try {

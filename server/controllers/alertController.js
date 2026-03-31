@@ -1,6 +1,8 @@
 const Alert = require('../models/Alert');
 const User = require('../models/User');
 const { generateAlertEmailTemplate } = require('../services/emailService');
+const jwt = require('jsonwebtoken');
+const { createNotification } = require('./notificationController');
 
 // @desc    Create a new alert
 // @route   POST /api/alerts
@@ -88,14 +90,10 @@ const createAlert = async (req, res) => {
         alert.sentTo = targetUsers.map(u => u._id);
         await alert.save();
 
-        // Generate rich HTML email with full details and sender info
-        const isTelugu = req.user.language === 'Telugu';
-        const emailHtml = generateAlertEmailTemplate(alert, req.user);
-        const creatorAlertEmailHtml = generateAlertEmailTemplate(alert, req.user, true);
-
         // SEND NOTIFICATIONS IN BACKGROUND (Non-blocking)
         setImmediate(async () => {
-            try {
+             const creatorAlertEmailHtml = generateAlertEmailTemplate(alert, req.user, true);
+             try {
                 console.log(`🚀 [Background] Starting broadcast for Alert ${alert._id} to ${targetUsers.length} users`);
 
                 const { createNotification } = require('./notificationController');
@@ -121,7 +119,7 @@ const createAlert = async (req, res) => {
                     req.user._id,
                     creatorAlertNotification,
                     'ALERT',
-                    '/alerts',
+                    '/activity',
                     creatorAlertEmailHtml,
                     false, // skipEmail
                     {
@@ -154,12 +152,16 @@ const createAlert = async (req, res) => {
                             'General': 'సాధారణం'
                         };
 
+                        const magicToken = jwt.sign({ id: user._id }, process.env.SMARTHOOD_JWT_SECRET, { expiresIn: '1d' });
+                        const magicLink = `${process.env.FRONTEND_URL || 'https://smarthood.onrender.com'}/auto-login/${magicToken}?redirect=${encodeURIComponent(`/alert/${alert._id}?action=interest`)}`;
+                        const personalizedEmailHtml = generateAlertEmailTemplate(alert, req.user, false, magicLink);
+
                         await createNotification(
                             user._id,
                             notificationData,
                             'ALERT',
-                            '/alerts',
-                            emailHtml,
+                            `/alert/${alert._id}?action=interest`,
+                            personalizedEmailHtml,
                             false,
                             {
                                 workTitle: `${category} (${subType})`,
@@ -230,28 +232,118 @@ const getMyAlerts = async (req, res) => {
     }
 };
 
-// @desc    Get recipients of an alert
-// @route   GET /api/alerts/:id/recipients
+// @desc    Get single alert detail
+// @route   GET /api/alerts/detail/:id
 // @access  Private
-const getAlertRecipients = async (req, res) => {
+const getAlertDetail = async (req, res) => {
     try {
         const alert = await Alert.findById(req.params.id)
-            .populate('sentTo', 'name uniqueId locality professionCategory profilePhoto phone');
+            .populate('senderId', 'name uniqueId profilePhoto phone')
+            .populate('interestedUsers', 'name uniqueId profilePhoto phone');
 
         if (!alert) {
             return res.status(404).json({ message: 'Alert not found' });
         }
 
-        // Only the sender can see the recipient list
-        if (alert.senderId.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Not authorized' });
-        }
-
-        res.json(alert.sentTo || []);
+        res.json(alert);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
 
-module.exports = { createAlert, getAlerts, getMyAlerts, getAlertRecipients };
+// @desc    Express interest in an alert
+// @route   POST /api/alerts/:id/interest
+// @access  Private
+const expressInterest = async (req, res) => {
+    try {
+        const alert = await Alert.findById(req.params.id);
+
+        if (!alert) {
+            return res.status(404).json({ message: 'Alert not found' });
+        }
+
+        if (alert.senderId.toString() === req.user._id.toString()) {
+            return res.status(400).json({ message: 'Cannot express interest in your own alert' });
+        }
+
+        const hasInterest = alert.interestedUsers.includes(req.user._id);
+
+        if (hasInterest) {
+            // Remove interest
+            alert.interestedUsers = alert.interestedUsers.filter(
+                id => id.toString() !== req.user._id.toString()
+            );
+        } else {
+            // Add interest
+            alert.interestedUsers.push(req.user._id);
+
+            // Notify alert sender
+            const { createNotification } = require('./notificationController');
+            const sender = await User.findById(alert.senderId);
+            
+            if (sender) {
+                const isTelugu = sender.language === 'Telugu';
+                const notificationData = {
+                    title: isTelugu ? 'కొత్త ప్రతిస్పందన 🚨' : 'New Response 🚨',
+                    titleTe: 'కొత్త ప్రతిస్పందన 🚨',
+                    body: isTelugu 
+                        ? `${req.user.name} మీ అలెర్ట్‌కు స్పందించారు: ${alert.description}` 
+                        : `${req.user.name} responded to your alert: ${alert.description}`,
+                    bodyTe: `${req.user.name} మీ అలెర్ట్‌కు స్పందించారు: ${alert.description}`
+                };
+
+                await createNotification(
+                    alert.senderId,
+                    notificationData,
+                    'ALERT_INTEREST',
+                    `/activity`,
+                    null, // No email for this yet
+                    true, // Skip email for speed
+                    {
+                        workTitle: alert.category,
+                        workInfo: `${req.user.name} is interested`,
+                        senderName: req.user.name,
+                        senderPhone: req.user.phone
+                    }
+                );
+            }
+        }
+
+        await alert.save();
+        res.json({
+            hasInterest: !hasInterest,
+            interestedCount: alert.interestedUsers.length
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get recipients of an alert
+// @route   GET /api/alerts/:id/recipients
+// @access  Private
+const getAlertRecipients = async (req, res) => {
+    try {
+        const alert = await Alert.findById(req.params.id)
+            .populate('interestedUsers', 'name uniqueId locality professionCategory profilePhoto phone');
+
+        if (!alert) {
+            return res.status(404).json({ message: 'Alert not found' });
+        }
+
+        // Only the sender can see the list
+        if (alert.senderId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        // We now return interested people instead of the entire broadcast list
+        res.json(alert.interestedUsers || []);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+module.exports = { createAlert, getAlerts, getMyAlerts, getAlertRecipients, expressInterest, getAlertDetail };

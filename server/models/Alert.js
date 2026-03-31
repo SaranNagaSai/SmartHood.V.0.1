@@ -25,6 +25,9 @@ const alertSchema = new mongoose.Schema({
     // Recipients tracking
     sentTo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
+    // Users who expressed interest/responded
+    interestedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
     isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
