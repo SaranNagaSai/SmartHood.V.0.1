@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     gender: { type: String, enum: ['Male', 'Female', 'Other'] },
     email: { type: String }, // Optional
     bloodGroup: { type: String, required: true }, // Mandatory, Locked
+    pin: { type: String, required: true }, // 4-digit PIN for free authentication
 
     // Geographic Hierarchy
     address: { type: String },

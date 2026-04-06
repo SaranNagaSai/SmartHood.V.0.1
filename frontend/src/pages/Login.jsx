@@ -11,7 +11,7 @@ const Login = () => {
     const { t } = useLanguage();
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ name: '', phone: '' });
+    const [formData, setFormData] = useState({ name: '', phone: '', pin: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [isOTPStep, setIsOTPStep] = useState(false);
@@ -22,8 +22,8 @@ const Login = () => {
 
     const handleLogin = async () => {
         // Basic validation
-        if (!formData.name.trim() || !formData.phone.trim()) {
-            setError(t('fill_all_error') || 'Please enter both name and phone number');
+        if (!formData.name.trim() || (!formData.phone.trim() && !formData.pin.trim())) {
+            setError(t('fill_all_error') || 'Please enter name and (Phone or PIN)');
             return;
         }
 
@@ -111,23 +111,52 @@ const Login = () => {
                     {!isOTPStep ? (
                         <div className="space-y-6">
                             <div className="space-y-4">
-                                <VoiceInput
-                                    label={t('name_label')}
-                                    value={formData.name}
-                                    onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setError(''); }}
-                                    placeholder={t('name_placeholder')}
-                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 pr-10 text-gray-800 placeholder-gray-500"
-                                    labelClassName="text-white drop-shadow-sm"
-                                />
-                                <VoiceInput
-                                    label={t('phone_label')}
-                                    value={formData.phone}
-                                    onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setError(''); }}
-                                    placeholder={t('phone_placeholder')}
-                                    type="tel"
-                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 pr-10 text-gray-800 placeholder-gray-500"
-                                    labelClassName="text-white drop-shadow-sm"
-                                />
+                                <div className="space-y-4">
+                                    <VoiceInput
+                                        label="Name / Unique ID *"
+                                        value={formData.name}
+                                        onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setError(''); }}
+                                        placeholder={t('name_placeholder')}
+                                        className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 pr-10 text-gray-800 placeholder-gray-500"
+                                        labelClassName="text-white/80 text-[10px] font-black uppercase tracking-widest mb-1 shadow-sm"
+                                    />
+
+                                    <VoiceInput
+                                        label="Phone Number (For OTP Login)"
+                                        value={formData.phone}
+                                        onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setError(''); }}
+                                        placeholder={t('phone_placeholder')}
+                                        type="tel"
+                                        className="bg-white/90 border-2 border-primary/10 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 pr-10 text-gray-800 placeholder-gray-500"
+                                        labelClassName="text-white/80 text-[10px] font-black uppercase tracking-widest mb-1 shadow-sm"
+                                    />
+                                </div>
+
+                                <div className="relative flex items-center gap-4 py-2">
+                                    <div className="h-px bg-white/10 flex-1"></div>
+                                    <span className="text-[10px] font-black text-white/30 tracking-[0.3em]">OR</span>
+                                    <div className="h-px bg-white/10 flex-1"></div>
+                                </div>
+
+                                <div className="bg-indigo-500/20 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-xl overflow-hidden relative group">
+                                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-700"></div>
+
+                                    <label className="block text-center text-[11px] font-black text-indigo-200 uppercase tracking-[0.2em] mb-4">Login with 4-Digit PIN</label>
+                                    <div className="flex justify-center relative z-10">
+                                        <input
+                                            type="text"
+                                            value={formData.pin}
+                                            onChange={(e) => {
+                                                const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                                                setFormData({ ...formData, pin: val });
+                                                setError('');
+                                            }}
+                                            placeholder="0 0 0 0"
+                                            className="w-full max-w-[220px] bg-white border-2 border-white/20 text-indigo-900 rounded-2xl py-4 text-3xl font-black text-center tracking-[0.5em] focus:ring-8 focus:ring-indigo-500/30 outline-none transition-all shadow-inner placeholder:text-gray-200"
+                                            inputMode="numeric"
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             <button

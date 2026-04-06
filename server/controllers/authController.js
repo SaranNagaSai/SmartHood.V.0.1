@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
 
     try {
         const {
-            name, phone, age, gender, email, bloodGroup,
+            name, phone, age, gender, email, bloodGroup, pin,
             address, locality, town, district, state,
             professionCategory, experience
         } = req.body;
@@ -110,6 +110,7 @@ const registerUser = async (req, res) => {
             gender,
             email: (email || '').trim().toLowerCase(),
             bloodGroup,
+            pin: (pin || '0000').trim(), // Default to 0000 if not provided
             address: (address || '').trim(),
             locality: (locality || '').trim(),
             normalizedLocality: normLocality,
@@ -204,8 +205,8 @@ const sendRegistrationOTP = async (req, res) => {
 
     const result = await twilioService.sendOTP(phone);
     if (result.success) {
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: result.message || 'OTP sent successfully',
             isSandbox: result.isSandbox || false
         });
@@ -266,8 +267,29 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid name or unique ID' });
         }
 
-        // If credentials match, check if OTP is provided
-        const { otp } = req.body;
+        // --- NEW PIN AUTH CHECK ---
+        const { pin, otp } = req.body;
+
+        if (pin) {
+            if (user.pin && user.pin === pin.trim()) {
+                console.log(`[SUCCESS] PIN Login Successful for ${user.name}`);
+                return res.json({
+                    _id: user._id,
+                    uniqueId: user.uniqueId,
+                    name: user.name,
+                    phone: user.phone,
+                    locality: user.locality,
+                    town: user.town,
+                    district: user.district,
+                    state: user.state,
+                    profilePhoto: user.profilePhoto,
+                    token: generateToken(user._id)
+                });
+            } else {
+                return res.status(401).json({ message: 'Invalid PIN' });
+            }
+        }
+        // --------------------------
 
         if (!otp) {
             // STEP 1: Credentials valid, trigger OTP

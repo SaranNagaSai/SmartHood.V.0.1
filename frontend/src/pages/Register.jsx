@@ -23,11 +23,7 @@ const Register = () => {
     const webcamRef = React.useRef(null);
     const [publicStats, setPublicStats] = useState({ totalUsers: 0, totalLocalities: 0, totalTowns: 0 });
 
-    // OTP related states
-    const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
-    const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-    const [otpLoading, setOtpLoading] = useState(false);
 
     useEffect(() => {
         const fetchPublicStats = async () => {
@@ -71,7 +67,8 @@ const Register = () => {
             course: '',
             description: ''
         },
-        experience: 0
+        experience: 0,
+        pin: ''
     });
 
     const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -120,90 +117,17 @@ const Register = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        // Reset verification if phone changes
-        if (e.target.name === 'phone') {
-            setIsPhoneVerified(false);
-            setOtpSent(false);
-        }
     };
 
-    const [confirmationResult, setConfirmationResult] = useState(null);
+    // PIN-based registration logic
+    const isPhoneVerified = true;
+    const otpSent = false;
+    const otpLoading = false;
+    const sandboxActive = false;
 
-    const setupRecaptcha = (containerId) => {
-        if (!auth) return null;
-        try {
-            return new RecaptchaVerifier(auth, containerId, {
-                'size': 'invisible',
-                'callback': (response) => {
-                    console.log("Recaptcha resolved");
-                }
-            });
-        } catch (error) {
-            console.error("Recaptcha failed to initialize:", error);
-            return null;
-        }
-    };
-
-    const handleSendOTP = async () => {
-        if (!formData.phone) {
-            alert(t('phone_placeholder'));
-            return;
-        }
-
-        // Normalize phone for Firebase (E.164) and update state
-        let normalizedPhone = formData.phone.trim();
-        if (!normalizedPhone.startsWith('+')) {
-            // Assume India if 10 digits
-            let clean = normalizedPhone.replace(/\D/g, '');
-            if (clean.length === 10) normalizedPhone = `+91${clean}`;
-            else if (clean.length === 12 && clean.startsWith('91')) normalizedPhone = `+${clean}`;
-            else if (clean.length > 0) normalizedPhone = `+${clean}`;
-        }
-        setFormData(prev => ({ ...prev, phone: normalizedPhone }));
-
-        setOtpLoading(true);
-        try {
-            // Step 1: Check if user exists (Backend call with original check)
-            const checkRes = await axios.post(`${API_URL}/auth/send-registration-otp`, { phone: normalizedPhone, checkOnly: true });
-            
-            // Step 2: Send OTP via Firebase
-            const appVerifier = setupRecaptcha('recaptcha-container');
-            const confirmation = await signInWithPhoneNumber(auth, normalizedPhone, appVerifier);
-            
-            setConfirmationResult(confirmation);
-            setOtpSent(true);
-            alert(t('otp_sent_success', 'Verification code sent to your mobile.'));
-        } catch (err) {
-            console.error("Firebase Auth Error:", err);
-            const errMsg = err.response?.data?.message || err.message || 'Failed to send OTP';
-            if (errMsg.includes('auth/invalid-phone-number')) {
-                alert("Invalid phone number format. Please ensure it includes country code (e.g., +91).");
-            } else {
-                alert(errMsg);
-            }
-        }
-        setOtpLoading(false);
-    };
-
-    const handleVerifyOTP = async () => {
-        if (!otp || !confirmationResult) {
-            alert('Please enter the OTP');
-            return;
-        }
-        setOtpLoading(true);
-        try {
-            await confirmationResult.confirm(otp);
-            setIsPhoneVerified(true);
-            alert(t('phone_verified', 'Phone verified successfully!'));
-        } catch (err) {
-            console.error("OTP Verification Error:", err);
-            alert('Invalid OTP code. Please try again.');
-        }
-        setOtpLoading(false);
-    };
-
-    const [sandboxActive, setSandboxActive] = useState(false);
-
+    const handleSendOTP = () => { };
+    const handleVerifyOTP = () => { };
+    const handleWhatsAppVerify = () => { };
 
     const handleProfessionDetailChange = (field, value) => {
         setFormData({
@@ -215,12 +139,12 @@ const Register = () => {
     const nextStep = () => {
         // Validation for each step
         if (step === 1) {
-            if (!formData.name || !formData.phone || !formData.age || !formData.bloodGroup) {
+            if (!formData.name || !formData.phone || !formData.pin || !formData.age || !formData.bloodGroup) {
                 alert(t('fill_all_error'));
                 return;
             }
-            if (!isPhoneVerified) {
-                alert(t('verify_phone_error', 'Please verify your phone number first.'));
+            if (formData.pin.length !== 4) {
+                alert("Please enter a 4-digit code for PIN");
                 return;
             }
         }
@@ -475,7 +399,7 @@ const Register = () => {
                             {/* Step 1: Personal Details */}
                             {step === 1 && (
                                 <div className="space-y-6">
-                                    <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <VoiceInput
                                             name="name"
                                             label={t('name_label') + " *"}
@@ -486,123 +410,98 @@ const Register = () => {
                                             required
                                         />
 
-                                        <div className="relative group">
-                                            <VoiceInput
-                                                name="phone"
-                                                label={t('phone_label') + " *"}
-                                                value={formData.phone}
+                                        <VoiceInput
+                                            name="phone"
+                                            label={t('phone_label') + " *"}
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            type="tel"
+                                            placeholder={t('phone_placeholder')}
+                                            className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* Security PIN Setup Box */}
+                                    <div className="bg-amber-50/50 p-6 rounded-3xl border border-amber-200/60 shadow-sm">
+                                        <div className="flex flex-col items-center">
+                                            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mb-3 text-amber-600">
+                                                <span className="text-xl">🛡️</span>
+                                            </div>
+                                            <label className="text-[11px] font-black text-amber-800 uppercase tracking-[0.2em] mb-4">Set Your 4-Digit Login PIN</label>
+
+                                            <div className="flex justify-center w-full">
+                                                <input
+                                                    type="text"
+                                                    value={formData.pin}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                                                        setFormData({ ...formData, pin: val });
+                                                    }}
+                                                    placeholder="0 0 0 0"
+                                                    className="w-full max-w-[220px] bg-white border-2 border-amber-400 text-amber-900 rounded-2xl py-4 text-3xl font-black text-center tracking-[0.4em] focus:ring-8 focus:ring-amber-400/20 outline-none transition-all shadow-md placeholder:text-gray-200"
+                                                    required
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-amber-700/60 mt-4 text-center font-bold px-4">
+                                                Keep this PIN safe. You will need it to login to your SmartHood account later.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <VoiceInput
+                                            name="age"
+                                            label={t('age') + " *"}
+                                            value={formData.age}
+                                            onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                                            type="number"
+                                            placeholder={t('age')}
+                                            className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
+                                            required
+                                        />
+                                        <div className="space-y-1">
+                                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 ml-1">{t('gender')} *</label>
+                                            <select
+                                                name="gender"
+                                                value={formData.gender}
                                                 onChange={handleChange}
-                                                type="tel"
-                                                placeholder={t('phone_placeholder')}
-                                                className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3 pr-32"
-                                                required
-                                                disabled={isPhoneVerified}
-                                            />
-                                            {!isPhoneVerified && !otpSent && (
-                                                <button
-                                                    type="button"
-                                                    onClick={handleSendOTP}
-                                                    disabled={otpLoading || !formData.phone}
-                                                    className="absolute right-10 top-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50 z-10 h-8 mt-4"
-                                                >
-                                                    {otpLoading ? '...' : t('get_otp', 'Get OTP')}
-                                                </button>
-                                            )}
-                                            {isPhoneVerified && (
-                                                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-success flex items-center gap-1 mt-4">
-                                                    <Check size={16} strokeWidth={3} />
-                                                    <span className="text-[10px] font-bold uppercase">{t('verified', 'Verified')}</span>
-                                                </div>
-                                            )}
+                                                className="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-primary outline-none transition-all font-bold text-gray-700"
+                                            >
+                                                {genders.map(g => <option key={g} value={g}>{t(g)}</option>)}
+                                            </select>
                                         </div>
+                                    </div>
 
-                                        {otpSent && !isPhoneVerified && (
-                                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 animate-fade-in shadow-inner relative overflow-hidden">
-                                                {sandboxActive && (
-                                                    <div className="absolute top-0 left-0 w-full bg-amber-500/10 py-1 px-3 border-b border-amber-500/20 flex items-center justify-between">
-                                                        <span className="text-[9px] font-bold text-amber-700 uppercase tracking-tight">Sandbox Mode Active</span>
-                                                        <span className="text-[9px] font-bold text-amber-900">DECODE: 123456</span>
-                                                    </div>
-                                                )}
-                                                <label className={`block text-xs font-bold text-gray-500 uppercase mb-2 ${sandboxActive ? 'mt-4' : ''}`}>{t('enter_otp', 'Enter 6-Digit OTP')}</label>
-                                                <div className="flex gap-2">
-                                                    <input
-                                                        type="text"
-                                                        maxLength="6"
-                                                        value={otp}
-                                                        onChange={(e) => setOtp(e.target.value)}
-                                                        className="flex-1 p-3 border border-gray-200 rounded-lg text-center font-bold tracking-[0.5em] focus:ring-2 focus:ring-primary outline-none"
-                                                        placeholder="000000"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleVerifyOTP}
-                                                        disabled={otpLoading || otp.length < 6}
-                                                        className="bg-success text-white px-6 py-3 rounded-lg font-bold hover:bg-success/90 transition disabled:opacity-50"
-                                                    >
-                                                        {otpLoading ? '...' : t('verify', 'Verify')}
-                                                    </button>
-                                                </div>
-                                                <p className="text-[10px] text-gray-400 mt-2 text-center">
-                                                    Didn't receive? <button type="button" onClick={handleSendOTP} className="text-primary font-bold">Resend</button>
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ${!isPhoneVerified ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
-                                            <VoiceInput
-                                                name="age"
-                                                label={t('age') + " *"}
-                                                value={formData.age}
-                                                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                                                type="number"
-                                                placeholder={t('age')}
-                                                className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
-                                                required
-                                            />
-                                            <div>
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">{t('gender')} *</label>
-                                                <select
-                                                    name="gender"
-                                                    value={formData.gender}
-                                                    onChange={handleChange}
-                                                    className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-primary outline-none transition-all"
-                                                >
-                                                    {genders.map(g => <option key={g} value={g}>{t(g)}</option>)}
-                                                </select>
-                                            </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 ml-1">{t('blood_group')} *</label>
+                                            <select
+                                                name="bloodGroup"
+                                                value={formData.bloodGroup}
+                                                onChange={handleChange}
+                                                className="w-full p-3.5 border border-red-100 rounded-xl bg-red-50 focus:ring-2 focus:ring-red-500 outline-none text-red-700 font-black"
+                                            >
+                                                {bloodGroups.map(bg => <option key={bg} value={bg}>{translateValue(bg)}</option>)}
+                                            </select>
                                         </div>
-
-                                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ${!isPhoneVerified ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
-                                            <div>
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">{t('blood_group')} *</label>
-                                                <select
-                                                    name="bloodGroup"
-                                                    value={formData.bloodGroup}
-                                                    onChange={handleChange}
-                                                    className="w-full p-3 border border-red-100 rounded-xl bg-red-50 focus:ring-2 focus:ring-red-500 outline-none text-red-700 font-bold"
-                                                >
-                                                    {bloodGroups.map(bg => <option key={bg} value={bg}>{translateValue(bg)}</option>)}
-                                                </select>
-                                            </div>
-                                            <VoiceInput
-                                                name="email"
-                                                label={t('email') + ` (${t('optional')})`}
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                type="email"
-                                                placeholder={t('email_placeholder') || "your@email.com"}
-                                                className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
-                                            />
-                                        </div>
+                                        <VoiceInput
+                                            name="email"
+                                            label={t('email') + ` (${t('optional')})`}
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            type="email"
+                                            placeholder="yourname@example.com"
+                                            className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
+                                        />
                                     </div>
 
                                     <button
                                         onClick={nextStep}
-                                        disabled={!isPhoneVerified}
-                                        className="w-full bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full bg-primary text-white py-4 px-6 rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:shadow-primary/40 hover:-translate-y-1 active:scale-95 transition-all mt-4 flex items-center justify-center gap-3 group"
                                     >
-                                        {t('continue_location')} →
+                                        <span>{t('continue_location')}</span>
+                                        <span className="group-hover:translate-x-2 transition-transform text-2xl">→</span>
                                     </button>
                                 </div>
                             )}
@@ -928,18 +827,21 @@ const Register = () => {
                                 </div>
                             )}
                         </form>
-
-                        <p className="text-center text-sm text-gray-500 mt-8">
-                            {t('already_account')} {' '}
-                            <Link to="/login" className="text-primary font-bold hover:underline">
-                                {t('login_here')}
-                            </Link>
-                        </p>
                     </div>
-                </div>
-            </div>
-            <div id="recaptcha-container"></div>
-        </div>
+                </div >
+
+                {/* Mobile Bottom Spacer */}
+                < div className="lg:hidden h-20" ></div >
+
+                <p className="text-center text-sm text-gray-500 mt-8 mb-8">
+                    {t('already_account')} {' '}
+                    <Link to="/login" className="text-primary font-bold hover:underline">
+                        {t('login_here')}
+                    </Link>
+                </p>
+            </div >
+            <div id="recaptcha-container" className="hidden"></div>
+        </div >
     );
 };
 
