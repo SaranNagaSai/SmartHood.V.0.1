@@ -31,8 +31,8 @@ async function trigger() {
             senderPhone: '9398176717'
         };
 
-        console.log('[3/5] Triggering Triple-Channel Notification (Email, FCM, SMS)...');
-        const notification = await createNotification(user._id, data, 'alert', '/home', null, false, extendedData);
+        console.log('[3/5] Triggering Push-Only Notification (SMS + FCM)...');
+        const notification = await createNotification(user._id, data, 'alert', '/home', null, true, extendedData);
 
         if (notification) {
             console.log('--- [4/5] TRIGGER RESULTS ---');

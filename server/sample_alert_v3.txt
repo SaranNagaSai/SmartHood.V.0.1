@@ -1,0 +1,28 @@
+Parsing Firebase Key... Present: true
+[Firebase] Key Cleaned. Length: 1703
+[Firebase] First 50 Char Codes: 45,45,45,45,45,66,69,71,73,78,32,80,82,73,86,65,84,69,32,75,69,89,45,45,45,45,45,10,77,73,73,69,118,81,73,66,65,68,65,78,66,103,107,113,104,107,105,71,57,119,
+[Firebase] Key Starts With: "-----BEGIN PRIVATE KEY-----\nMI"
+[Firebase] Key Ends With: "4VM=\n-----END PRIVATE KEY-----"
+[Firebase] Configuring for Project: smart-hood-9da8f
+[Firebase] Client Email Present: true
+[Firebase] Private Key Present: true
+✅ Firebase Admin initialized successfully
+[1/5] Connecting to MongoDB...
+[2/5] Finding user 9398176717...
+🎯 Found user: Thiriveedhi Saran Naga Sai in Patimeeda
+[3/5] Triggering Push-Only Notification (SMS + FCM)...
+[Notification] Creating for userId: 6981a63b1ddcf1b5b44c981c, type: alert
+[Notification] 🎯 TARGET: Thiriveedhi Saran Naga Sai (9398176717, sarannagasait@gmail.com, Lang: English)
+ℹ️ [Notification] Skipping email for Thiriveedhi Saran Naga Sai (No email or skipEmail=true)
+📱 [Notification] Attempting push to Thiriveedhi Saran Naga Sai (2 devices)...
+[Notification] FCM successful for at least one device of Thiriveedhi Saran Naga Sai
+📱 [Notification] Attempting SMS to 9398176717...
+✅ [Notification] SMS SUCCESS for 9398176717
+🏁 [Notification] FINISHED: Delivered via fcm+sms
+--- [4/5] TRIGGER RESULTS ---
+✅ Notification ID: new ObjectId('69b288dbac4a639b0f1fb8ce')
+✅ Delivered Status: true
+✅ Delivery Method: fcm+sms
+----------------------------
+🔌 Closing DB Connection...
+🏁 Done.

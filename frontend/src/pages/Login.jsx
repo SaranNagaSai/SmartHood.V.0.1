@@ -18,41 +18,7 @@ const Login = () => {
     const [otp, setOtp] = useState('');
     const [serverReady, setServerReady] = useState(false);
     const [warmingUp, setWarmingUp] = useState(true);
-    const retryCountRef = useRef(0);
-
-    // Wake up the Render backend as soon as the login page loads
-    useEffect(() => {
-        let cancelled = false;
-        const wakeServer = async () => {
-            try {
-                await axios.get(`${SERVER_URL}/api/health/ping`, { timeout: 45000 });
-                if (!cancelled) {
-                    setServerReady(true);
-                    setWarmingUp(false);
-                }
-            } catch (err) {
-                // Even a 404 means the server is awake
-                if (err.response) {
-                    if (!cancelled) {
-                        setServerReady(true);
-                        setWarmingUp(false);
-                    }
-                } else {
-                    // Network error — server is still spinning up, retry
-                    if (!cancelled) {
-                        setTimeout(wakeServer, 3000);
-                    }
-                }
-            }
-        };
-        wakeServer();
-        // If server doesn't respond within 5s, hide the warming indicator but keep trying
-        const fallbackTimer = setTimeout(() => {
-            if (!cancelled) setWarmingUp(false);
-        }, 5000);
-
-        return () => { cancelled = true; clearTimeout(fallbackTimer); };
-    }, []);
+    const [sandboxActive, setSandboxActive] = useState(false);
 
     const handleLogin = async () => {
         // Basic validation
@@ -70,6 +36,9 @@ const Login = () => {
                 const res = await axios.post(`${API_URL}/auth/login`, formData, {
                     timeout: 30000 // 30s timeout for cold starts
                 });
+                if (res.data.isSandbox) {
+                    setSandboxActive(true);
+                }
                 if (res.data.requireOTP) {
                     setIsOTPStep(true);
                     setLoading(false);
@@ -147,7 +116,7 @@ const Login = () => {
                                     value={formData.name}
                                     onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setError(''); }}
                                     placeholder={t('name_placeholder')}
-                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
+                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 pr-10 text-gray-800 placeholder-gray-500"
                                     labelClassName="text-white drop-shadow-sm"
                                 />
                                 <VoiceInput
@@ -156,7 +125,7 @@ const Login = () => {
                                     onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setError(''); }}
                                     placeholder={t('phone_placeholder')}
                                     type="tel"
-                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 text-gray-800 placeholder-gray-500"
+                                    className="bg-white/90 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all rounded-xl py-3 pr-10 text-gray-800 placeholder-gray-500"
                                     labelClassName="text-white drop-shadow-sm"
                                 />
                             </div>
@@ -195,8 +164,14 @@ const Login = () => {
                         </div>
                     ) : (
                         <div className="space-y-6 animate-fade-in">
-                            <div className="text-center bg-blue-500/10 p-4 rounded-2xl border border-blue-400/20 mb-6">
-                                <p className="text-blue-200 text-sm">{t('otp_sent_to', 'Verification code sent to')} <br /> <span className="font-bold text-white text-base">{formData.phone}</span></p>
+                            <div className="text-center bg-blue-500/10 p-4 rounded-2xl border border-blue-400/20 mb-6 relative overflow-hidden">
+                                {sandboxActive && (
+                                    <div className="absolute top-0 left-0 w-full bg-amber-500/20 py-1 px-3 border-b border-amber-400/30 flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-amber-200 uppercase tracking-tight italic">Sandbox Mode</span>
+                                        <span className="text-[10px] font-bold text-amber-100 uppercase tracking-widest">USE: 123456</span>
+                                    </div>
+                                )}
+                                <p className={`text-blue-200 text-sm ${sandboxActive ? 'mt-4' : ''}`}>{t('otp_sent_to', 'Verification code sent to')} <br /> <span className="font-bold text-white text-base">{formData.phone}</span></p>
                             </div>
 
                             <div className="space-y-2">

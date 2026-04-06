@@ -188,7 +188,7 @@ const registerUser = async (req, res) => {
 // @route   POST /api/auth/send-registration-otp
 // @access  Public
 const sendRegistrationOTP = async (req, res) => {
-    const { phone } = req.body;
+    const { phone, checkOnly } = req.body;
     if (!phone) return res.status(400).json({ success: false, message: 'Phone number is required' });
 
     // Check if user exists
@@ -197,9 +197,18 @@ const sendRegistrationOTP = async (req, res) => {
         return res.status(400).json({ success: false, message: 'User already exists with this phone number' });
     }
 
+    // New: If the frontend just wants to check for existence (e.g., when using Firebase for OTP)
+    if (checkOnly) {
+        return res.json({ success: true, message: 'User does not exist, proceed with OTP' });
+    }
+
     const result = await twilioService.sendOTP(phone);
     if (result.success) {
-        res.json({ success: true, message: 'OTP sent successfully' });
+        res.json({ 
+            success: true, 
+            message: result.message || 'OTP sent successfully',
+            isSandbox: result.isSandbox || false
+        });
     } else {
         res.status(500).json({ success: false, message: 'Failed to send OTP: ' + result.error });
     }
@@ -267,7 +276,8 @@ const loginUser = async (req, res) => {
                 return res.json({
                     success: true,
                     requireOTP: true,
-                    message: 'Verification code sent to your mobile.'
+                    message: twilioResult.message || 'Verification code sent to your mobile.',
+                    isSandbox: twilioResult.isSandbox || false
                 });
             } else {
                 return res.status(500).json({ message: 'Failed to send OTP: ' + twilioResult.error });

@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { API_URL } from '../utils/apiConfig';
+import { auth } from '../config/firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { User, MapPin, Briefcase, Check, Camera, Upload, X } from 'lucide-react';
 import './Register.css';
 
@@ -125,41 +127,82 @@ const Register = () => {
         }
     };
 
+    const [confirmationResult, setConfirmationResult] = useState(null);
+
+    const setupRecaptcha = (containerId) => {
+        if (!auth) return null;
+        try {
+            return new RecaptchaVerifier(auth, containerId, {
+                'size': 'invisible',
+                'callback': (response) => {
+                    console.log("Recaptcha resolved");
+                }
+            });
+        } catch (error) {
+            console.error("Recaptcha failed to initialize:", error);
+            return null;
+        }
+    };
+
     const handleSendOTP = async () => {
         if (!formData.phone) {
             alert(t('phone_placeholder'));
             return;
         }
+
+        // Normalize phone for Firebase (E.164) and update state
+        let normalizedPhone = formData.phone.trim();
+        if (!normalizedPhone.startsWith('+')) {
+            // Assume India if 10 digits
+            let clean = normalizedPhone.replace(/\D/g, '');
+            if (clean.length === 10) normalizedPhone = `+91${clean}`;
+            else if (clean.length === 12 && clean.startsWith('91')) normalizedPhone = `+${clean}`;
+            else if (clean.length > 0) normalizedPhone = `+${clean}`;
+        }
+        setFormData(prev => ({ ...prev, phone: normalizedPhone }));
+
         setOtpLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/auth/send-registration-otp`, { phone: formData.phone });
-            if (res.data.success) {
-                setOtpSent(true);
-                alert(t('otp_sent_success', 'Verification code sent to your mobile.'));
-            }
+            // Step 1: Check if user exists (Backend call with original check)
+            const checkRes = await axios.post(`${API_URL}/auth/send-registration-otp`, { phone: normalizedPhone, checkOnly: true });
+            
+            // Step 2: Send OTP via Firebase
+            const appVerifier = setupRecaptcha('recaptcha-container');
+            const confirmation = await signInWithPhoneNumber(auth, normalizedPhone, appVerifier);
+            
+            setConfirmationResult(confirmation);
+            setOtpSent(true);
+            alert(t('otp_sent_success', 'Verification code sent to your mobile.'));
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to send OTP');
+            console.error("Firebase Auth Error:", err);
+            const errMsg = err.response?.data?.message || err.message || 'Failed to send OTP';
+            if (errMsg.includes('auth/invalid-phone-number')) {
+                alert("Invalid phone number format. Please ensure it includes country code (e.g., +91).");
+            } else {
+                alert(errMsg);
+            }
         }
         setOtpLoading(false);
     };
 
     const handleVerifyOTP = async () => {
-        if (!otp) {
+        if (!otp || !confirmationResult) {
             alert('Please enter the OTP');
             return;
         }
         setOtpLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/auth/verify-registration-otp`, { phone: formData.phone, otp });
-            if (res.data.success) {
-                setIsPhoneVerified(true);
-                alert(t('phone_verified', 'Phone verified successfully!'));
-            }
+            await confirmationResult.confirm(otp);
+            setIsPhoneVerified(true);
+            alert(t('phone_verified', 'Phone verified successfully!'));
         } catch (err) {
-            alert(err.response?.data?.message || 'Invalid OTP');
+            console.error("OTP Verification Error:", err);
+            alert('Invalid OTP code. Please try again.');
         }
         setOtpLoading(false);
     };
+
+    const [sandboxActive, setSandboxActive] = useState(false);
 
 
     const handleProfessionDetailChange = (field, value) => {
@@ -443,7 +486,7 @@ const Register = () => {
                                             required
                                         />
 
-                                        <div className="relative">
+                                        <div className="relative group">
                                             <VoiceInput
                                                 name="phone"
                                                 label={t('phone_label') + " *"}
@@ -451,7 +494,7 @@ const Register = () => {
                                                 onChange={handleChange}
                                                 type="tel"
                                                 placeholder={t('phone_placeholder')}
-                                                className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3 pr-24"
+                                                className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3 pr-32"
                                                 required
                                                 disabled={isPhoneVerified}
                                             />
@@ -460,13 +503,13 @@ const Register = () => {
                                                     type="button"
                                                     onClick={handleSendOTP}
                                                     disabled={otpLoading || !formData.phone}
-                                                    className="absolute right-2 top-8 bg-primary text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/90 transition disabled:opacity-50"
+                                                    className="absolute right-10 top-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50 z-10 h-8 mt-4"
                                                 >
                                                     {otpLoading ? '...' : t('get_otp', 'Get OTP')}
                                                 </button>
                                             )}
                                             {isPhoneVerified && (
-                                                <div className="absolute right-3 top-9 text-success flex items-center gap-1">
+                                                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-success flex items-center gap-1 mt-4">
                                                     <Check size={16} strokeWidth={3} />
                                                     <span className="text-[10px] font-bold uppercase">{t('verified', 'Verified')}</span>
                                                 </div>
@@ -474,8 +517,14 @@ const Register = () => {
                                         </div>
 
                                         {otpSent && !isPhoneVerified && (
-                                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 animate-fade-in">
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">{t('enter_otp', 'Enter 6-Digit OTP')}</label>
+                                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 animate-fade-in shadow-inner relative overflow-hidden">
+                                                {sandboxActive && (
+                                                    <div className="absolute top-0 left-0 w-full bg-amber-500/10 py-1 px-3 border-b border-amber-500/20 flex items-center justify-between">
+                                                        <span className="text-[9px] font-bold text-amber-700 uppercase tracking-tight">Sandbox Mode Active</span>
+                                                        <span className="text-[9px] font-bold text-amber-900">DECODE: 123456</span>
+                                                    </div>
+                                                )}
+                                                <label className={`block text-xs font-bold text-gray-500 uppercase mb-2 ${sandboxActive ? 'mt-4' : ''}`}>{t('enter_otp', 'Enter 6-Digit OTP')}</label>
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
@@ -889,6 +938,7 @@ const Register = () => {
                     </div>
                 </div>
             </div>
+            <div id="recaptcha-container"></div>
         </div>
     );
 };
