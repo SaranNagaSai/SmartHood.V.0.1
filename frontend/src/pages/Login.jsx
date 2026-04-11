@@ -19,6 +19,8 @@ const Login = () => {
     const [serverReady, setServerReady] = useState(false);
     const [warmingUp, setWarmingUp] = useState(true);
     const [sandboxActive, setSandboxActive] = useState(false);
+    const retryCountRef = useRef(0);
+    const MAX_RETRIES = 3;
 
     const handleLogin = async () => {
         // Basic validation
@@ -47,8 +49,8 @@ const Login = () => {
                 login(res.data, res.data.token);
                 navigate('/home');
             } catch (err) {
-                // If it's a network/timeout error and we haven't retried yet, auto-retry once
-                if (!err.response && retryCountRef.current < 1) {
+                // If it's a network/timeout error and we haven't retried yet, auto-retry
+                if (!err.response && retryCountRef.current < MAX_RETRIES) {
                     retryCountRef.current += 1;
                     // Wait 2 seconds and retry
                     await new Promise(resolve => setTimeout(resolve, 2000));
