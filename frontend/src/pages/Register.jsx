@@ -318,11 +318,12 @@ const Register = () => {
                 ))}
             </div>
 
-            <div className="w-full max-w-[1100px] flex flex-col lg:flex-row bg-white sm:bg-white/95 backdrop-blur-xl sm:rounded-[2rem] shadow-2xl overflow-hidden animate-slide-up relative z-10 min-h-screen sm:min-h-0">
+            <div className="w-full max-w-[1280px] lg:h-[85vh] flex flex-col lg:flex-row bg-white sm:bg-white/95 backdrop-blur-xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up relative z-10 mx-auto">
 
                 {/* Left Side Illustration */}
-                <div className="hidden lg:flex lg:w-[420px] bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-10 flex-col justify-between relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-10">
+                <div className="hidden lg:flex lg:w-[450px] bg-gradient-to-br from-[#0a5e75] via-[#0E7490] to-[#4338CA] p-12 flex-col justify-between relative overflow-hidden">
+                    {/* Animated Background Elements */}
+                    <div className="absolute inset-0 opacity-20">
                         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                                 <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5" />
@@ -331,26 +332,40 @@ const Register = () => {
                         </svg>
                     </div>
 
+                    {/* Restored Moving Nodes Animation */}
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
+                        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl animate-bounce-subtle"></div>
+                    </div>
+
                     <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                                <span className="text-2xl">🏘️</span>
+                        <div className="flex items-center gap-4 mb-10">
+                            <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
+                                <span className="text-3xl">🏘️</span>
                             </div>
                             <div>
-                                <h2 className="text-white text-xl font-bold tracking-tight">SmartHood</h2>
-                                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">Community Network</p>
+                                <h2 className="text-white text-2xl font-bold tracking-tight">SmartHood</h2>
+                                <p className="text-white/60 text-[11px] font-black uppercase tracking-[0.2em]">{t('community_network') || 'Community Network'}</p>
                             </div>
                         </div>
-                        <h3 className="text-white text-3xl font-bold leading-tight mb-4">Build Your<br />Neighborhood<br />Network</h3>
-                        <p className="text-white/70 text-sm leading-relaxed">Connect with professionals, neighbors, and services in your locality. Join the smart community revolution.</p>
+                        <div className="space-y-6">
+                            <h3 className="text-white text-4xl font-black leading-tight">
+                                Build Your<br />
+                                <span className="text-accent">Neighborhood</span><br />
+                                Network
+                            </h3>
+                            <p className="text-white/70 text-base leading-relaxed max-w-sm font-medium">
+                                Connect with professionals, neighbors, and essential services in your locality. Join the smart community revolution today.
+                            </p>
+                        </div>
                     </div>
 
                     {/* Stats */}
-                    <div className="relative z-10 grid grid-cols-3 gap-3">
+                    <div className="relative z-10 grid grid-cols-3 gap-4">
                         {[{ value: publicStats.totalUsers, label: t('active_users') }, { value: publicStats.totalLocalities, label: t('localities') }, { value: publicStats.totalTowns, label: t('towns') }].map((stat, i) => (
-                            <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/10">
-                                <p className="text-white text-lg font-bold">{stat.value}+</p>
-                                <p className="text-white/50 text-[9px] font-bold uppercase tracking-wider">{stat.label}</p>
+                            <div key={i} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 hover:bg-white/20 transition-all cursor-default">
+                                <p className="text-white text-xl font-black">{stat.value}+</p>
+                                <p className="text-white/50 text-[10px] font-bold uppercase tracking-widest">{stat.label}</p>
                             </div>
                         ))}
                     </div>
@@ -386,13 +401,23 @@ const Register = () => {
                 </div>
 
                 {/* Right Side - Registration Form Container */}
-                <div className="flex-1 flex flex-col bg-white">
-                    <div className="hidden lg:block bg-primary/5 p-8 text-center border-b border-primary/10">
-                        <h1 className="text-3xl font-bold text-primary tracking-tight">{t('join_smarthood')}</h1>
-                        <p className="text-gray-500 text-sm mt-2">{t('community_connect')}</p>
+                <div className="flex-1 flex flex-col bg-white min-w-0">
+                    <div className="lg:flex items-center justify-between bg-primary/5 p-6 lg:px-10 border-b border-primary/10">
+                        <div>
+                            <h1 className="text-2xl lg:text-3xl font-black text-primary tracking-tight">{t('join_smarthood')}</h1>
+                            <p className="text-gray-500 text-xs lg:text-sm font-medium">{t('community_connect')}</p>
+                        </div>
+                        <div className="hidden lg:block">
+                            <p className="text-sm text-gray-400 font-medium">
+                                {t('already_account')} {' '}
+                                <Link to="/login" className="text-primary font-bold hover:underline ml-1">
+                                    {t('login_here')}
+                                </Link>
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="p-6 sm:p-8 flex-1">
+                    <div className="p-6 lg:p-10 flex-1 overflow-y-auto custom-scrollbar">
                         <Stepper current={step} />
 
                         <form onSubmit={(e) => e.preventDefault()} className="animate-fade-in">
@@ -568,16 +593,16 @@ const Register = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-4 mt-6">
+                                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
                                         <button
                                             onClick={prevStep}
-                                            className="flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition"
+                                            className="w-full sm:flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition order-2 sm:order-1"
                                         >
                                             {t('back')}
                                         </button>
                                         <button
                                             onClick={nextStep}
-                                            className="flex-1 bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition"
+                                            className="w-full sm:flex-1 bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition order-1 sm:order-2"
                                         >
                                             {t('next_step')} →
                                         </button>
@@ -707,16 +732,16 @@ const Register = () => {
                                         )}
                                     </div>
 
-                                    <div className="flex gap-4 mt-6">
+                                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
                                         <button
                                             onClick={prevStep}
-                                            className="flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition"
+                                            className="w-full sm:flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition order-2 sm:order-1"
                                         >
                                             {t('back')}
                                         </button>
                                         <button
                                             onClick={nextStep}
-                                            className="flex-1 bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition"
+                                            className="w-full sm:flex-1 bg-primary text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition order-1 sm:order-2"
                                         >
                                             {t('next_step')} →
                                         </button>
@@ -809,17 +834,17 @@ const Register = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-4 mt-8">
+                                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
                                         <button
                                             onClick={prevStep}
-                                            className="flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition"
+                                            className="w-full sm:flex-1 p-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition order-2 sm:order-1"
                                         >
                                             {t('back')}
                                         </button>
                                         <button
                                             onClick={handleSubmit}
                                             disabled={loading}
-                                            className="flex-1 bg-gradient-to-r from-success to-emerald-600 text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-success/30 hover:-translate-y-0.5 transition-all disabled:opacity-50"
+                                            className="w-full sm:flex-1 bg-gradient-to-r from-success to-emerald-600 text-white p-4 rounded-xl font-bold shadow-lg hover:shadow-success/30 hover:-translate-y-0.5 transition-all disabled:opacity-50 order-1 sm:order-2"
                                         >
                                             {loading ? t('creating') : t('complete_join')}
                                         </button>
@@ -828,20 +853,13 @@ const Register = () => {
                             )}
                         </form>
                     </div>
-                </div >
+                </div>
 
                 {/* Mobile Bottom Spacer */}
-                < div className="lg:hidden h-20" ></div >
-
-                <p className="text-center text-sm text-gray-500 mt-8 mb-8">
-                    {t('already_account')} {' '}
-                    <Link to="/login" className="text-primary font-bold hover:underline">
-                        {t('login_here')}
-                    </Link>
-                </p>
-            </div >
+                <div className="lg:hidden h-20"></div>
+            </div>
             <div id="recaptcha-container" className="hidden"></div>
-        </div >
+        </div>
     );
 };
 
