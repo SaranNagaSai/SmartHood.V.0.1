@@ -4,6 +4,8 @@ const Revenue = require('../models/Revenue');
 const jwt = require('jsonwebtoken');
 const { createNotification } = require('./notificationController');
 const { sendEmail, generateServiceEmailTemplate, generateInterestEmailTemplate, generateCompletionEmailTemplate } = require('../services/emailService');
+const { translateText } = require('../utils/translationUtility');
+const { locationMap } = require('../utils/locationMap');
 
 // @desc    Create a new service offer/request
 // @route   POST /api/services
@@ -104,17 +106,35 @@ const createService = async (req, res) => {
 
             // NOTIFICATION LOGIC - Broaden to TOWN if no specific localities selected
             const trimmedTown = (user.town || '').trim();
-            const townRegex = new RegExp(`^\\s*${trimmedTown}\\s*$`, 'i');
+            
+            // Get bilingual equivalents for more robust matching
+            const townTranslations = [trimmedTown];
+            for (const [en, te] of Object.entries(locationMap)) {
+                if (en.toLowerCase() === trimmedTown.toLowerCase()) townTranslations.push(te);
+                else if (te === trimmedTown) townTranslations.push(en);
+            }
 
-            // Include Admins Globably + Users in the target town/localities
+            // Create a single combined regex for ALL localities and all their language equivalents
+            const combinedEquivalents = allCommunities.flatMap(loc => {
+                const trimmed = (loc || '').trim();
+                const equivalents = [trimmed];
+                for (const [en, te] of Object.entries(locationMap)) {
+                    if (en.toLowerCase() === trimmed.toLowerCase()) equivalents.push(te);
+                    else if (te === trimmed) equivalents.push(en);
+                }
+                return equivalents;
+            });
+
+            // Include Admins Globally + Users in the target town/localities (Bilingual)
+            const townRegex = new RegExp(`^\\s*(${townTranslations.join('|')})\\s*$`, 'i');
+            const localityRegex = new RegExp(`^\\s*(${combinedEquivalents.join('|')})\\s*$`, 'i');
+
             query.$or = [
                 { isAdmin: true },
                 {
                     town: { $regex: townRegex },
-                    ...(allCommunities.length > 1 ? {
-                        locality: {
-                            $in: allCommunities.map(loc => new RegExp(`^\\s*${(loc || '').trim()}\\s*$`, 'i'))
-                        }
+                    ...(combinedEquivalents.length > 0 ? {
+                        locality: { $regex: localityRegex }
                     } : {})
                 }
             ];
@@ -253,12 +273,21 @@ const getServices = async (req, res) => {
         const currentUser = req.user;
         const { type, status } = req.query;
 
-        const localityRegex = new RegExp(`^\\s*${currentUser.locality.trim()}\\s*$`, 'i');
+        // Get bilingual equivalents for current user's locality to match posts created in either language
+        const myLocality = currentUser.locality.trim();
+        const localityEquivalents = [myLocality];
+        for (const [en, te] of Object.entries(locationMap)) {
+            if (en.toLowerCase() === myLocality.toLowerCase()) localityEquivalents.push(te);
+            else if (te === myLocality) localityEquivalents.push(en);
+        }
+
+        const matchRegex = new RegExp(`^\\s*(${localityEquivalents.join('|')})\\s*$`, 'i');
+        
         let query = {
             $or: [
-                { locality: { $regex: localityRegex } },
-                { targetLocalities: { $regex: localityRegex } },
-                { selectedCommunities: { $regex: localityRegex } }
+                { locality: { $regex: matchRegex } },
+                { targetLocalities: { $regex: matchRegex } },
+                { selectedCommunities: { $regex: matchRegex } }
             ],
             $and: [
                 {

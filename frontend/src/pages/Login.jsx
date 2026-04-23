@@ -47,7 +47,10 @@ const Login = () => {
                     return;
                 }
                 login(res.data, res.data.token);
-                navigate('/home');
+                // Check for redirect parameter
+                const queryParams = new URLSearchParams(window.location.search);
+                const redirectTo = queryParams.get('redirect');
+                navigate(redirectTo ? decodeURIComponent(redirectTo) : '/home');
             } catch (err) {
                 // If it's a network/timeout error and we haven't retried yet, auto-retry
                 if (!err.response && retryCountRef.current < MAX_RETRIES) {

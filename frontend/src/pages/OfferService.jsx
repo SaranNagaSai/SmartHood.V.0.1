@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import VoiceInput from '../components/common/VoiceInput';
 import axios from 'axios';
-import { ArrowLeft, Send, Users, UserCheck, Paperclip, X, Image, AlertCircle, Globe } from 'lucide-react';
+import { ArrowLeft, Send, Users, UserCheck, Paperclip, X, AlertCircle, Globe } from 'lucide-react';
 import { API_URL } from '../utils/apiConfig';
 
 const OfferService = () => {
-    const { t, translateValue } = useLanguage();
+    const { t, translateValue, language, toEnglish } = useLanguage();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     const [formData, setFormData] = useState({
@@ -20,14 +20,12 @@ const OfferService = () => {
     const [loading, setLoading] = useState(false);
     const [titleError, setTitleError] = useState('');
     const [localities, setLocalities] = useState([]);
-    const { language } = useLanguage();
 
     const isTelugu = (text) => {
         if (!text) return true;
         const teluguRegex = /^[\u0C00-\u0C7F0-9\s.,!?-]+$/;
         return teluguRegex.test(text);
     };
-
     const [jobTitles, setJobTitles] = useState([]);
     const [communities, setCommunities] = useState([]); // NEW: Available communities in town
     const [professionError, setProfessionError] = useState(''); // NEW: Validation error
@@ -38,7 +36,9 @@ const OfferService = () => {
     // Fetch localities on mount
     React.useEffect(() => {
         const fetchInitialData = async () => {
-            const userTown = user?.town?.trim();
+            // ALWAYS use English keys for server queries to ensure consistency
+            const userTown = toEnglish(user?.town?.trim());
+            const userLocality = toEnglish(user?.locality?.trim());
 
             if (userTown) {
                 // 1. Fetch Localities (independent)
@@ -47,7 +47,7 @@ const OfferService = () => {
                     setLocalities(locRes.data);
 
                     if (formData.targetLocalities.length === 0) {
-                        setFormData(prev => ({ ...prev, targetLocalities: [user.locality] }));
+                        setFormData(prev => ({ ...prev, targetLocalities: [userLocality] }));
                     }
                 } catch (err) {
                     console.error("Failed to fetch localities", err);
@@ -59,29 +59,25 @@ const OfferService = () => {
                     const commRes = await axios.get(`${API_URL}/communities/by-town?town=${encodeURIComponent(userTown)}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    console.log("Communities response:", commRes.data);
                     setCommunities(commRes.data);
                 } catch (err) {
                     console.error("Failed to fetch communities", err);
                 }
 
-                // 3. Fetch professions TOWN-WIDE (shows professions from the entire town for more options)
+                // 3. Fetch professions TOWN-WIDE
                 try {
                     console.log(`Fetching professions for town: ${userTown}`);
                     const profRes = await axios.get(`${API_URL}/professions/by-community?town=${encodeURIComponent(userTown)}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    console.log("Professions response:", profRes.data);
                     setJobTitles(profRes.data);
                 } catch (err) {
                     console.error("Failed to fetch professions by town", err);
                 }
-            } else {
-                console.warn("No user town found in localStorage user object");
             }
         };
         fetchInitialData();
-    }, []);
+    }, [toEnglish]);
 
     // REMOVED: Old profession fetching logic based on localities
     // Professions are now fetched only from user's community on mount
@@ -217,7 +213,7 @@ const OfferService = () => {
                         label={`${t('service_title')} * (${formData.title.length}/100)`}
                         value={formData.title}
                         onChange={(e) => handleTitleChange(e.target.value)}
-                        placeholder="e.g., Plumbing Repairs"
+                        placeholder={t('offer_placeholder')}
                         required
                     />
                     {titleError && (
@@ -230,11 +226,21 @@ const OfferService = () => {
                 {/* Description (Chat Bubble Style) */}
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 relative">
                     <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">{t('description_label')} *</label>
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="block text-xs font-bold text-gray-400 uppercase">{t('description_label')} *</label>
+                        <span className={`text-[10px] font-bold ${formData.description.length > 950 ? 'text-red-500' : 'text-gray-400'}`}>
+                            {formData.description.length}/1000
+                        </span>
+                    </div>
                     <VoiceInput
                         type="textarea"
                         value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        onChange={(e) => {
+                            if (e.target.value.length <= 1000) {
+                                setFormData({ ...formData, description: e.target.value });
+                            }
+                        }}
+                        maxLength={1000}
                         placeholder={t('describe_service_placeholder')}
                         required
                     />
@@ -244,11 +250,22 @@ const OfferService = () => {
                         <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-dashed">
                             {attachments.map((att, idx) => (
                                 <div key={idx} className="relative group">
-                                    <img
-                                        src={att.preview}
-                                        alt={att.name}
-                                        className="w-16 h-16 object-cover rounded-lg border"
-                                    />
+                                    {att.file.type.startsWith('video/') ? (
+                                        <div className="w-16 h-16 bg-gray-100 rounded-lg border flex items-center justify-center overflow-hidden">
+                                            <video src={att.preview} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 text-white">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.841z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <img
+                                            src={att.preview}
+                                            alt={att.name}
+                                            className="w-16 h-16 object-cover rounded-lg border"
+                                        />
+                                    )}
                                     <button
                                         onClick={() => removeAttachment(idx)}
                                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
@@ -260,21 +277,62 @@ const OfferService = () => {
                         </div>
                     )}
 
-                    <div className="flex justify-end mt-2 pt-2 border-t border-dashed">
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleFileSelect}
-                            className="hidden"
-                        />
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-[var(--col-secondary)] transition"
-                        >
-                            <Paperclip size={14} /> {t('attach_media')} ({attachments.length}/5)
-                        </button>
+                    <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-dashed">
+                        <p className="text-[10px] text-gray-400 font-medium italic">
+                            💡 {t('upload_limits_hint')}
+                        </p>
+                        <div className="flex justify-end">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*,video/*"
+                                multiple
+                                onChange={(e) => {
+                                    const files = Array.from(e.target.files);
+                                    let currentImages = attachments.filter(a => a.file.type.startsWith('image/')).length;
+                                    let currentVideos = attachments.filter(a => a.file.type.startsWith('video/')).length;
+                                    let currentSize = attachments.reduce((sum, a) => sum + a.file.size, 0);
+
+                                    const validFiles = [];
+                                    for (const file of files) {
+                                        const isImage = file.type.startsWith('image/');
+                                        const isVideo = file.type.startsWith('video/');
+
+                                        if (isImage && currentImages >= 3) {
+                                            alert(t('image_limit_reached'));
+                                            continue;
+                                        }
+                                        if (isVideo && currentVideos >= 2) {
+                                            alert(t('video_limit_reached'));
+                                            continue;
+                                        }
+                                        if (currentSize + file.size > 10 * 1024 * 1024) {
+                                            alert(t('file_size_exceeded'));
+                                            break;
+                                        }
+
+                                        if (isImage) currentImages++;
+                                        if (isVideo) currentVideos++;
+                                        currentSize += file.size;
+
+                                        validFiles.push({
+                                            file,
+                                            preview: URL.createObjectURL(file),
+                                            name: file.name
+                                        });
+                                    }
+
+                                    setAttachments([...attachments, ...validFiles]);
+                                }}
+                                className="hidden"
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-[var(--col-secondary)] transition"
+                            >
+                                <Paperclip size={14} /> {t('attach_media')} ({attachments.length}/5)
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -458,7 +516,7 @@ const OfferService = () => {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className={`text-xs font-bold truncate ${isSelected ? 'text-blue-700' : 'text-gray-700'}`}>
-                                                            {p.profession}
+                                                            {translateValue(p.profession)}
                                                         </p>
                                                         <p className="text-[10px] text-gray-400">{p.userCount} {t('users_count_suffix')}</p>
                                                     </div>
@@ -551,7 +609,7 @@ const OfferService = () => {
                                 <h4 className="font-bold text-gray-800">{formData.title}</h4>
                                 <p className="text-sm text-gray-500 mt-2 line-clamp-3">{formData.description}</p>
                                 <p className="text-xs text-gray-400 mt-2">
-                                    {t('who_receive_q')}: {formData.targetAudience === 'ALL' ? t('everyone') : formData.targetProfessions.join(', ')}
+                                    {t('who_receive_q')}: {formData.targetAudience === 'ALL' ? t('everyone') : formData.targetProfessions.map(p => translateValue(p)).join(', ')}
                                 </p>
                                 {attachments.length > 0 && (
                                     <p className="text-xs text-blue-500 mt-1">

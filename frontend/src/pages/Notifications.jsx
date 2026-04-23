@@ -14,7 +14,7 @@ const Notifications = () => {
     const { t } = useLanguage();
     const { token, logout } = useAuth();
     const navigate = useNavigate();
-    const { notifications, unreadCount, loading, fetchNotifications, markAsRead, markAllRead } = useNotificationsContext();
+    const { notifications, unreadCount, loading, fetchNotifications, markAsRead, markAllRead, deleteNotification } = useNotificationsContext();
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
@@ -127,9 +127,23 @@ const Notifications = () => {
                                         {new Date(notif.createdAt).toLocaleString()}
                                     </p>
                                 </div>
-                                {!notif.read && (
-                                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                                )}
+                                <div className="flex flex-col gap-2">
+                                    {!notif.read && (
+                                        <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                                    )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(t('confirm_delete') || 'Delete notification?')) {
+                                                deleteNotification(notif._id);
+                                            }
+                                        }}
+                                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                        title={t('delete') || 'Delete'}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))

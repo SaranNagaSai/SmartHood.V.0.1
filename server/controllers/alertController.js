@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { generateAlertEmailTemplate } = require('../services/emailService');
 const jwt = require('jsonwebtoken');
 const { createNotification } = require('./notificationController');
+const { locationMap } = require('../utils/locationMap');
 
 // @desc    Create a new alert
 // @route   POST /api/alerts
@@ -44,8 +45,16 @@ const createAlert = async (req, res) => {
 
         // NOTIFICATION LOGIC
         // Broaden to TOWN-wide alerts for community emergency/general alerts
-        const userTown = req.user.town || town || '';
-        const townRegex = new RegExp(`^\\s*${userTown.trim()}\\s*$`, 'i');
+        const userTown = (req.user.town || town || '').trim();
+        
+        // Get bilingual equivalents for more robust matching
+        const townTranslations = [userTown];
+        for (const [en, te] of Object.entries(locationMap)) {
+            if (en.toLowerCase() === userTown.toLowerCase()) townTranslations.push(te);
+            else if (te === userTown) townTranslations.push(en);
+        }
+
+        const townRegex = new RegExp(`^\\s*(${townTranslations.join('|')})\\s*$`, 'i');
         let query = {};
 
         // Normalize targetUserIds (handle string or array from formData)
@@ -201,7 +210,14 @@ const getAlerts = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user._id);
 
-        const localityRegex = new RegExp(`^\\s*${currentUser.locality.trim()}\\s*$`, 'i');
+        const myLocality = (currentUser.locality || '').trim();
+        const localityTranslations = [myLocality];
+        for (const [en, te] of Object.entries(locationMap)) {
+            if (en.toLowerCase() === myLocality.toLowerCase()) localityTranslations.push(te);
+            else if (te === myLocality) localityTranslations.push(en);
+        }
+
+        const localityRegex = new RegExp(`^\\s*(${localityTranslations.join('|')})\\s*$`, 'i');
         const alerts = await Alert.find({
             locality: { $regex: localityRegex },
             isActive: true,

@@ -179,7 +179,7 @@ const Profile = () => {
     if (loading) {
         return (
             <div className="p-8 text-center text-gray-500">
-                Loading profile...
+                {t('loading_profile')}
             </div>
         );
     }
@@ -328,6 +328,7 @@ const Profile = () => {
                                     value={editData.email || ''}
                                     onChange={(e) => setEditData({ ...editData, email: e.target.value })}
                                     type="email"
+                                    forceLanguage="English"
                                     className="bg-gray-50 border-gray-200 rounded-lg py-1 px-2 text-sm"
                                 />
                             ) : (
@@ -614,7 +615,7 @@ const Profile = () => {
                         <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
                             <TrendingUp size={18} className="text-white" />
                         </div>
-                        {t('notification_settings', 'Notification Settings')}
+                        {t('notification_settings')}
                     </h3>
                     <div className="space-y-4">
                         <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-xl border border-indigo-100">

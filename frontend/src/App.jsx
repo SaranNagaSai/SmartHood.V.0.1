@@ -52,7 +52,7 @@ const AuthGuard = ({ children }) => {
     }
 
     if (!language) return <Navigate to="/" />;
-    if (!isAuthenticated) return <Navigate to="/login" />;
+    if (!isAuthenticated) return <Navigate to={`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`} />;
     return children;
 };
 

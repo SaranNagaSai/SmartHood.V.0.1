@@ -24,6 +24,9 @@ const AlertDetail = () => {
         fetchAlert();
     }, [id]);
 
+    const isOwner = currentUser && alert?.senderId?._id === currentUser._id;
+    const categoryColor = alert?.category === 'Emergency' ? 'bg-red-500' : 'bg-blue-600';
+
     const fetchAlert = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -69,13 +72,10 @@ const AlertDetail = () => {
     if (loading) return <div className="p-10 text-center text-gray-500">{t('processing')}</div>;
     if (!alert) return (
         <div className="p-10 text-center">
-            <p className="text-gray-500">Alert not found or has been removed.</p>
-            <button onClick={() => navigate('/home')} className="mt-4 text-indigo-600 font-bold">Go Home</button>
+            <p className="text-gray-500">{t('alert_not_found')}</p>
+            <button onClick={() => navigate('/home')} className="mt-4 text-indigo-600 font-bold">{t('go_home')}</button>
         </div>
     );
-
-    const isOwner = currentUser && alert.senderId?._id === currentUser._id;
-    const categoryColor = alert.category === 'Emergency' ? 'bg-red-500' : 'bg-blue-600';
 
     return (
         <div className="min-h-screen bg-slate-50 pb-24">
@@ -139,7 +139,7 @@ const AlertDetail = () => {
                     {(isOwner || isInterested) && (
                         <div className="mt-6 p-5 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-4">
                             <p className="text-xs font-bold text-indigo-700 uppercase flex items-center gap-2">
-                                <Shield size={14} /> Contact Information
+                                <Shield size={14} /> {t('contact_info')}
                             </p>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -147,8 +147,8 @@ const AlertDetail = () => {
                                         <Phone size={18} />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500">Phone Number</p>
-                                        <p className="font-bold text-gray-800">{alert.senderId?.phone || 'N/A'}</p>
+                                        <p className="text-xs text-gray-500">{t('phone_label')}</p>
+                                        <p className="font-bold text-gray-800">{alert.senderId?.phone || t('na')}</p>
                                     </div>
                                 </div>
                                 <a href={`tel:${alert.senderId?.phone}`} className="p-3 bg-indigo-600 text-white rounded-full shadow-lg active:scale-95 transition">
@@ -193,7 +193,7 @@ const AlertDetail = () => {
                 {isOwner && (
                     <div className="bg-amber-50 border border-amber-200 p-5 rounded-3xl text-center">
                         <AlertTriangle className="mx-auto text-amber-500 mb-2" size={32} />
-                        <h3 className="font-bold text-amber-800">You sent this alert</h3>
+                        <h3 className="font-bold text-amber-800">{t('you_sent_alert')}</h3>
                         <p className="text-sm text-amber-700 mt-1">
                             Check your <span onClick={() => navigate('/activity')} className="underline font-bold cursor-pointer">Activity Dashboard</span> to see who responded.
                         </p>

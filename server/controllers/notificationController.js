@@ -130,17 +130,18 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         },
                         webpush: {
                             headers: {
-                                Urgency: "high"
+                                Urgency: "high",
+                                "TTL": "86400" // 24 hours
                             },
                             notification: {
                                 title: finalTitle,
                                 body: finalBody.substring(0, 200),
                                 icon: '/logo.png',
                                 badge: '/logo.png',
-                                vibrate: [200, 100, 200, 100, 200],
-                                requireInteraction: true,
+                                vibrate: [300, 100, 300, 100, 300],
+                                requireInteraction: true, // KEEP ON SCREEN until interact
                                 renotify: true,
-                                tag: 'smarthood-' + type + '-' + Date.now(),
+                                tag: 'smarthood-' + type + '-' + notification._id, // Use notification ID to prevent swapping unless it's an update
                                 actions: [
                                     { action: 'open', title: 'Open SmartHood' }
                                 ]
@@ -151,16 +152,21 @@ const createNotification = async (userId, data, type = 'system', link = null, em
                         },
                         android: {
                             priority: 'high',
+                            ttl: 86400000, // 24 hours
                             notification: {
                                 sound: 'default',
                                 priority: 'high',
-                                channelId: 'high_priority_alerts',
-                                notificationCount: 1
+                                channelId: 'high_priority_alerts', // Must be created on client
+                                notificationCount: 1,
+                                visibility: 'public', // Show on lock screen
+                                sticky: true, // Prevent accidentally swiping away during interaction
+                                eventTime: new Date().toISOString()
                             }
                         },
                         data: {
                             url: link || '/home',
-                            type: type
+                            type: type,
+                            notificationId: notification._id.toString()
                         }
                     });
                     return true;
@@ -435,10 +441,32 @@ const sendInterlinkRequest = async (req, res) => {
     }
 };
 
+// @desc    Delete a notification
+// @route   DELETE /api/notifications/:id
+// @access  Private
+const deleteNotification = async (req, res) => {
+    try {
+        const notification = await Notification.findOneAndDelete({
+            _id: req.params.id,
+            userId: req.user._id
+        });
+
+        if (!notification) {
+            return res.status(404).json({ message: 'Notification not found' });
+        }
+
+        res.json({ message: 'Notification deleted' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getNotifications,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
     createNotification,
     getUnreadCount,
     sendInterlinkRequest

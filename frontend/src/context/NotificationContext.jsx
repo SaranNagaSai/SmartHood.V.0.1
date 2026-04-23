@@ -90,6 +90,26 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
+    const deleteNotification = async (id) => {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/notifications/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                setNotifications(prev => prev.filter(n => n._id !== id));
+                // If it was unread, decrement the count
+                const deletedNotif = notifications.find(n => n._id === id);
+                if (deletedNotif && !deletedNotif.read) {
+                    setUnreadCount(prev => Math.max(0, prev - 1));
+                }
+            }
+        } catch (err) {
+            console.error('Failed to delete notification:', err);
+        }
+    };
+
     return (
         <NotificationContext.Provider value={{
             unreadCount,
@@ -98,7 +118,8 @@ export const NotificationProvider = ({ children }) => {
             fetchNotifications,
             fetchUnreadCount,
             markAsRead,
-            markAllRead
+            markAllRead,
+            deleteNotification
         }}>
             {children}
         </NotificationContext.Provider>

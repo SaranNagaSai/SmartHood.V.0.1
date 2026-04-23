@@ -4,12 +4,8 @@ import { useLanguage } from '../../context/LanguageContext';
 
 import PropTypes from 'prop-types';
 
-const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', required = false, className, labelClassName, name }) => {
-    // ... (rest of component body same as before, essentially just wrapping export and adding propTypes)
-    // Actually, because the component is long, I will use MultiReplace or just replace the end.
-    // Replacing the whole file is safer to ensure imports are at top.
+const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', required = false, className, labelClassName, name, maxLength, forceLanguage }) => {
     const { language, t } = useLanguage();
-    // ... [RE-IMPLEMENTING COMPONENT BODY TO ENSURE NO LOSS]
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState(null);
     const valueRef = React.useRef(value);
@@ -30,7 +26,10 @@ const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', requir
                 'English': 'en-IN',
                 'Telugu': 'te-IN'
             };
-            recognizer.lang = langMap[language] || 'en-IN';
+            
+            // Use forceLanguage if provided, otherwise use current UI language
+            const activeLang = forceLanguage || language || 'English';
+            recognizer.lang = langMap[activeLang] || 'en-IN';
 
             recognizer.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
@@ -81,6 +80,7 @@ const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', requir
                         placeholder={currentPlaceholder}
                         required={required}
                         name={name}
+                        maxLength={maxLength}
                     />
                 ) : (
                     <input
@@ -91,6 +91,7 @@ const VoiceInput = ({ label, value, onChange, placeholder, type = 'text', requir
                         placeholder={currentPlaceholder}
                         required={required}
                         name={name}
+                        maxLength={maxLength}
                     />
                 )}
 
@@ -121,7 +122,9 @@ VoiceInput.propTypes = {
     required: PropTypes.bool,
     className: PropTypes.string,
     labelClassName: PropTypes.string,
-    name: PropTypes.string
+    name: PropTypes.string,
+    maxLength: PropTypes.number,
+    forceLanguage: PropTypes.string
 };
 
 export default VoiceInput;

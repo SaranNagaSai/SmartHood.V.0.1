@@ -517,6 +517,7 @@ const Register = () => {
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             type="email"
                                             placeholder="yourname@example.com"
+                                            forceLanguage="English"
                                             className="bg-gray-50 border-gray-200 focus:border-primary rounded-xl py-3"
                                         />
                                     </div>

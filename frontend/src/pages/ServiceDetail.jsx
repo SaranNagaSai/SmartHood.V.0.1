@@ -31,6 +31,10 @@ const ServiceDetail = () => {
         fetchService();
     }, [id]);
 
+    const isOwner = currentUser && service?.createdBy?._id === currentUser._id;
+    const isInterested = service?.interestedProviders?.some(p => p._id === currentUser?._id);
+    const isCompleted = service?.status === 'completed';
+
     useEffect(() => {
         // Auto-action logic
         const queryParams = new URLSearchParams(location.search);
@@ -103,10 +107,6 @@ const ServiceDetail = () => {
     if (loading) return <div className="p-10 text-center text-gray-500">{t('processing')}</div>;
     if (!service) return null;
 
-    const isOwner = currentUser && service.createdBy?._id === currentUser._id;
-    const isInterested = service.interestedProviders?.some(p => p._id === currentUser?._id);
-    const isCompleted = service.status === 'completed';
-
     return (
         <div className="min-h-screen bg-[var(--col-bg)] pb-24">
             {/* Header */}
@@ -137,7 +137,7 @@ const ServiceDetail = () => {
                         <div>
                             <h3 className="font-bold text-green-800">{t('job_done')}</h3>
                             <p className="text-sm text-green-700 mt-1">
-                                {t('completed_by')} <span className="font-bold">{translateValue(service.completedBy?.name) || service.completedByUniqueId}</span> on {new Date(service.completionDate).toLocaleDateString()}.
+                                {t('completed_by')} <span className="font-bold">{translateValue(service.completedBy?.name) || service.completedByUniqueId}</span> {t('on')} {new Date(service.completionDate).toLocaleDateString()}.
                             </p>
                             {service.amountSpent > 0 && (
                                 <p className="text-sm font-bold text-green-800 mt-2">
@@ -210,7 +210,7 @@ const ServiceDetail = () => {
                                 <div key={idx} className="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 border overflow-hidden">
                                     {/* Placeholder for real attachment display */}
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-2">
-                                        Attachment {idx + 1}
+                                        {t('attachment')} {idx + 1}
                                     </div>
                                 </div>
                             ))}
@@ -404,7 +404,7 @@ const ServiceDetail = () => {
                                         <VoiceInput
                                             value={providerId}
                                             onChange={(e) => setProviderId(e.target.value)}
-                                            placeholder="e.g. ABC12 or John Doe"
+                                            placeholder="ABC12"
                                             className="text-center text-lg tracking-wide"
                                             required
                                         />

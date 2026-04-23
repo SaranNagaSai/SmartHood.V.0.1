@@ -126,7 +126,7 @@ const MyActivity = () => {
         { id: 'overview', label: t('overview'), icon: BarChart3 },
         { id: 'financial', label: t('financial'), icon: DollarSign },
         { id: 'services', label: t('active_list'), icon: Briefcase },
-        { id: 'alerts', label: 'My Alerts', icon: Bell },
+        { id: 'alerts', label: t('my_alerts'), icon: Bell },
         { id: 'engagement', label: t('engagement'), icon: Award }
     ];
 
@@ -301,7 +301,7 @@ const MyActivity = () => {
                                                 <div className="min-w-0">
                                                     <h4 className="font-bold text-gray-800 truncate">{service.title}</h4>
                                                     <p className="text-xs text-gray-500">
-                                                        {new Date(service.createdAt).toLocaleDateString()} • {service.targetAudience === 'ALL' ? 'Everyone' : 'Specific'}
+                                                        {new Date(service.createdAt).toLocaleDateString()} • {service.targetAudience === 'ALL' ? t('everyone') : t('specific')}
                                                     </p>
                                                     {service.status === 'completed' && (
                                                         <span className="text-xs font-bold text-green-600 uppercase mt-1 block">{t('completed')}</span>
@@ -313,7 +313,7 @@ const MyActivity = () => {
                                                     onClick={(e) => { e.stopPropagation(); fetchServiceRecipients(service._id); }}
                                                     className={`text-xs px-3 py-1.5 rounded-full font-medium transition ${expandedServiceId === service._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
                                                 >
-                                                    💙 {service.interestedProviders?.length || 0} Interested
+                                                    💙 {service.interestedProviders?.length || 0} {t('interested', 'Interested')}
                                                 </button>
                                                 <button
                                                     onClick={() => navigate(`/service/${service._id}`)}
@@ -326,7 +326,7 @@ const MyActivity = () => {
                                         {/* Expandable Recipient List */}
                                         {expandedServiceId === service._id && (
                                             <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
-                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Interested People ({recipients.length})</p>
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 {t('interested_people', 'Interested People')} ({recipients.length})</p>
                                                 {loadingRecipients ? (
                                                     <p className="text-xs text-gray-400 text-center py-2">{t('loading')}...</p>
                                                 ) : recipients.length > 0 ? (
@@ -416,7 +416,7 @@ const MyActivity = () => {
                                                             onClick={() => fetchAlertRecipients(alert._id)}
                                                             className={`text-xs px-3 py-1 rounded-full font-medium transition ml-auto ${expandedAlertId === alert._id ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
                                                         >
-                                                            💙 {alert.interestedUsers?.length || 0} Responses
+                                                            💙 {alert.interestedUsers?.length || 0} {t('responses', 'Responses')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -425,7 +425,7 @@ const MyActivity = () => {
                                         {/* Expandable Recipient List */}
                                         {expandedAlertId === alert._id && (
                                             <div className="border-t border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white px-4 py-3">
-                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 Interested People ({alertRecipients.length})</p>
+                                                <p className="text-xs font-semibold text-indigo-600 mb-2">📋 {t('interested_people', 'Interested People')} ({alertRecipients.length})</p>
                                                 {loadingRecipients ? (
                                                     <p className="text-xs text-gray-400 text-center py-2">{t('loading')}...</p>
                                                 ) : alertRecipients.length > 0 ? (
@@ -463,8 +463,8 @@ const MyActivity = () => {
                         ) : (
                             <div className="text-center py-10 bg-white rounded-2xl border border-dashed">
                                 <Bell className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                                <p className="text-gray-500 font-medium">No alerts sent yet</p>
-                                <p className="text-sm text-gray-400">Alerts you send will appear here</p>
+                                <p className="text-gray-500 font-medium">{t('no_alerts_sent')}</p>
+                                <p className="text-sm text-gray-400">{t('alerts_appear_here')}</p>
                             </div>
                         )}
                     </div>

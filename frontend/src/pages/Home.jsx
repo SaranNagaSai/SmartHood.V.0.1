@@ -238,7 +238,7 @@ const Home = () => {
                         }}
                         className={`text-[10px] font-bold px-3 py-2 rounded-lg shadow-md active:scale-95 transition-transform ${permissionStatus === 'granted' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}
                     >
-                        {t('test_signal') || 'TEST PUSH'}
+                        {t('test_signal')}
                     </button>
                 </div>
             </div>
@@ -329,7 +329,7 @@ const Home = () => {
                     <h2 className="text-lg font-bold text-[var(--col-text-primary)]">{t('local_professionals')}</h2>
                     <div className="flex items-center gap-1.5">
                         <Navigation size={14} className="text-primary" />
-                        <span className="text-xs font-bold text-primary">{t('explore_town') || 'Explore Town'}</span>
+                        <span className="text-xs font-bold text-primary">{t('explore_town')}</span>
                     </div>
                 </div>
 
@@ -382,7 +382,7 @@ const Home = () => {
                     <div className="mb-3 flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
                         <MapPin size={14} className="text-blue-600" />
                         <span className="text-xs font-bold text-blue-700">
-                            {t('showing_professionals_from') || 'Showing professionals from'}: {translateValue(selectedLocality)}
+                            {t('showing_professionals_from')}: {translateValue(selectedLocality)}
                         </span>
                         <button
                             onClick={() => setSelectedLocality(null)}
