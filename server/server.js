@@ -89,7 +89,20 @@ app.use('/api/communities', require('./routes/communityRoutes'));
 // Health & Keep-Alive Route
 app.get('/api/health/ping', (req, res) => {
     console.log(`[Ping] Received at ${new Date().toISOString()}`);
-    res.json({ status: 'active', time: new Date().toISOString() });
+    res.json({
+        status: 'active',
+        time: new Date().toISOString(),
+        env: {
+            nodeEnv: process.env.NODE_ENV || 'not_set',
+            mongo: !!process.env.MONGODB_URI,
+            jwt: !!process.env.SMARTHOOD_JWT_SECRET,
+            email: !!process.env.EMAIL_USER && !!process.env.EMAIL_PASSWORD,
+            emailHost: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
+            emailUser: process.env.EMAIL_USER ? 'Configured' : 'MISSING',
+            firebase: !!process.env.FIREBASE_PROJECT_ID && !!process.env.FIREBASE_PRIVATE_KEY,
+            twilio: !!process.env.TWILIO_ACCOUNT_SID && !!process.env.TWILIO_AUTH_TOKEN
+        }
+    });
 });
 
 app.get('/', (req, res) => res.json({ status: 'ok', message: 'SmartHood API Running' }));
