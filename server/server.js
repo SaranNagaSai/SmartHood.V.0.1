@@ -110,16 +110,19 @@ mongoose.connect(process.env.MONGODB_URI)
             schedulerService.start();
 
             // Self-pinging mechanism (mitigation for Render cold starts)
-            // It pings its own health endpoint every 10 minutes
-            const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-            const serverUrl = process.env.RENDER_EXTERNAL_URL || (FRONTEND_URL.includes('localhost') ? `http://localhost:${PORT}` : FRONTEND_URL.replace('5173', PORT.toString()));
+            // RENDER_EXTERNAL_URL is set automatically by Render for web services
+            // Fallback: construct from the known backend hostname, or use localhost
+            const selfUrl = process.env.RENDER_EXTERNAL_URL
+                || (process.env.NODE_ENV === 'production' ? 'https://smarthoodbackend.onrender.com' : `http://localhost:${PORT}`);
+
+            console.log(`[Stay-Alive] Self-ping target: ${selfUrl}/api/health/ping`);
 
             setInterval(() => {
                 const axios = require('axios');
-                axios.get(`${serverUrl}/api/health/ping`)
+                axios.get(`${selfUrl}/api/health/ping`, { timeout: 10000 })
                     .then(() => console.log('[Stay-Alive] Self-ping successful'))
-                    .catch(e => console.log('[Stay-Alive] Self-ping failed (expected if local)'));
-            }, 10 * 60 * 1000); // 10 minutes
+                    .catch(e => console.log('[Stay-Alive] Self-ping failed:', e.message));
+            }, 5 * 60 * 1000); // 5 minutes (Render free tier spins down after 15 mins of inactivity)
         });
     })
     .catch(err => {

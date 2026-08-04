@@ -2,9 +2,9 @@ const getBaseApiUrl = () => {
     // 1. Check for explicit environment variable first
     if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
 
-    // 2. If we are on Render, use the Render production URL
+    // 2. If we are on Render, use the Render production backend URL
     if (window.location.hostname === 'smarthood.onrender.com') {
-        return 'https://smarthood.onrender.com/api';
+        return 'https://smarthoodbackend.onrender.com/api';
     }
 
     // 3. If accessing via local network (IP address) or localhost, 
