@@ -59,6 +59,11 @@ class SchedulerService {
      */
     async runCatchUp() {
         try {
+            const mongoose = require('mongoose');
+            if (mongoose.connection.readyState !== 1) {
+                console.log('🔄 [Scheduler] DB not ready yet, skipping startup catch-up.');
+                return;
+            }
             console.log('🔄 [Scheduler] Running startup catch-up for missed follow-ups...');
 
             const activeServices = await Service.find({
@@ -123,6 +128,10 @@ class SchedulerService {
 
     async runChecks() {
         try {
+            const mongoose = require('mongoose');
+            if (mongoose.connection.readyState !== 1) {
+                return;
+            }
             console.log(`⏱️ Running scheduled checks at ${new Date().toLocaleTimeString()}`);
             await this.checkServiceFollowUps();
         } catch (error) {

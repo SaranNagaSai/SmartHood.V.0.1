@@ -102,31 +102,44 @@ const PORT = process.env.PORT || 5000;
 
 const schedulerService = require('./services/schedulerService');
 
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log('--- MongoDB Connected ---');
-        app.listen(PORT, () => {
-            console.log(`--- Server ready on port ${PORT} ---`);
-            schedulerService.start();
+const startServer = async () => {
+    // 1. Start HTTP Server first so Render deployment health checks succeed
+    app.listen(PORT, () => {
+        console.log(`--- Server ready on port ${PORT} ---`);
+        schedulerService.start();
 
-            // Self-pinging mechanism (mitigation for Render cold starts)
-            // RENDER_EXTERNAL_URL is set automatically by Render for web services
-            // Fallback: construct from the known backend hostname, or use localhost
-            const selfUrl = process.env.RENDER_EXTERNAL_URL
-                || (process.env.NODE_ENV === 'production' ? 'https://smarthoodbackend.onrender.com' : `http://localhost:${PORT}`);
+        // Self-pinging mechanism (mitigation for Render cold starts)
+        const selfUrl = process.env.RENDER_EXTERNAL_URL
+            || (process.env.NODE_ENV === 'production' ? 'https://smarthoodbackend.onrender.com' : `http://localhost:${PORT}`);
 
-            console.log(`[Stay-Alive] Self-ping target: ${selfUrl}/api/health/ping`);
+        console.log(`[Stay-Alive] Self-ping target: ${selfUrl}/api/health/ping`);
 
-            setInterval(() => {
-                const axios = require('axios');
-                axios.get(`${selfUrl}/api/health/ping`, { timeout: 10000 })
-                    .then(() => console.log('[Stay-Alive] Self-ping successful'))
-                    .catch(e => console.log('[Stay-Alive] Self-ping failed:', e.message));
-            }, 5 * 60 * 1000); // 5 minutes (Render free tier spins down after 15 mins of inactivity)
-        });
-    })
-    .catch(err => {
-        console.error('--- DB Connection Error ---');
-        console.error(err);
-        process.exit(1);
+        setInterval(() => {
+            const axios = require('axios');
+            axios.get(`${selfUrl}/api/health/ping`, { timeout: 10000 })
+                .then(() => console.log('[Stay-Alive] Self-ping successful'))
+                .catch(e => console.log('[Stay-Alive] Self-ping failed:', e.message));
+        }, 5 * 60 * 1000); // 5 minutes
     });
+
+    // 2. Connect to MongoDB Atlas with auto-retry
+    const connectWithRetry = async () => {
+        try {
+            if (!process.env.MONGODB_URI) {
+                console.error('❌ MONGODB_URI missing from environment variables');
+                return;
+            }
+            await mongoose.connect(process.env.MONGODB_URI, { family: 4 });
+            console.log('--- ✅ MongoDB Connected Successfully ---');
+        } catch (err) {
+            console.error('--- ⚠️ DB Connection Error (Retrying in 10s...) ---');
+            console.error(`Reason: ${err.message}`);
+            setTimeout(connectWithRetry, 10000);
+        }
+    };
+
+    connectWithRetry();
+};
+
+startServer();
+
